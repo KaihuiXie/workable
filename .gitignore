@@ -1,0 +1,10 @@
+# Ignore all .log files
+*.log
+
+# Ignore .env
+*.env
+
+# Ignore pycache
+__pycache__/
+*.pyc
+*.pytest_cache
