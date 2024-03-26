@@ -9,7 +9,7 @@ import os
 import json
 from src.math_agent.math_agent import MathAgent
 from src.math_agent.supabase import Supabase
-from src.interfaces import QuestionRequest, ChatRequest, AllChatsRequest
+from src.interfaces import QuestionRequest, ChatRequest, AllChatsRequest, Mode
 from dotenv import load_dotenv
 
 # Configure logging at the top of your test file
@@ -38,7 +38,12 @@ async def read_image(request: QuestionRequest):
     try:
         question = math_agent.query_vision(request.image_string)
         # Upsert to db, assuming create_chat now correctly handles the parameters
-        chat_id = supabase.create_chat(request.image_string, request.user_id, question)
+        chat_id = supabase.create_chat(
+            request.image_string,
+            request.user_id,
+            question,
+            request.mode == Mode.LEARNER,
+        )
         return {"chat_id": chat_id, "status_code": 200}
     except Exception as e:
         raise HTTPException(
