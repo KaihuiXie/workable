@@ -8,6 +8,43 @@ class Supabase:
     def __init__(self, url, key):
         self.supabase: Client = create_client(url, key)
 
+    def client(self):
+        return self.supabase
+
+    def sign_up(self, email: str, password: str):
+        try:
+            res = self.supabase.auth.sign_up({"email": email, "password": password})
+            return res
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during signing up user with email {email}: {e}"
+            )
+
+    def sign_in_with_password(self, email: str, password: str):
+        try:
+            res = self.supabase.auth.sign_in_with_password(
+                {"email": email, "password": password}
+            )
+            return res
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during signing in user with email {email}: {e}"
+            )
+
+    def sign_out(self):
+        try:
+            res = self.supabase.auth.sign_out()
+            return res
+        except Exception as e:
+            raise Exception(f"An error occurred during signing out: {e}")
+
+    def get_user(self):
+        try:
+            user = self.supabase.auth.get_user()
+            return user
+        except Exception as e:
+            raise Exception(f"An error occurred during getting user: {e}")
+
     def get_chat_by_id(self, chat_id):
         try:
             response = (

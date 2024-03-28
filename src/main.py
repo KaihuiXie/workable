@@ -9,7 +9,14 @@ import os
 import json
 from src.math_agent.math_agent import MathAgent
 from src.math_agent.supabase import Supabase
-from src.interfaces import QuestionRequest, ChatRequest, AllChatsRequest, Mode
+from src.interfaces import (
+    QuestionRequest,
+    ChatRequest,
+    AllChatsRequest,
+    Mode,
+    SignUpRequest,
+    SignInRequest,
+)
 from dotenv import load_dotenv
 
 # Configure logging at the top of your test file
@@ -33,6 +40,49 @@ app.add_middleware(
 )
 
 
+@app.post("/sign_up/")
+async def sign_up(request: SignUpRequest):
+    try:
+        res = supabase.sign_up(request.email, request.password)
+        return res
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/sign_in/")
+async def sign_in(request: SignInRequest):
+    try:
+        res = supabase.sign_in_with_password(
+            email=request.email,
+            password=request.password,
+        )
+        return res
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/sign_out/")
+async def sign_out():
+    try:
+        res = supabase.sign_out()
+        return "success"
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/user/")
+async def get_user():
+    try:
+        user = supabase.get_user()
+        return user
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/image/")
 async def read_image(request: QuestionRequest):
     try:
@@ -44,7 +94,7 @@ async def read_image(request: QuestionRequest):
             question,
             request.mode == Mode.LEARNER,
         )
-        return {"chat_id": chat_id, "status_code": 200}
+        return {"chat_id": chat_id}
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"An error occurred during reading image: {str(e)}"
@@ -101,7 +151,7 @@ async def chat(request: ChatRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/all-chats/")
+@app.post("/all_chats/")
 async def all_chats(request: AllChatsRequest):
     try:
         # Query db to get messages

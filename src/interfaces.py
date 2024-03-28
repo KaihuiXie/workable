@@ -18,6 +18,17 @@ class Mode(Enum):
 
 
 # Define a Pydantic model for the request data
+class SignUpRequest(BaseModel):
+    email: str
+    password: str
+    redirect_to: Optional[str] = None
+
+
+class SignInRequest(BaseModel):
+    email: str
+    password: str
+
+
 class QuestionRequest(BaseModel):
     user_id: str
     mode: Mode
