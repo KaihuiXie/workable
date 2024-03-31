@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Depends, HTTPException
+from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import RedirectResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Callable
@@ -40,6 +40,11 @@ app.add_middleware(
 )
 
 
+def set_no_cache_headers(response: Response) -> Response:
+    response.headers["Potato"] = "potato"
+    return response
+
+
 @app.post("/sign_up")
 async def sign_up(request: SignUpRequest):
     try:
@@ -65,22 +70,22 @@ async def sign_in(request: SignInRequest):
 
 # OAuth
 @app.get("/oauth/google")
-async def signin_with_google(request: Request = Depends()):
+async def signin_with_google(request):
     res = supabase.auth().sign_in_with_oauth(
         {
             "provider": "google",
-            "options": {"redirect_to": f"{request.base_url}/callback"},
+            "options": {"redirect_to": f"{request.redirect_to}/callback"},
         }
     )
     return RedirectResponse(url=res.url)
 
 
 @app.get("/oauth/apple")
-async def signin_with_apple(request: Request = Depends()):
+async def signin_with_apple(request):
     res = supabase.auth().sign_in_with_oauth(
         {
             "provider": "apple",
-            "options": {"redirect_to": f"{request.base_url}/callback"},
+            "options": {"redirect_to": f"{request.redirect_to}/callback"},
         }
     )
     return RedirectResponse(url=res.url)

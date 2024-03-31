@@ -27,6 +27,7 @@ class SignUpRequest(BaseModel):
 class SignInRequest(BaseModel):
     email: str
     password: str
+    redirect_to: str
 
 
 class QuestionRequest(BaseModel):
