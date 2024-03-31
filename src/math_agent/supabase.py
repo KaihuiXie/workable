@@ -1,4 +1,4 @@
-from supabase import create_client, Client
+from supabase import create_client, Client, ClientOptions
 import uuid
 from datetime import datetime, timezone
 import json
@@ -6,10 +6,15 @@ import json
 
 class Supabase:
     def __init__(self, url, key):
-        self.supabase: Client = create_client(url, key)
+        self.supabase: Client = create_client(
+            url, key, options=ClientOptions(flow_type="pkce")
+        )
 
     def client(self):
         return self.supabase
+
+    def auth(self):
+        return self.auth
 
     def sign_up(self, email: str, password: str):
         try:

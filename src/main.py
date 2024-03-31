@@ -1,5 +1,5 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI, Request, Depends, HTTPException
+from fastapi.responses import RedirectResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Callable
 import logging
@@ -40,7 +40,7 @@ app.add_middleware(
 )
 
 
-@app.post("/sign_up/")
+@app.post("/sign_up")
 async def sign_up(request: SignUpRequest):
     try:
         res = supabase.sign_up(request.email, request.password)
@@ -50,7 +50,7 @@ async def sign_up(request: SignUpRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/sign_in/")
+@app.post("/sign_in")
 async def sign_in(request: SignInRequest):
     try:
         res = supabase.sign_in_with_password(
@@ -63,7 +63,41 @@ async def sign_in(request: SignInRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/sign_out/")
+# OAuth
+@app.get("/oauth/google")
+async def signin_with_google(request: Request = Depends()):
+    res = supabase.auth().sign_in_with_oauth(
+        {
+            "provider": "google",
+            "options": {"redirect_to": f"{request.base_url}/callback"},
+        }
+    )
+    return RedirectResponse(url=res.url)
+
+
+@app.get("/oauth/apple")
+async def signin_with_apple(request: Request = Depends()):
+    res = supabase.auth().sign_in_with_oauth(
+        {
+            "provider": "apple",
+            "options": {"redirect_to": f"{request.base_url}/callback"},
+        }
+    )
+    return RedirectResponse(url=res.url)
+
+
+@app.get("/callback")
+async def callback(request: Request, next: str = "/"):
+    code = request.query_params.get("code")
+
+    if code:
+        res = supabase.auth().exchange_code_for_session({"auth_code": code})
+        return RedirectResponse(url=next)
+    else:
+        raise HTTPException(status_code=400, detail="Authorization code not found")
+
+
+@app.post("/sign_out")
 async def sign_out():
     try:
         res = supabase.sign_out()
@@ -73,7 +107,7 @@ async def sign_out():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/user/")
+@app.get("/user")
 async def get_user():
     try:
         user = supabase.get_user()
@@ -83,7 +117,7 @@ async def get_user():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/image/")
+@app.post("/image")
 async def read_image(request: QuestionRequest):
     try:
         question = math_agent.query_vision(request.image_string)
@@ -101,7 +135,7 @@ async def read_image(request: QuestionRequest):
         )
 
 
-@app.post("/helper/")
+@app.post("/helper")
 async def helper(request: ChatRequest):
     try:
         question = supabase.get_chat_question_by_id(request.chat_id)
@@ -117,7 +151,7 @@ async def helper(request: ChatRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/learner/")
+@app.post("/learner")
 async def learner(request: ChatRequest):
     try:
         question = supabase.get_chat_question_by_id(request.chat_id)
@@ -133,7 +167,7 @@ async def learner(request: ChatRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/chat/")
+@app.post("/chat")
 async def chat(request: ChatRequest):
     try:
         # Query db to get messages
@@ -151,7 +185,7 @@ async def chat(request: ChatRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/all_chats/")
+@app.post("/all_chats")
 async def all_chats(request: AllChatsRequest):
     try:
         # Query db to get messages
