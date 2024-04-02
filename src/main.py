@@ -1,9 +1,11 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Callable
 import logging
-
+import time
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
 
 import os
 import json
@@ -38,6 +40,18 @@ app.add_middleware(
 )
 
 
+class TimerMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        start_time = time.time()
+        response = await call_next(request)
+        process_time = time.time() - start_time
+        response.headers["X-Process-Time"] = str(process_time)
+        return response
+
+
+app.add_middleware(TimerMiddleware)
+
+
 @app.post("/image")
 async def read_image(request: QuestionRequest):
     try:
@@ -49,7 +63,7 @@ async def read_image(request: QuestionRequest):
             question,
             request.mode == Mode.LEARNER,
         )
-        return {"chat_id": chat_id}
+        return {"chat_id": chat_id, "question": question}
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"An error occurred during reading image: {str(e)}"
@@ -111,7 +125,18 @@ async def all_chats(request: AllChatsRequest):
     try:
         # Query db to get messages
         response = supabase.get_all_chats(request.user_id)
-        return {"data": response, "status_code": 200}
+        return {"data": response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/get_chat")
+async def get_chat(chat_id: str):
+    try:
+        # Query db to get messages
+        response = supabase.get_chat_payload_by_id(chat_id)
+        return {"payload": response}
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
