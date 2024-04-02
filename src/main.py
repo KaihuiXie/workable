@@ -1,5 +1,5 @@
-from fastapi import FastAPI, Request, Response, HTTPException
-from fastapi.responses import RedirectResponse, StreamingResponse
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Callable
 import logging
@@ -14,8 +14,6 @@ from src.interfaces import (
     ChatRequest,
     AllChatsRequest,
     Mode,
-    SignUpRequest,
-    SignInRequest,
 )
 from dotenv import load_dotenv
 
@@ -38,88 +36,6 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
-
-
-def set_no_cache_headers(response: Response) -> Response:
-    response.headers["Potato"] = "potato"
-    return response
-
-
-@app.post("/sign_up")
-async def sign_up(request: SignUpRequest):
-    try:
-        res = supabase.sign_up(request.email, request.password)
-        return res
-    except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/sign_in")
-async def sign_in(request: SignInRequest):
-    try:
-        res = supabase.sign_in_with_password(
-            email=request.email,
-            password=request.password,
-        )
-        return res
-    except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# OAuth
-@app.get("/oauth/google")
-async def signin_with_google(request):
-    res = supabase.auth().sign_in_with_oauth(
-        {
-            "provider": "google",
-            "options": {"redirect_to": f"{request.redirect_to}/callback"},
-        }
-    )
-    return RedirectResponse(url=res.url)
-
-
-@app.get("/oauth/apple")
-async def signin_with_apple(request):
-    res = supabase.auth().sign_in_with_oauth(
-        {
-            "provider": "apple",
-            "options": {"redirect_to": f"{request.redirect_to}/callback"},
-        }
-    )
-    return RedirectResponse(url=res.url)
-
-
-@app.get("/callback")
-async def callback(request: Request, next: str = "/"):
-    code = request.query_params.get("code")
-
-    if code:
-        res = supabase.auth().exchange_code_for_session({"auth_code": code})
-        return RedirectResponse(url=next)
-    else:
-        raise HTTPException(status_code=400, detail="Authorization code not found")
-
-
-@app.post("/sign_out")
-async def sign_out():
-    try:
-        res = supabase.sign_out()
-        return "success"
-    except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/user")
-async def get_user():
-    try:
-        user = supabase.get_user()
-        return user
-    except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/image")
