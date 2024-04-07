@@ -143,3 +143,99 @@ class Supabase:
         message = [{"role": "assistant", "content": question}]
         payload = {"messages": message}
         return payload
+
+    # for everyday login & refresh every Sunday
+    def update_temp_credit(self, user_id, amount):
+        try:
+            response = (
+                self.supabase.table("users")
+                .update({"temp_credit": amount})
+                .eq("id", user_id)
+                .execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during updating temp credit for user {user_id}: {e}"
+            )
+
+    # for invitations and purchases
+    def update_perm_credit(self, user_id, amount):
+        try:
+            response = (
+                self.supabase.table("users")
+                .update({"perm_credit": amount})
+                .eq("id", user_id)
+                .execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during updating perm credit for user {user_id}: {e}"
+            )
+
+    def get_temp_credit_by_id(self, user_id):
+        try:
+            data, count = (
+                self.supabase.from_("users")
+                .select("temp_credit")
+                .eq("id", user_id)
+                .execute()
+            )
+            return data[1][0]["temp_credit"]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting temp credit by user {user_id}: {e}"
+            )
+
+    def get_perm_credit_by_id(self, user_id):
+        try:
+            data, count = (
+                self.supabase.from_("users")
+                .select("perm_credit")
+                .eq("id", user_id)
+                .execute()
+            )
+            return data[1][0]["perm_credit"]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting perm credit by user {user_id}: {e}"
+            )
+
+    def get_credit_by_id(self, user_id):
+        try:
+            return self.get_temp_credit_by_id(user_id) + self.get_perm_credit_by_id(user_id)
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting credit by user {user_id}: {e}"
+            )
+
+    def get_user_id_by_chat_id(self, chat_id):
+        try:
+            data, count = (
+                self.supabase.from_("chats")
+                .select("user_id")
+                .eq("id", chat_id)
+                .execute()
+            )
+            return data[1][0]["user_id"]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting user_id by chat {chat_id}: {e}"
+            )
+
+
+    def decrement_credit(self, user_id):
+        try:
+            temp_credit = self.get_temp_credit_by_id(user_id)
+            perm_credit = self.get_perm_credit_by_id(user_id)
+            if temp_credit > 0:
+                self.update_temp_credit(user_id, temp_credit - 1)
+            elif perm_credit > 0:
+                self.update_perm_credit(user_id, perm_credit - 1)
+            else:
+                raise ValueError(f"User {user_id}: {user_id} doesn't have enough credit.")
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during decrement credit from user {user_id}: {e}"
+            )

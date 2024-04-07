@@ -76,6 +76,11 @@ async def helper(request: ChatRequest):
         question = supabase.get_chat_question_by_id(request.chat_id)
         payload = Supabase.question_to_payload(question)
         response = math_agent.helper(payload["messages"])
+
+        # decrement credit for user
+        user_id = supabase.get_user_id_by_chat_id(request.chat_id)
+        supabase.decrement_credit(user_id)
+
         return StreamingResponse(
             event_generator(response, payload, request.chat_id),
             media_type="text/event-stream",
@@ -92,6 +97,10 @@ async def learner(request: ChatRequest):
         question = supabase.get_chat_question_by_id(request.chat_id)
         payload = Supabase.question_to_payload(question)
         response = math_agent.learner(payload["messages"])
+
+        # decrement credit for user
+        user_id = supabase.get_user_id_by_chat_id(request.chat_id)
+        supabase.decrement_credit(user_id)
 
         return StreamingResponse(
             event_generator(response, payload, request.chat_id),
@@ -137,6 +146,36 @@ async def get_chat(chat_id: str):
         # Query db to get messages
         response = supabase.get_chat_payload_by_id(chat_id)
         return {"payload": response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/get_credit")
+async def get_credit(user_id: str):
+    try:
+        response = supabase.get_credit_by_id(user_id)
+        return {"credit": response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/temp_credit")
+async def temp_credit(user_id: str, credit: int):
+    try:
+        response = supabase.update_temp_credit(user_id, credit)
+        return {"credit": response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/perm_credit")
+async def perm_credit(user_id: str, credit: int):
+    try:
+        response = supabase.update_perm_credit(user_id, credit)
+        return {"credit": response}
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
