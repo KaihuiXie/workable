@@ -132,17 +132,6 @@ async def all_chats(request: AllChatsRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/get_chat")
-async def get_chat(chat_id: str):
-    try:
-        # Query db to get messages
-        response = supabase.get_chat_payload_by_id(chat_id)
-        return {"payload": response}
-    except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 @app.get("/chat/{chat_id}")
 async def get_chat(chat_id: str):
     try:
