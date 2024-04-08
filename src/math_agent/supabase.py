@@ -4,6 +4,10 @@ from datetime import datetime, timezone
 import json
 
 
+def is_same_day(date: datetime):
+    return date.date() == datetime.today().date()
+
+
 class Supabase:
     def __init__(self, url, key):
         self.supabase: Client = create_client(
@@ -30,6 +34,10 @@ class Supabase:
             res = self.supabase.auth.sign_in_with_password(
                 {"email": email, "password": password}
             )
+            # if it is the first login of the day, increment the credit
+            last_login = self.get_last_login_by_user_email(email)
+            if not is_same_day(last_login):
+                self.update_temp_credit_by_email(email, 20)
             return res
         except Exception as e:
             raise Exception(
@@ -145,69 +153,69 @@ class Supabase:
         return payload
 
     # for everyday login & refresh every Sunday
-    def update_temp_credit(self, user_id, amount):
+    def update_temp_credit_by_email(self, user_email, amount):
         try:
             response = (
                 self.supabase.table("users")
                 .update({"temp_credit": amount})
-                .eq("id", user_id)
+                .eq("email", user_email)
                 .execute()
             )
             return response
         except Exception as e:
             raise Exception(
-                f"An error occurred during updating temp credit for user {user_id}: {e}"
+                f"An error occurred during updating temp credit for user {user_email}: {e}"
             )
 
     # for invitations and purchases
-    def update_perm_credit(self, user_id, amount):
+    def update_perm_credit_by_email(self, user_email, amount):
         try:
             response = (
                 self.supabase.table("users")
                 .update({"perm_credit": amount})
-                .eq("id", user_id)
+                .eq("email", user_email)
                 .execute()
             )
             return response
         except Exception as e:
             raise Exception(
-                f"An error occurred during updating perm credit for user {user_id}: {e}"
+                f"An error occurred during updating perm credit for user {user_email}: {e}"
             )
 
-    def get_temp_credit_by_id(self, user_id):
+    def get_temp_credit_by_email(self, user_email):
         try:
             data, count = (
                 self.supabase.from_("users")
                 .select("temp_credit")
-                .eq("id", user_id)
+                .eq("email", user_email)
                 .execute()
             )
             return data[1][0]["temp_credit"]
         except Exception as e:
             raise Exception(
-                f"An error occurred during getting temp credit by user {user_id}: {e}"
+                f"An error occurred during getting temp credit by user {user_email}: {e}"
             )
 
-    def get_perm_credit_by_id(self, user_id):
+    def get_perm_credit_by_email(self, user_email):
         try:
             data, count = (
                 self.supabase.from_("users")
                 .select("perm_credit")
-                .eq("id", user_id)
+                .eq("email", user_email)
                 .execute()
             )
             return data[1][0]["perm_credit"]
         except Exception as e:
             raise Exception(
-                f"An error occurred during getting perm credit by user {user_id}: {e}"
+                f"An error occurred during getting perm credit by user {user_email}: {e}"
             )
 
-    def get_credit_by_id(self, user_id):
+    def get_credit_by_email(self, user_email):
         try:
-            return self.get_temp_credit_by_id(user_id) + self.get_perm_credit_by_id(user_id)
+            return self.get_temp_credit_by_email(user_email) + self.get_perm_credit_by_email(user_email)
         except Exception as e:
             raise Exception(
-                f"An error occurred during getting credit by user {user_id}: {e}"
+                f"An error occurred during getting credit by user {user_email}: {e}"
             )
 
     def get_user_id_by_chat_id(self, chat_id):
@@ -224,18 +232,46 @@ class Supabase:
                 f"An error occurred during getting user_id by chat {chat_id}: {e}"
             )
 
+    def get_last_login_by_user_email(self, user_email):
+        try:
+            data, count = (
+                self.supabase.auth.from_("users")
+                .select("last_sign_in_at")
+                .eq("email", user_email)
+                .execute()
+            )
+            return data[1][0]["last_sign_in_at"]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting last login by user email {user_email}: {e}"
+            )
 
     def decrement_credit(self, user_id):
         try:
-            temp_credit = self.get_temp_credit_by_id(user_id)
-            perm_credit = self.get_perm_credit_by_id(user_id)
+            user_email = self.get_user_email_by_id(user_id)
+            temp_credit = self.get_temp_credit_by_email(user_email)
+            perm_credit = self.get_perm_credit_by_email(user_email)
             if temp_credit > 0:
-                self.update_temp_credit(user_id, temp_credit - 1)
+                self.update_temp_credit_by_email(user_email, temp_credit - 1)
             elif perm_credit > 0:
-                self.update_perm_credit(user_id, perm_credit - 1)
+                self.update_perm_credit_by_email(user_email, perm_credit - 1)
             else:
                 raise ValueError(f"User {user_id}: {user_id} doesn't have enough credit.")
         except Exception as e:
             raise Exception(
                 f"An error occurred during decrement credit from user {user_id}: {e}"
+            )
+
+    def get_user_email_by_id(self, user_id):
+        try:
+            data, count = (
+                self.supabase.auth.from_("users")
+                .select("user_email")
+                .eq("id", user_id)
+                .execute()
+            )
+            return data[1][0]["user_email"]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting last login by user id {user_id}: {e}"
             )
