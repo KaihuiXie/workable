@@ -1,11 +1,26 @@
 from openai import OpenAI
+import requests
+import logging
 
-from src.math_agent.prompts import IMAGE_READING_PROMPT, HELPER_PROMPT, LEARNING_PROMPT
+
+from src.math_agent.prompts import (
+    IMAGE_READING_PROMPT,
+    HELPER_PROMPT,
+    LEARNING_PROMPT,
+    WOLFRAM_ALPHA_PROMPT,
+    WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE,
+    WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT,
+    SYSTEM_PROMPT,
+)
+
+# Configure logging
+logging.basicConfig(level=logging.info)
 
 
 class MathAgent:
-    def __init__(self, api_key):
-        self.client = OpenAI(api_key=api_key)
+    def __init__(self, openai_api_key, wolf_api_key):
+        self.client = OpenAI(api_key=openai_api_key)
+        self.wolf_api_key = wolf_api_key
 
     def _compose_image_content(self, image_base64_str, text_prompt):
         return [
@@ -32,11 +47,73 @@ class MathAgent:
             stream=True,
         )
         return stream
+    
+    def helper(self, question, messages):
+        return self._solve(question, HELPER_PROMPT, messages)
 
-    def helper(self, messages):
-        messages.append({"role": "user", "content": HELPER_PROMPT})
-        return self.query(messages)
+    def learner(self, question, messages):
+        return self._solve(question, LEARNING_PROMPT, messages)
 
-    def learner(self, messages):
-        messages.append({"role": "user", "content": LEARNING_PROMPT})
+    def _generate_wolfram_query(self, question):
+        response = self.client.chat.completions.create(
+            model="gpt-4-0125-preview",
+            messages=[
+                {"role": "user", "content": WOLFRAM_ALPHA_PROMPT.format(question)}
+            ],
+        )
+        response_str = response.choices[0].message.content
+        return response_str
+
+
+    def _solve(self, question, mode_prompt, messages):
+        wolfram_alpha_response = self._query_wolfram_alpha(question)
+        extracted_response = ""
+        if wolfram_alpha_response:
+            extracted_response = self._extract_wolfram_alpha_response(wolfram_alpha_response, question)
+
+        text_prompt = (
+            mode_prompt
+        ).format(question=question, reference=extracted_response)
+
+        messages.extend([
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": text_prompt}
+        ])
         return self.query(messages)
+        
+    def _query_wolfram_alpha(self, query):
+        url = "http://api.wolframalpha.com/v2/query"
+        params = {
+            "input": self._generate_wolfram_query(query),
+            "appid": self.wolf_api_key,
+            "output": "JSON",
+        }
+        try:
+            response = requests.get(url, params=params)
+            response_data = response.json()
+            # st.sidebar.write(response_data)
+            if not response_data["queryresult"]["success"]:
+                return None
+            return response_data
+        except KeyError as e:
+            error_message = f"KeyError: The key {e} is missing in the response."
+            logging.error(error_message)
+            return None
+        except IndexError as e:
+            logging.error(error_message)
+            return None
+
+    def _extract_wolfram_alpha_response(self, wa_response, question):
+        response = self.client.chat.completions.create(
+            model="gpt-4-0125-preview",
+            messages=[
+                {"role": "system", "content": WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT},
+                {
+                    "role": "user",
+                    "content": WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE.format(
+                        response=wa_response, question=question
+                    ),
+                },
+            ],
+        )
+        return response.choices[0].message.content

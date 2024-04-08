@@ -43,7 +43,7 @@ client = TestClient(app)
 
 # def test_helper():
 #     payload = {
-#         "chat_id": "b3833758-6f24-4695-a076-9d82c2e5c0e1",
+#         "chat_id": "2121490b-a396-45fd-aaa4-4abf785443e7",
 #     }
 #     response = client.post("/helper", json=payload)
 #     assert response.status_code == 200
@@ -51,14 +51,14 @@ client = TestClient(app)
 
 # def test_learner():
 #     payload = {
-#         "chat_id": "b3833758-6f24-4695-a076-9d82c2e5c0e1",
+#         "chat_id": "2121490b-a396-45fd-aaa4-4abf785443e7",
 #     }
 #     response = client.post("/learner", json=payload)
 #     assert response.status_code == 200
 
 
 # def test_chat():
-#     payload = {"chat_id": "b3833758-6f24-4695-a076-9d82c2e5c0e1", "query": "what's new"}
+#     payload = {"chat_id": "2121490b-a396-45fd-aaa4-4abf785443e7", "query": "what's new"}
 #     response = client.post("/chat", json=payload)
 #     assert response.status_code == 200
 
