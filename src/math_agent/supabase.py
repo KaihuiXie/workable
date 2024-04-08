@@ -140,18 +140,11 @@ class Supabase:
 
     def delete_chat_by_id(self, chat_id):
         try:
-            response = (
-                self.supabase.table("chats")
-                .delete()
-                .eq("id", chat_id)
-                .execute()
-            )
+            response = self.supabase.table("chats").delete().eq("id", chat_id).execute()
             return response
         except Exception as e:
-            raise Exception(
-                f"An error occurred during deleting chat {chat_id}: {e}"
-            )
-        
+            raise Exception(f"An error occurred during deleting chat {chat_id}: {e}")
+
     @staticmethod
     def question_to_payload(question):
         message = [{"role": "assistant", "content": question}]

@@ -47,7 +47,7 @@ class MathAgent:
             stream=True,
         )
         return stream
-    
+
     def helper(self, question, messages):
         return self._solve(question, HELPER_PROMPT, messages)
 
@@ -64,23 +64,26 @@ class MathAgent:
         response_str = response.choices[0].message.content
         return response_str
 
-
     def _solve(self, question, mode_prompt, messages):
         wolfram_alpha_response = self._query_wolfram_alpha(question)
         extracted_response = ""
         if wolfram_alpha_response:
-            extracted_response = self._extract_wolfram_alpha_response(wolfram_alpha_response, question)
+            extracted_response = self._extract_wolfram_alpha_response(
+                wolfram_alpha_response, question
+            )
 
-        text_prompt = (
-            mode_prompt
-        ).format(question=question, reference=extracted_response)
+        text_prompt = (mode_prompt).format(
+            question=question, reference=extracted_response
+        )
 
-        messages.extend([
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": text_prompt}
-        ])
+        messages.extend(
+            [
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": text_prompt},
+            ]
+        )
         return self.query(messages)
-        
+
     def _query_wolfram_alpha(self, query):
         url = "http://api.wolframalpha.com/v2/query"
         params = {

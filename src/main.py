@@ -142,6 +142,7 @@ async def get_chat(chat_id: str):
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.get("/chat/{chat_id}")
 async def get_chat(chat_id: str):
     try:
@@ -152,6 +153,7 @@ async def get_chat(chat_id: str):
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.delete("/chat/{chat_id}")
 async def delete_chat(chat_id: str):
     try:
@@ -160,6 +162,7 @@ async def delete_chat(chat_id: str):
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
+
 
 async def event_generator(response, payload, chat_id):
     full_response = ""
