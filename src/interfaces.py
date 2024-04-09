@@ -1,5 +1,5 @@
 from enum import Enum
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, model_validator
 from typing import Optional, List
 
 # Define the Mode enumeration
@@ -35,6 +35,13 @@ class QuestionRequest(BaseModel):
     mode: Mode
     prompt: Optional[str] = None
     image_string: Optional[str] = None
+
+    @model_validator(mode="before")
+    def check_image_str_and_prompt(cls, values):
+        image_string, prompt = values.get("image_string"), values.get("prompt")
+        if not image_string and not prompt:
+            raise ValueError("If image_string is empty, then prompt must exist.")
+        return values
 
 
 class ChatRequest(BaseModel):

@@ -53,10 +53,19 @@ class TimerMiddleware(BaseHTTPMiddleware):
 app.add_middleware(TimerMiddleware)
 
 
-@app.post("/image")
-async def read_image(request: QuestionRequest):
+@app.post("/question")
+async def prepare_question(request: QuestionRequest):
     try:
-        question = math_agent.query_vision(request.image_string)
+        question = ""
+        if request.image_string:
+            question = math_agent.query_vision(request.image_string)
+        elif request.prompt:
+            question = request.prompt
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail=f"An error occurred during reading image: {str(e)}",
+            )
         # Upsert to db, assuming create_chat now correctly handles the parameters
         chat_id = supabase.create_chat(
             request.image_string,
