@@ -66,7 +66,7 @@ async def prepare_question(request: QuestionRequest):
         else:
             raise HTTPException(
                 status_code=500,
-                detail=f"An error occurred during reading image: {str(e)}",
+                detail=f"At least one of `image_string` or `prompt` are required!",
             )
         # Upsert to db, assuming create_chat now correctly handles the parameters
         chat_id = supabase.create_chat(
