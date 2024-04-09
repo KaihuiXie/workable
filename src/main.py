@@ -19,15 +19,16 @@ from src.interfaces import (
 )
 from dotenv import load_dotenv
 
-# Configure logging at the top of your test file
+# Configure logging
 logging.basicConfig(level=logging.info)
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+WOLFRAM_ALPHA_APP_ID = os.getenv("WOLFRAM_ALPHA_APP_ID")
 supabase = Supabase(SUPABASE_URL, SUPABASE_KEY)
-math_agent = MathAgent(OPENAI_API_KEY)
+math_agent = MathAgent(OPENAI_API_KEY, WOLFRAM_ALPHA_APP_ID)
 
 app = FastAPI()
 # Configure CORS
@@ -52,10 +53,19 @@ class TimerMiddleware(BaseHTTPMiddleware):
 app.add_middleware(TimerMiddleware)
 
 
-@app.post("/image")
-async def read_image(request: QuestionRequest):
+@app.post("/question")
+async def prepare_question(request: QuestionRequest):
     try:
-        question = math_agent.query_vision(request.image_string)
+        question = ""
+        if request.image_string:
+            question = math_agent.query_vision(request.image_string)
+        elif request.prompt:
+            question = request.prompt
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail=f"An error occurred during reading image: {str(e)}",
+            )
         # Upsert to db, assuming create_chat now correctly handles the parameters
         chat_id = supabase.create_chat(
             request.image_string,
@@ -74,9 +84,9 @@ async def read_image(request: QuestionRequest):
 async def helper(request: ChatRequest):
     try:
         question = supabase.get_chat_question_by_id(request.chat_id)
-        payload = Supabase.question_to_payload(question)
-        response = math_agent.helper(payload["messages"])
-
+        payload = {"messages": []}
+        response = math_agent.helper(question, payload["messages"])
+    
         # decrement credit for user
         user_id = supabase.get_user_id_by_chat_id(request.chat_id)
         supabase.decrement_credit(user_id)
@@ -95,8 +105,8 @@ async def helper(request: ChatRequest):
 async def learner(request: ChatRequest):
     try:
         question = supabase.get_chat_question_by_id(request.chat_id)
-        payload = Supabase.question_to_payload(question)
-        response = math_agent.learner(payload["messages"])
+        payload = {"messages": []}
+        response = math_agent.learner(question, payload["messages"])
 
         # decrement credit for user
         user_id = supabase.get_user_id_by_chat_id(request.chat_id)
@@ -140,7 +150,7 @@ async def all_chats(request: AllChatsRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/get_chat")
+@app.get("/chat/{chat_id}")
 async def get_chat(chat_id: str):
     try:
         # Query db to get messages
@@ -180,6 +190,15 @@ async def perm_credit(user_id: str, credit: int):
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.delete("/chat/{chat_id}")
+async def delete_chat(chat_id: str):
+    try:
+        response = supabase.delete_chat_by_id(chat_id)
+        return {"message": f"Chat {chat_id} deleted successfully"}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 async def event_generator(response, payload, chat_id):
     full_response = ""
@@ -190,6 +209,7 @@ async def event_generator(response, payload, chat_id):
                 full_response += event_text
                 event_data = {"text": event_text}
                 yield f"data: {json.dumps(event_data)}\n\n"
+        # logging.info(full_response)
         print(full_response)
         payload["messages"].append({"role": "assistant", "content": full_response})
         supabase.update_payload(chat_id, payload)

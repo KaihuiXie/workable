@@ -27,8 +27,20 @@ client = TestClient(app)
 #         "image_string": base64_encoded_string,
 #         "mode": "learner",
 #     }
-#     response = client.post("/image", json=payload)
+#     response = client.post("/question", json=payload)
 #     logging.debug(response.json())  # Log the JSON response
+#     assert response.status_code == 200
+
+
+# def test_no_image():
+
+#     payload = {
+#         "user_id": "6e0d1fed-8845-488e-832d-4c767f0f5bb0",
+#         "prompt": "There are chicken and rabbits in the cage. They are in total 10 heads and 20 feet. How many rabbits? ",
+#         "mode": "learner",
+#     }
+#     response = client.post("/question", json=payload)
+#     print(response.json())  # Log the JSON response
 #     assert response.status_code == 200
 
 
@@ -43,7 +55,7 @@ client = TestClient(app)
 
 # def test_helper():
 #     payload = {
-#         "chat_id": "b3833758-6f24-4695-a076-9d82c2e5c0e1",
+#         "chat_id": "2121490b-a396-45fd-aaa4-4abf785443e7",
 #     }
 #     response = client.post("/helper", json=payload)
 #     assert response.status_code == 200
@@ -51,14 +63,14 @@ client = TestClient(app)
 
 # def test_learner():
 #     payload = {
-#         "chat_id": "b3833758-6f24-4695-a076-9d82c2e5c0e1",
+#         "chat_id": "2121490b-a396-45fd-aaa4-4abf785443e7",
 #     }
 #     response = client.post("/learner", json=payload)
 #     assert response.status_code == 200
 
 
 # def test_chat():
-#     payload = {"chat_id": "b3833758-6f24-4695-a076-9d82c2e5c0e1", "query": "what's new"}
+#     payload = {"chat_id": "2121490b-a396-45fd-aaa4-4abf785443e7", "query": "what's new"}
 #     response = client.post("/chat", json=payload)
 #     assert response.status_code == 200
 
