@@ -3,6 +3,8 @@ import uuid
 from datetime import datetime, timezone
 import json
 
+from src.math_agent.constant import EVERY_DAY_CREDIT_INCREMENT, COST_PER_QUESTION, DEFAULT_CREDIT
+
 
 def is_same_day(date: datetime):
     return date.date() == datetime.today().date()
@@ -39,7 +41,7 @@ class Supabase:
             last_login = self.get_last_login_by_user_email(email)
             if not is_same_day(last_login):
                 prev_credit = self.get_credit_by_email(email)
-                self.update_temp_credit_by_email(email, prev_credit + 20)
+                self.update_temp_credit_by_email(email, prev_credit + EVERY_DAY_CREDIT_INCREMENT)
             return res
         except Exception as e:
             raise Exception(
@@ -253,10 +255,10 @@ class Supabase:
             user_email = self.get_user_email_by_id(user_id)
             temp_credit = self.get_temp_credit_by_email(user_email)
             perm_credit = self.get_perm_credit_by_email(user_email)
-            if temp_credit > 0:
-                self.update_temp_credit_by_email(user_email, temp_credit - 1)
-            elif perm_credit > 0:
-                self.update_perm_credit_by_email(user_email, perm_credit - 1)
+            if temp_credit >= COST_PER_QUESTION:
+                self.update_temp_credit_by_email(user_email, temp_credit - COST_PER_QUESTION)
+            elif perm_credit >= COST_PER_QUESTION:
+                self.update_perm_credit_by_email(user_email, perm_credit - COST_PER_QUESTION)
             else:
                 raise ValueError(f"User {user_id}: {user_id} doesn't have enough credit.")
         except Exception as e:
@@ -282,8 +284,8 @@ class Supabase:
         try:
             row_dict = {
                 "user_email": user_email,
-                "temp_credit": 0,
-                "perm_credit": 0,
+                "temp_credit": DEFAULT_CREDIT,
+                "perm_credit": DEFAULT_CREDIT,
             }
             data, count = self.supabase.table("credits").insert(row_dict).execute()
             # Check if exactly one record was inserted
