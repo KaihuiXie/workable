@@ -59,6 +59,8 @@ async def prepare_question(request: QuestionRequest):
         question = ""
         if request.image_string:
             question = math_agent.query_vision(request.image_string)
+            if request.prompt:
+                question += f"\n Instruction: {request.prompt}"
         elif request.prompt:
             question = request.prompt
         else:
@@ -80,33 +82,21 @@ async def prepare_question(request: QuestionRequest):
         )
 
 
-@app.post("/helper")
-async def helper(request: ChatRequest):
+@app.post("/solve")
+async def solve(request: ChatRequest):
     try:
-        question = supabase.get_chat_question_by_id(request.chat_id)
+        chat_info = supabase.get_chat_by_id(request.chat_id)
+        question = chat_info["question"]
         payload = {"messages": []}
-        response = math_agent.helper(question, payload["messages"])
+        if chat_info["learner_mode"]:
+            response = math_agent.learner(question, payload["messages"])
+        else:
+            response = math_agent.helper(question, payload["messages"])
         return StreamingResponse(
             event_generator(response, payload, request.chat_id),
             media_type="text/event-stream",
         )
 
-    except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/learner")
-async def learner(request: ChatRequest):
-    try:
-        question = supabase.get_chat_question_by_id(request.chat_id)
-        payload = {"messages": []}
-        response = math_agent.learner(question, payload["messages"])
-
-        return StreamingResponse(
-            event_generator(response, payload, request.chat_id),
-            media_type="text/event-stream",
-        )
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
@@ -133,7 +123,6 @@ async def chat(request: ChatRequest):
 @app.post("/all_chats")
 async def all_chats(request: AllChatsRequest):
     try:
-        # Query db to get messages
         response = supabase.get_all_chats(request.user_id)
         return {"data": response}
     except Exception as e:
@@ -144,7 +133,6 @@ async def all_chats(request: AllChatsRequest):
 @app.get("/chat/{chat_id}")
 async def get_chat(chat_id: str):
     try:
-        # Query db to get messages
         response = supabase.get_chat_payload_by_id(chat_id)
         return {"payload": response}
     except Exception as e:
@@ -171,8 +159,8 @@ async def event_generator(response, payload, chat_id):
                 full_response += event_text
                 event_data = {"text": event_text}
                 yield f"data: {json.dumps(event_data)}\n\n"
-        # logging.info(full_response)
-        print(full_response)
+        logging.info(full_response)
+        # print(full_response)
         payload["messages"].append({"role": "assistant", "content": full_response})
         supabase.update_payload(chat_id, payload)
     except Exception as e:

@@ -55,9 +55,9 @@ client = TestClient(app)
 
 # def test_helper():
 #     payload = {
-#         "chat_id": "2121490b-a396-45fd-aaa4-4abf785443e7",
+#         "chat_id": "e4aa146f-86d7-4cd1-a687-bc4acbaa921f",
 #     }
-#     response = client.post("/helper", json=payload)
+#     response = client.post("/solve", json=payload)
 #     assert response.status_code == 200
 
 
@@ -65,7 +65,7 @@ client = TestClient(app)
 #     payload = {
 #         "chat_id": "2121490b-a396-45fd-aaa4-4abf785443e7",
 #     }
-#     response = client.post("/learner", json=payload)
+#     response = client.post("/solve", json=payload)
 #     assert response.status_code == 200
 
 
