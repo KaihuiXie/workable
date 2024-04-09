@@ -42,7 +42,7 @@ class Supabase:
             )
             # if it is the first login of the day, increment the credit
             user_id = res.user.user_id
-            last_login = self.get_last_login_by_user_id(user_id)
+            last_login = res.user.last_sign_in_at
             if not is_same_day(last_login):
                 prev_credit = self.get_credit_by_user_id(user_id)
                 self.update_temp_credit_by_user_id(user_id, prev_credit + EVERY_DAY_CREDIT_INCREMENT)
@@ -65,17 +65,6 @@ class Supabase:
             return user
         except Exception as e:
             raise Exception(f"An error occurred during getting user: {e}")
-
-    def get_chat_by_id(self, chat_id):
-        try:
-            response = (
-                self.supabase.from_("chats").select("*").eq("id", chat_id).execute()
-            )
-            return response
-        except Exception as e:
-            raise Exception(
-                f"An error occurred during getting a chat by chat_id {chat_id}: {e}"
-            )
 
     def get_chat_payload_by_id(self, chat_id):
         try:
@@ -258,20 +247,6 @@ class Supabase:
                 f"An error occurred during getting user_id by chat {chat_id}: {e}"
             )
 
-    def get_last_login_by_user_id(self, user_id):
-        try:
-            data, count = (
-                self.supabase.auth.from_("users")
-                .select("last_sign_in_at")
-                .eq("id", user_id)
-                .execute()
-            )
-            return data[1][0]["last_sign_in_at"]
-        except Exception as e:
-            raise Exception(
-                f"An error occurred during getting last login by user email {user_id}: {e}"
-            )
-
     def decrement_credit(self, user_id):
         try:
             temp_credit = self.get_temp_credit_by_user_id(user_id)
@@ -281,7 +256,7 @@ class Supabase:
             elif perm_credit >= COST_PER_QUESTION:
                 self.update_perm_credit_by_user_id(user_id, perm_credit - COST_PER_QUESTION)
             else:
-                raise ValueError(f"User {user_id}: {user_id} doesn't have enough credit.")
+                raise ValueError(f"User {user_id}: {user_id} doesn't have enough credits.")
         except Exception as e:
             raise Exception(
                 f"An error occurred during decrement credit from user {user_id}: {e}"

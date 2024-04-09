@@ -107,7 +107,7 @@ async def solve(request: ChatRequest):
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
-        
+
 @app.post("/chat")
 async def chat(request: ChatRequest):
     try:
@@ -146,7 +146,7 @@ async def get_chat(chat_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/get_credit")
+@app.get("/credit")
 async def get_credit(user_id: str):
     try:
         response = supabase.get_credit_by_user_id(user_id)
@@ -156,8 +156,8 @@ async def get_credit(user_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/temp_credit")
-async def temp_credit(user_id: str, credit: int):
+@app.put("credit/temp")
+async def update_temp_credit(user_id: str, credit: int):
     try:
         response = supabase.update_temp_credit_by_user_id(user_id, credit)
         return {"credit": response}
@@ -166,14 +166,15 @@ async def temp_credit(user_id: str, credit: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/perm_credit")
-async def perm_credit(user_id: str, credit: int):
+@app.put("credit/perm")
+async def update_perm_credit(user_id: str, credit: int):
     try:
         response = supabase.update_perm_credit_by_user_id(user_id, credit)
         return {"credit": response}
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.delete("/chat/{chat_id}")
 async def delete_chat(chat_id: str):
