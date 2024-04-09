@@ -152,9 +152,9 @@ async def get_chat(chat_id: str):
 
 
 @app.get("/get_credit")
-async def get_credit(user_email: str):
+async def get_credit(user_id: str):
     try:
-        response = supabase.get_credit_by_email(user_email)
+        response = supabase.get_credit_by_user_id(user_id)
         return {"credit": response}
     except Exception as e:
         logging.error(e)
@@ -162,9 +162,9 @@ async def get_credit(user_email: str):
 
 
 @app.post("/temp_credit")
-async def temp_credit(user_email: str, credit: int):
+async def temp_credit(user_id: str, credit: int):
     try:
-        response = supabase.update_temp_credit_by_email(user_email, credit)
+        response = supabase.update_temp_credit_by_user_id(user_id, credit)
         return {"credit": response}
     except Exception as e:
         logging.error(e)
@@ -172,9 +172,9 @@ async def temp_credit(user_email: str, credit: int):
 
 
 @app.post("/perm_credit")
-async def perm_credit(user_email: str, credit: int):
+async def perm_credit(user_id: str, credit: int):
     try:
-        response = supabase.update_perm_credit_by_email(user_email, credit)
+        response = supabase.update_perm_credit_by_user_id(user_id, credit)
         return {"credit": response}
     except Exception as e:
         logging.error(e)
