@@ -146,6 +146,16 @@ async def get_chat(chat_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.delete("/chat/{chat_id}")
+async def delete_chat(chat_id: str):
+    try:
+        response = supabase.delete_chat_by_id(chat_id)
+        return {"message": f"Chat {chat_id} deleted successfully"}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/credit")
 async def get_credit(user_id: str):
     try:
@@ -171,16 +181,6 @@ async def update_perm_credit(user_id: str, credit: int):
     try:
         response = supabase.update_perm_credit_by_user_id(user_id, credit)
         return {"credit": response}
-    except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.delete("/chat/{chat_id}")
-async def delete_chat(chat_id: str):
-    try:
-        response = supabase.delete_chat_by_id(chat_id)
-        return {"message": f"Chat {chat_id} deleted successfully"}
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
