@@ -27,8 +27,20 @@ client = TestClient(app)
 #         "image_string": base64_encoded_string,
 #         "mode": "learner",
 #     }
-#     response = client.post("/image", json=payload)
+#     response = client.post("/question", json=payload)
 #     logging.debug(response.json())  # Log the JSON response
+#     assert response.status_code == 200
+
+
+# def test_no_image():
+
+#     payload = {
+#         "user_id": "6e0d1fed-8845-488e-832d-4c767f0f5bb0",
+#         "prompt": "There are chicken and rabbits in the cage. They are in total 10 heads and 20 feet. How many rabbits? ",
+#         "mode": "learner",
+#     }
+#     response = client.post("/question", json=payload)
+#     print(response.json())  # Log the JSON response
 #     assert response.status_code == 200
 
 
