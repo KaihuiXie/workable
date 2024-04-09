@@ -23,6 +23,7 @@ class Supabase:
     def sign_up(self, email: str, password: str):
         try:
             res = self.supabase.auth.sign_up({"email": email, "password": password})
+            self.create_credit(email)
             return res
         except Exception as e:
             raise Exception(
@@ -37,7 +38,8 @@ class Supabase:
             # if it is the first login of the day, increment the credit
             last_login = self.get_last_login_by_user_email(email)
             if not is_same_day(last_login):
-                self.update_temp_credit_by_email(email, 20)
+                prev_credit = self.get_credit_by_email(email)
+                self.update_temp_credit_by_email(email, prev_credit + 20)
             return res
         except Exception as e:
             raise Exception(
@@ -156,7 +158,7 @@ class Supabase:
     def update_temp_credit_by_email(self, user_email, amount):
         try:
             response = (
-                self.supabase.table("users")
+                self.supabase.table("credits")
                 .update({"temp_credit": amount})
                 .eq("email", user_email)
                 .execute()
@@ -171,7 +173,7 @@ class Supabase:
     def update_perm_credit_by_email(self, user_email, amount):
         try:
             response = (
-                self.supabase.table("users")
+                self.supabase.table("credits")
                 .update({"perm_credit": amount})
                 .eq("email", user_email)
                 .execute()
@@ -185,7 +187,7 @@ class Supabase:
     def get_temp_credit_by_email(self, user_email):
         try:
             data, count = (
-                self.supabase.from_("users")
+                self.supabase.from_("credits")
                 .select("temp_credit")
                 .eq("email", user_email)
                 .execute()
@@ -199,7 +201,7 @@ class Supabase:
     def get_perm_credit_by_email(self, user_email):
         try:
             data, count = (
-                self.supabase.from_("users")
+                self.supabase.from_("credits")
                 .select("perm_credit")
                 .eq("email", user_email)
                 .execute()
@@ -275,3 +277,21 @@ class Supabase:
             raise Exception(
                 f"An error occurred during getting last login by user id {user_id}: {e}"
             )
+
+    def create_credit(self, user_email):
+        try:
+            row_dict = {
+                "user_email": user_email,
+                "temp_credit": 0,
+                "perm_credit": 0,
+            }
+            data, count = self.supabase.table("credits").insert(row_dict).execute()
+            # Check if exactly one record was inserted
+            if len(data[1]) == 1:
+                return data[1][0]["id"]
+            else:
+                raise ValueError(
+                    f"Unexpected number of records inserted: {len(data)}. Expected 1."
+                )
+        except Exception as e:
+            raise Exception(f"An error occurred during creating a user credit: {e}")
