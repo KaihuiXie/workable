@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +11,8 @@ from starlette.requests import Request
 
 import os
 import json
+
+from src.math_agent.constant import EVERY_DAY_CREDIT_INCREMENT
 from src.math_agent.math_agent import MathAgent
 from src.math_agent.supabase import Supabase
 from src.interfaces import (
@@ -186,6 +190,31 @@ async def update_perm_credit(user_id: str, credit: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("credit/")
+async def create_credit(user_id: str):
+    try:
+        response = supabase.create_credit(user_id)
+        return {"id": response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("first_login_of_the_day")
+async def get_first_loging(user_id: str):
+    try:
+        # if it is the first login of the day, increment the credit
+        last_login = supabase.get_last_login_by_user_id(user_id)
+        is_first_login = not is_same_day(last_login)
+        if is_first_login:  # award the temp credit for first login
+            prev_temp_credit = supabase.get_temp_credit_by_user_id(user_id)
+            supabase.update_temp_credit_by_user_id(user_id, prev_temp_credit + EVERY_DAY_CREDIT_INCREMENT)
+        return {"first_login": is_first_login}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 async def event_generator(response, payload, chat_id):
     full_response = ""
     try:
@@ -203,3 +232,7 @@ async def event_generator(response, payload, chat_id):
         # Handle exceptions or end of stream
         logging.error(e)
         yield
+
+
+def is_same_day(date: datetime):
+    return date.date() == datetime.today().date()

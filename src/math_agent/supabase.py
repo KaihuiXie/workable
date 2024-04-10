@@ -279,3 +279,17 @@ class Supabase:
                 )
         except Exception as e:
             raise Exception(f"An error occurred during creating a user credit: {e}")
+
+    def get_last_login_by_user_id(self, user_id):
+        try:
+            data, count = (
+                self.supabase.auth.from_("users")
+                .select("last_sign_in_at")
+                .eq("id", user_id)
+                .execute()
+            )
+            return data[1][0]["last_sign_in_at"]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting last login by user email {user_id}: {e}"
+            )
