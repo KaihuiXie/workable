@@ -21,7 +21,7 @@ cp .env.example .env
 uvicorn src.main:app --reload --port=8080 --timeout-keep-alive 120
 ```
 
-Check `http://127.0.0.1:8080/docs` for OPENAI documentation.
+Check `http://127.0.0.1:8080/docs` for OPENAPI documentation.
 
 
 ### Contribute
