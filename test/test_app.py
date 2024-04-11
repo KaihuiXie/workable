@@ -15,21 +15,21 @@ from src.main import app
 client = TestClient(app)
 
 # def test_image():
-#     image_file_path = "./simple.png"
-#     with open(image_file_path, "rb") as image_file:
-#         # Read the file's content
-#         binary_data = image_file.read()
-#         # Encode the binary data to a base64 string
-#         base64_encoded_string = base64.b64encode(binary_data).decode("utf-8")
+#     image_file_path = "./iphone.HEIC"
+#     # image_file_path = "./phone.jpeg"
 
-#     payload = {
-#         "user_id": "6e0d1fed-8845-488e-832d-4c767f0f5bb0",
-#         "image_string": base64_encoded_string,
-#         "mode": "learner",
-#     }
-#     response = client.post("/question", json=payload)
-#     logging.debug(response.json())  # Log the JSON response
-#     assert response.status_code == 200
+#     with open(image_file_path, "rb") as image_file:
+#         data = {
+#             "user_id": "6e0d1fed-8845-488e-832d-4c767f0f5bb0",
+#             "mode": "learner",
+#             # "prompt": "Optional prompt here if needed",
+#         }
+#         files = {
+#             "image_file": image_file,
+#         }
+#         response = client.post("/question", data=data, files=files)
+#         logging.debug(response.json())  # Log the JSON response
+#         assert response.status_code == 200
 
 
 # def test_no_image():

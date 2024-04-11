@@ -1,29 +1,29 @@
 from datetime import datetime
+from dotenv import load_dotenv
+import yaml
+import os
+import json
 
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Callable
+from typing import Optional
 import logging
 import time
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 
-import os
-import json
-
 from src.math_agent.constant import EVERY_DAY_CREDIT_INCREMENT
-import yaml
-
 from src.math_agent.math_agent import MathAgent
 from src.math_agent.supabase import Supabase
 from src.interfaces import (
     QuestionRequest,
+    parse_question_request,
     ChatRequest,
     AllChatsRequest,
     Mode,
 )
-from dotenv import load_dotenv
+from src.utils import preprocess_image, bytes_to_base64
 
 # Configure logging
 logging.basicConfig(level=logging.info)
@@ -75,11 +75,13 @@ async def get_examples():
 
 
 @app.post("/question")
-async def prepare_question(request: QuestionRequest):
+async def prepare_question(request: QuestionRequest = Depends(parse_question_request)):
     try:
         question = ""
-        if request.image_string:
-            question = math_agent.query_vision(request.image_string)
+        if request.image_file:
+            image_bytes = await request.image_file.read()
+            image_string = preprocess_image(image_bytes)
+            question = math_agent.query_vision(image_string)
             if request.prompt:
                 question += f"\n Instruction: {request.prompt}"
         elif request.prompt:
@@ -91,7 +93,7 @@ async def prepare_question(request: QuestionRequest):
             )
         # Upsert to db, assuming create_chat now correctly handles the parameters
         chat_id = supabase.create_chat(
-            request.image_string,
+            image_string,
             request.user_id,
             question,
             request.mode == Mode.LEARNER,
@@ -227,7 +229,9 @@ async def get_first_loging(user_id: str):
         is_first_login = not is_same_day(last_login)
         if is_first_login:  # award the temp credit for first login
             prev_temp_credit = supabase.get_temp_credit_by_user_id(user_id)
-            supabase.update_temp_credit_by_user_id(user_id, prev_temp_credit + EVERY_DAY_CREDIT_INCREMENT)
+            supabase.update_temp_credit_by_user_id(
+                user_id, prev_temp_credit + EVERY_DAY_CREDIT_INCREMENT
+            )
         return {"first_login": is_first_login}
     except Exception as e:
         logging.error(e)

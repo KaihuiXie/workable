@@ -1,5 +1,6 @@
 from enum import Enum
-from pydantic import BaseModel, model_validator
+from fastapi import UploadFile, Form, HTTPException, File
+from pydantic import BaseModel, model_validator, ValidationError
 from typing import Optional, List
 
 # Define the Mode enumeration
@@ -34,14 +35,31 @@ class QuestionRequest(BaseModel):
     user_id: str
     mode: Mode
     prompt: Optional[str] = None
-    image_string: Optional[str] = None
+    image_file: Optional[UploadFile] = None
 
     @model_validator(mode="before")
     def check_image_str_and_prompt(cls, values):
-        image_string, prompt = values.get("image_string"), values.get("prompt")
-        if not image_string and not prompt:
-            raise ValueError("If image_string is empty, then prompt must exist.")
+        image_file, prompt = values.get("image_file"), values.get("prompt")
+        if not image_file and not prompt:
+            raise ValueError("If image_file is empty, then prompt must exist.")
         return values
+
+
+# Dependency to parse QuestionRequest model from form data
+async def parse_question_request(
+    user_id: str = Form(...),
+    mode: Mode = Form(...),
+    prompt: Optional[str] = Form(None),
+    image_file: Optional[UploadFile] = File(None),
+) -> QuestionRequest:
+    try:
+        # Construct the QuestionRequest object
+        return QuestionRequest(
+            user_id=user_id, mode=mode, prompt=prompt, image_file=image_file
+        )
+    except ValidationError as e:
+        # Handle validation errors, e.g., by raising an HTTP exception
+        raise HTTPException(status_code=400, detail="Invalid request data")
 
 
 class ChatRequest(BaseModel):

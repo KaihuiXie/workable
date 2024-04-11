@@ -3,7 +3,11 @@ import uuid
 from datetime import datetime, timezone
 import json
 
-from src.math_agent.constant import EVERY_DAY_CREDIT_INCREMENT, COST_PER_QUESTION, DEFAULT_CREDIT
+from src.math_agent.constant import (
+    EVERY_DAY_CREDIT_INCREMENT,
+    COST_PER_QUESTION,
+    DEFAULT_CREDIT,
+)
 
 
 def is_same_day(date: datetime):
@@ -45,7 +49,9 @@ class Supabase:
             last_login = res.user.last_sign_in_at
             if not is_same_day(last_login):
                 prev_credit = self.get_credit_by_user_id(user_id)
-                self.update_temp_credit_by_user_id(user_id, prev_credit + EVERY_DAY_CREDIT_INCREMENT)
+                self.update_temp_credit_by_user_id(
+                    user_id, prev_credit + EVERY_DAY_CREDIT_INCREMENT
+                )
             return res
         except Exception as e:
             raise Exception(
@@ -245,7 +251,9 @@ class Supabase:
 
     def get_credit_by_user_id(self, user_id):
         try:
-            return self.get_temp_credit_by_user_id(user_id) + self.get_perm_credit_by_user_id(user_id)
+            return self.get_temp_credit_by_user_id(
+                user_id
+            ) + self.get_perm_credit_by_user_id(user_id)
         except Exception as e:
             raise Exception(
                 f"An error occurred during getting credit by user {user_id}: {e}"
@@ -270,11 +278,17 @@ class Supabase:
             temp_credit = self.get_temp_credit_by_user_id(user_id)
             perm_credit = self.get_perm_credit_by_user_id(user_id)
             if temp_credit >= COST_PER_QUESTION:
-                self.update_temp_credit_by_user_id(user_id, temp_credit - COST_PER_QUESTION)
+                self.update_temp_credit_by_user_id(
+                    user_id, temp_credit - COST_PER_QUESTION
+                )
             elif perm_credit >= COST_PER_QUESTION:
-                self.update_perm_credit_by_user_id(user_id, perm_credit - COST_PER_QUESTION)
+                self.update_perm_credit_by_user_id(
+                    user_id, perm_credit - COST_PER_QUESTION
+                )
             else:
-                raise ValueError(f"User {user_id}: {user_id} doesn't have enough credits.")
+                raise ValueError(
+                    f"User {user_id}: {user_id} doesn't have enough credits."
+                )
         except Exception as e:
             raise Exception(
                 f"An error occurred during decrement credit from user {user_id}: {e}"
