@@ -43,6 +43,12 @@ client = TestClient(app)
 #     print(response.json())  # Log the JSON response
 #     assert response.status_code == 200
 
+# def test_examples():
+#     response = client.get("/examples")
+#     logging.error(response.json())
+#     print(response.json())  # Log the JSON response
+#     assert response.status_code == 200
+
 
 # def test_all_chats():
 #     payload = {
@@ -75,7 +81,7 @@ client = TestClient(app)
 #     assert response.status_code == 200
 
 # def test_get_chat():
-#     chat_id = "2121490b-a396-45fd-aaa4-4abf785443e7"
-#     response = client.get(f"/get_chat?chat_id={chat_id}")
+#     chat_id = "f1d30395-91c4-4e0a-8753-43ee99fa9b4f"
+#     response = client.get(f"/chat/{chat_id}")
 #     print(response.json())
 #     assert response.status_code == 200
