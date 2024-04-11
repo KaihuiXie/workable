@@ -140,6 +140,20 @@ class Supabase:
                 f"An error occurred getting all chats for user {user_id}: {e}"
             )
 
+    def get_chats_by_ids(self, chat_ids):
+        try:
+            response = (
+                self.supabase.from_("chats")
+                .select("id, question, learner_mode", count="exact")
+                .in_("id", chat_ids)
+                .execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred getting chats for chat_ids {chat_ids}: {e}"
+            )
+
     def update_payload(self, chat_id, payload):
         try:
             response = (
