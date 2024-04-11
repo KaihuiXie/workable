@@ -3,6 +3,12 @@ import uuid
 from datetime import datetime, timezone
 import json
 
+from src.math_agent.constant import EVERY_DAY_CREDIT_INCREMENT, COST_PER_QUESTION, DEFAULT_CREDIT
+
+
+def is_same_day(date: datetime):
+    return date.date() == datetime.today().date()
+
 
 class Supabase:
     def __init__(self, url, key):
@@ -19,6 +25,10 @@ class Supabase:
     def sign_up(self, email: str, password: str):
         try:
             res = self.supabase.auth.sign_up({"email": email, "password": password})
+
+            # create a credit record for the account
+            self.create_credit(res.user.user_id)
+
             return res
         except Exception as e:
             raise Exception(
@@ -30,6 +40,12 @@ class Supabase:
             res = self.supabase.auth.sign_in_with_password(
                 {"email": email, "password": password}
             )
+            # if it is the first login of the day, increment the credit
+            user_id = res.user.user_id
+            last_login = res.user.last_sign_in_at
+            if not is_same_day(last_login):
+                prev_credit = self.get_credit_by_user_id(user_id)
+                self.update_temp_credit_by_user_id(user_id, prev_credit + EVERY_DAY_CREDIT_INCREMENT)
             return res
         except Exception as e:
             raise Exception(
@@ -49,17 +65,6 @@ class Supabase:
             return user
         except Exception as e:
             raise Exception(f"An error occurred during getting user: {e}")
-
-    def get_chat_by_id(self, chat_id):
-        try:
-            response = (
-                self.supabase.from_("chats").select("*").eq("id", chat_id).execute()
-            )
-            return response
-        except Exception as e:
-            raise Exception(
-                f"An error occurred during getting a chat by chat_id {chat_id}: {e}"
-            )
 
     def get_chat_payload_by_id(self, chat_id):
         try:
@@ -175,3 +180,134 @@ class Supabase:
         message = [{"role": "assistant", "content": question}]
         payload = {"messages": message}
         return payload
+
+    # for everyday login & refresh every Sunday
+    def update_temp_credit_by_user_id(self, user_id, amount):
+        try:
+            if amount < 0:
+                raise ValueError(f"User {user_id}: credit can't be negative.")
+            response = (
+                self.supabase.table("credits")
+                .update({"temp_credit": amount})
+                .eq("user_id", user_id)
+                .execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during updating temp credit for user {user_id}: {e}"
+            )
+
+    # for invitations and purchases
+    def update_perm_credit_by_user_id(self, user_id, amount):
+        try:
+            if amount < 0:
+                raise ValueError(f"User {user_id}: credit can't be negative.")
+            response = (
+                self.supabase.table("credits")
+                .update({"perm_credit": amount})
+                .eq("user_id", user_id)
+                .execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during updating perm credit for user {user_id}: {e}"
+            )
+
+    def get_temp_credit_by_user_id(self, user_id):
+        try:
+            data, count = (
+                self.supabase.from_("credits")
+                .select("temp_credit")
+                .eq("user_id", user_id)
+                .execute()
+            )
+            return data[1][0]["temp_credit"]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting temp credit by user {user_id}: {e}"
+            )
+
+    def get_perm_credit_by_user_id(self, user_id):
+        try:
+            data, count = (
+                self.supabase.from_("credits")
+                .select("perm_credit")
+                .eq("user_id", user_id)
+                .execute()
+            )
+            return data[1][0]["perm_credit"]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting perm credit by user {user_id}: {e}"
+            )
+
+    def get_credit_by_user_id(self, user_id):
+        try:
+            return self.get_temp_credit_by_user_id(user_id) + self.get_perm_credit_by_user_id(user_id)
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting credit by user {user_id}: {e}"
+            )
+
+    def get_user_id_by_chat_id(self, chat_id):
+        try:
+            data, count = (
+                self.supabase.from_("chats")
+                .select("user_id")
+                .eq("id", chat_id)
+                .execute()
+            )
+            return data[1][0]["user_id"]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting user_id by chat {chat_id}: {e}"
+            )
+
+    def decrement_credit(self, user_id):
+        try:
+            temp_credit = self.get_temp_credit_by_user_id(user_id)
+            perm_credit = self.get_perm_credit_by_user_id(user_id)
+            if temp_credit >= COST_PER_QUESTION:
+                self.update_temp_credit_by_user_id(user_id, temp_credit - COST_PER_QUESTION)
+            elif perm_credit >= COST_PER_QUESTION:
+                self.update_perm_credit_by_user_id(user_id, perm_credit - COST_PER_QUESTION)
+            else:
+                raise ValueError(f"User {user_id}: {user_id} doesn't have enough credits.")
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during decrement credit from user {user_id}: {e}"
+            )
+
+    def create_credit(self, user_id):
+        try:
+            row_dict = {
+                "user_id": user_id,
+                "temp_credit": DEFAULT_CREDIT,
+                "perm_credit": DEFAULT_CREDIT,
+            }
+            data, count = self.supabase.table("credits").insert(row_dict).execute()
+            # Check if exactly one record was inserted
+            if len(data[1]) == 1:
+                return data[1][0]["id"]
+            else:
+                raise ValueError(
+                    f"Unexpected number of records inserted: {len(data)}. Expected 1."
+                )
+        except Exception as e:
+            raise Exception(f"An error occurred during creating a user credit: {e}")
+
+    def get_last_login_by_user_id(self, user_id):
+        try:
+            data, count = (
+                self.supabase.auth.from_("users")
+                .select("last_sign_in_at")
+                .eq("id", user_id)
+                .execute()
+            )
+            return data[1][0]["last_sign_in_at"]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting last login by user email {user_id}: {e}"
+            )
