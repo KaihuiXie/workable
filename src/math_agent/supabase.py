@@ -170,6 +170,8 @@ class Supabase:
     # for everyday login & refresh every Sunday
     def update_temp_credit_by_user_id(self, user_id, amount):
         try:
+            if amount < 0:
+                raise ValueError(f"User {user_id}: credit can't be negative.")
             response = (
                 self.supabase.table("credits")
                 .update({"temp_credit": amount})
@@ -185,6 +187,8 @@ class Supabase:
     # for invitations and purchases
     def update_perm_credit_by_user_id(self, user_id, amount):
         try:
+            if amount < 0:
+                raise ValueError(f"User {user_id}: credit can't be negative.")
             response = (
                 self.supabase.table("credits")
                 .update({"perm_credit": amount})
