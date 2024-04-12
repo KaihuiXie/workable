@@ -7,7 +7,6 @@ import json
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Optional
 import logging
 import time
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -89,7 +88,7 @@ async def prepare_question(request: QuestionRequest = Depends(parse_question_req
         else:
             raise HTTPException(
                 status_code=500,
-                detail=f"At least one of `image_string` or `prompt` are required!",
+                detail=f"At least one of `image_file` or `prompt` are required!",
             )
         # Upsert to db, assuming create_chat now correctly handles the parameters
         chat_id = supabase.create_chat(

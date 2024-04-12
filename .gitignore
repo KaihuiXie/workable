@@ -8,3 +8,6 @@
 __pycache__/
 *.pyc
 *.pytest_cache
+
+# Ignore .DS_store
+*.DS_store

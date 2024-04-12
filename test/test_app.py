@@ -23,18 +23,35 @@ client = TestClient(app)
 # def test_image():
 #     image_file_path = "./iphone.HEIC"
 #     # image_file_path = "./phone.jpeg"
+#     try:
+#         with open(image_file_path, "rb") as image_file:
+#             data = {
+#                 "user_id": "6e0d1fed-8845-488e-832d-4c767f0f5bb0",
+#                 "mode": "learner",
+#                 # "prompt": "Optional prompt here if needed",
+#             }
+#             files = {
+#                 "image_file": image_file,
+#             }
+#             response = client.post("/question", data=data, files=files)
+#             print(response.json())
+#             assert response.status_code == 200
+#     except Exception as e:
+#         logging.error(e)
 
+# def test_image_with_prompt():
+#     image_file_path = "./2024.png"
 #     with open(image_file_path, "rb") as image_file:
 #         data = {
 #             "user_id": "6e0d1fed-8845-488e-832d-4c767f0f5bb0",
-#             "mode": "learner",
-#             # "prompt": "Optional prompt here if needed",
+#             "mode": "helper",
+#             "prompt": "Solve this",
 #         }
 #         files = {
 #             "image_file": image_file,
 #         }
 #         response = client.post("/question", data=data, files=files)
-#         logging.debug(response.json())  # Log the JSON response
+#         print(response.json())
 #         assert response.status_code == 200
 
 
