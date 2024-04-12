@@ -14,6 +14,12 @@ from src.main import app
 
 client = TestClient(app)
 
+# def test_credit():
+#     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
+#     response = client.get(f"/credit/{user_id}")
+#     logging.error(response.json())
+#     assert response.status_code == 200
+
 # def test_image():
 #     image_file_path = "./iphone.HEIC"
 #     # image_file_path = "./phone.jpeg"

@@ -181,7 +181,7 @@ async def delete_chat(chat_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/credit")
+@app.get("/credit/{user_id}")
 async def get_credit(user_id: str):
     try:
         response = supabase.get_credit_by_user_id(user_id)
@@ -191,7 +191,7 @@ async def get_credit(user_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.put("credit/temp")
+@app.put("/credit/temp")
 async def update_temp_credit(user_id: str, credit: int):
     try:
         response = supabase.update_temp_credit_by_user_id(user_id, credit)
@@ -201,7 +201,7 @@ async def update_temp_credit(user_id: str, credit: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.put("credit/perm")
+@app.put("/credit/perm")
 async def update_perm_credit(user_id: str, credit: int):
     try:
         response = supabase.update_perm_credit_by_user_id(user_id, credit)
@@ -211,7 +211,7 @@ async def update_perm_credit(user_id: str, credit: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("credit/")
+@app.post("/credit/")
 async def create_credit(user_id: str):
     try:
         response = supabase.create_credit(user_id)
@@ -221,7 +221,7 @@ async def create_credit(user_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("first_login_of_the_day")
+@app.get("/first_login_of_the_day")
 async def get_first_loging(user_id: str):
     try:
         # if it is the first login of the day, increment the credit
