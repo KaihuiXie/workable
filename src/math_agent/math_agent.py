@@ -18,9 +18,19 @@ logging.basicConfig(level=logging.info)
 
 
 class MathAgent:
-    def __init__(self, openai_api_key, wolf_api_key):
-        self.client = OpenAI(api_key=openai_api_key)
+    def __init__(self, openai_api_keys: str, wolf_api_key):
+        self.open_ai_keys = [s.strip() for s in openai_api_keys.split(",")]
         self.wolf_api_key = wolf_api_key
+
+    def _get_openai_key(self):
+        # Remove and get the first element
+        cur_key = self.open_ai_keys.pop(0)
+        # Append the first element to the end of the list
+        self.open_ai_keys.append(cur_key)
+        return cur_key
+
+    def _cur_openai_client(self):
+        return OpenAI(api_key=self._get_openai_key())
 
     def _compose_image_content(self, image_base64_str, text_prompt):
         return [
@@ -32,8 +42,9 @@ class MathAgent:
         ]
 
     def query_vision(self, image_base64_str):
+        session = self._cur_openai_client()
         content = self._compose_image_content(image_base64_str, IMAGE_READING_PROMPT)
-        response = self.client.chat.completions.create(
+        response = session.chat.completions.create(
             model="gpt-4-vision-preview",
             messages=[{"role": "user", "content": content}],
             max_tokens=1000,
@@ -41,8 +52,9 @@ class MathAgent:
         return response.choices[0].message.content
 
     def query(self, messages):
-        stream = self.client.chat.completions.create(
-            model="gpt-4-0125-preview",
+        session = self._cur_openai_client()
+        stream = session.chat.completions.create(
+            model="gpt-4-turbo",
             messages=[{"role": m["role"], "content": m["content"]} for m in messages],
             stream=True,
         )
@@ -55,8 +67,9 @@ class MathAgent:
         return self._solve(question, LEARNING_PROMPT, messages)
 
     def _generate_wolfram_query(self, question):
-        response = self.client.chat.completions.create(
-            model="gpt-4-0125-preview",
+        session = self._cur_openai_client()
+        response = session.chat.completions.create(
+            model="gpt-4-turbo",
             messages=[
                 {"role": "user", "content": WOLFRAM_ALPHA_PROMPT.format(question)}
             ],
@@ -107,8 +120,9 @@ class MathAgent:
             return None
 
     def _extract_wolfram_alpha_response(self, wa_response, question):
-        response = self.client.chat.completions.create(
-            model="gpt-4-0125-preview",
+        session = self._cur_openai_client()
+        response = session.chat.completions.create(
+            model="gpt-4-turbo",
             messages=[
                 {"role": "system", "content": WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT},
                 {

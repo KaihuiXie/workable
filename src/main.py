@@ -22,19 +22,19 @@ from src.interfaces import (
     AllChatsRequest,
     Mode,
 )
-from src.utils import preprocess_image, bytes_to_base64
+from src.utils import preprocess_image
 
 # Configure logging
 logging.basicConfig(level=logging.info)
 
 # Initalization
 load_dotenv()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEYS = os.getenv("OPENAI_API_KEYS")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 WOLFRAM_ALPHA_APP_ID = os.getenv("WOLFRAM_ALPHA_APP_ID")
 supabase = Supabase(SUPABASE_URL, SUPABASE_KEY)
-math_agent = MathAgent(OPENAI_API_KEY, WOLFRAM_ALPHA_APP_ID)
+math_agent = MathAgent(OPENAI_API_KEYS, WOLFRAM_ALPHA_APP_ID)
 
 # FastAPI
 app = FastAPI()
