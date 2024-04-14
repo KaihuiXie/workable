@@ -3,6 +3,7 @@ from fastapi import UploadFile, Form, HTTPException, File
 from pydantic import BaseModel, model_validator, ValidationError
 from typing import Optional, List
 
+
 # Define the Mode enumeration
 class Mode(Enum):
     LEARNER = "learner"
@@ -69,3 +70,8 @@ class ChatRequest(BaseModel):
 
 class AllChatsRequest(BaseModel):
     user_id: str
+
+
+class CreditRequest(BaseModel):
+    user_id: str
+    credit: int

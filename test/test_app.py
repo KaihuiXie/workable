@@ -14,9 +14,49 @@ from src.main import app
 
 client = TestClient(app)
 
+
 # def test_credit():
 #     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
 #     response = client.get(f"/credit/{user_id}")
+#     logging.error(response.json())
+#     assert response.status_code == 200
+
+
+# This test would fail for 2 reasons:
+# 1. credit record has been created. To pass: delete the old record in Supabase
+# 2. user_id doesn't exist in auth.users. To pass: need to use a existing user_id
+# def test_create_credit():
+#     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
+#     response = client.post(f"/credit/{user_id}")
+#     print(response.json())
+#     logging.error(response.json())
+#     assert response.status_code == 200
+
+
+# def test_update_temp_credit():
+#     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
+#     credit_amount = 12
+#
+#     payload = {
+#         "user_id": user_id,
+#         "credit": credit_amount,
+#     }
+#
+#     response = client.put("/credit/temp", json=payload)
+#     logging.error(response.json())
+#     assert response.status_code == 200
+
+
+# def test_update_perm_credit():
+#     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
+#     credit_amount = 12
+#
+#     payload = {
+#         "user_id": user_id,
+#         "credit": credit_amount,
+#     }
+#
+#     response = client.put("/credit/perm", json=payload)
 #     logging.error(response.json())
 #     assert response.status_code == 200
 
@@ -76,16 +116,17 @@ client = TestClient(app)
 
 # def test_all_chats():
 #     payload = {
-#         "user_id": "6e0d1fed-8845-488e-832d-4c767f0f5bb0",
+#         "user_id": "1795b5e6-c839-474b-a3cc-d98c4afe365f",
 #     }
 #     response = client.post("/all_chats", json=payload)
+#     print(response.json())
 #     logging.error(response.json())
 #     assert response.status_code == 200
 
 
 # def test_helper():
 #     payload = {
-#         "chat_id": "e4aa146f-86d7-4cd1-a687-bc4acbaa921f",
+#         "chat_id": "178872f0-83ad-4976-8716-36701a67c3cf",
 #     }
 #     response = client.post("/solve", json=payload)
 #     assert response.status_code == 200

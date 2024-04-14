@@ -21,6 +21,7 @@ from src.interfaces import (
     ChatRequest,
     AllChatsRequest,
     Mode,
+    CreditRequest,
 )
 from src.utils import preprocess_image
 
@@ -181,6 +182,16 @@ async def delete_chat(chat_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/credit/{user_id}")
+async def create_credit(user_id: str):
+    try:
+        id = supabase.create_credit(user_id)
+        return {"id": id}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/credit/{user_id}")
 async def get_credit(user_id: str):
     try:
@@ -192,9 +203,11 @@ async def get_credit(user_id: str):
 
 
 @app.put("/credit/temp")
-async def update_temp_credit(user_id: str, credit: int):
+async def update_temp_credit(request: CreditRequest):
     try:
-        response = supabase.update_temp_credit_by_user_id(user_id, credit)
+        response = supabase.update_temp_credit_by_user_id(
+            request.user_id, request.credit
+        )
         return {"credit": response}
     except Exception as e:
         logging.error(e)
@@ -202,37 +215,12 @@ async def update_temp_credit(user_id: str, credit: int):
 
 
 @app.put("/credit/perm")
-async def update_perm_credit(user_id: str, credit: int):
+async def update_perm_credit(request: CreditRequest):
     try:
-        response = supabase.update_perm_credit_by_user_id(user_id, credit)
+        response = supabase.update_perm_credit_by_user_id(
+            request.user_id, request.credit
+        )
         return {"credit": response}
-    except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/credit/")
-async def create_credit(user_id: str):
-    try:
-        response = supabase.create_credit(user_id)
-        return {"id": response}
-    except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/first_login_of_the_day")
-async def get_first_loging(user_id: str):
-    try:
-        # if it is the first login of the day, increment the credit
-        last_login = supabase.get_last_login_by_user_id(user_id)
-        is_first_login = not is_same_day(last_login)
-        if is_first_login:  # award the temp credit for first login
-            prev_temp_credit = supabase.get_temp_credit_by_user_id(user_id)
-            supabase.update_temp_credit_by_user_id(
-                user_id, prev_temp_credit + EVERY_DAY_CREDIT_INCREMENT
-            )
-        return {"first_login": is_first_login}
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
@@ -255,7 +243,3 @@ async def event_generator(response, payload, chat_id):
         # Handle exceptions or end of stream
         logging.error(e)
         yield
-
-
-def is_same_day(date: datetime):
-    return date.date() == datetime.today().date()
