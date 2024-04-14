@@ -33,13 +33,6 @@ client = TestClient(app)
 #     assert response.status_code == 200
 
 
-# def test_get_first_sign_in():
-#     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
-#     response = client.get(f"/first_sign_in_of_the_day/{user_id}")
-#     print(response.json())
-#     logging.error(response.json())
-#     assert response.status_code == 200
-
 # def test_update_temp_credit():
 #     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
 #     credit_amount = 12
@@ -122,9 +115,10 @@ client = TestClient(app)
 
 # def test_all_chats():
 #     payload = {
-#         "user_id": "6e0d1fed-8845-488e-832d-4c767f0f5bb0",
+#         "user_id": "1795b5e6-c839-474b-a3cc-d98c4afe365f",
 #     }
 #     response = client.post("/all_chats", json=payload)
+#     print(response.json())
 #     logging.error(response.json())
 #     assert response.status_code == 200
 

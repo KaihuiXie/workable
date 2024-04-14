@@ -140,6 +140,7 @@ class Supabase:
                 .eq("user_id", user_id)
                 .execute()
             )
+            self.grant_login_award(user_id)
             return response
         except Exception as e:
             raise Exception(
@@ -321,6 +322,53 @@ class Supabase:
                 .execute()
             )
             return data[1][0]["last_sign_in_at"]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting last login by user email {user_id}: {e}"
+            )
+
+    # 1. Check if user is eligible for login award
+    # 1.1 get last_award_time
+    # 1.2 compare with today
+    # 2. if 1 is yes
+    # 2.1 get_prev_temp_credit
+    # 2.2 update_temp_credit
+    # 2.3 update last_award_time
+    def grant_login_award(self, user_id):
+        last_award_time = self.get_last_award_time_by_user_id(user_id)
+        is_eligible = not is_same_day(
+            #datetime.strptime(last_award_time, "%Y-%m-%dT%H:%M:%S.%f%z")
+            datetime.strptime(last_award_time, "%Y-%m-%dT%H:%M:%S%z")
+        )
+        if not is_eligible:
+            return
+        prev_temp_credit = self.get_temp_credit_by_user_id(user_id)
+        self.update_temp_credit_by_user_id(user_id, prev_temp_credit + EVERY_DAY_CREDIT_INCREMENT)
+        self.update_last_award_time_by_user_id(user_id)
+
+    def update_last_award_time_by_user_id(self, user_id):
+        try:
+            response = (
+                self.supabase.table("credits")
+                .update({"last_award_time": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S%z")})
+                .eq("user_id", user_id)
+                .execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during updating perm credit for user {user_id}: {e}"
+            )
+
+    def get_last_award_time_by_user_id(self, user_id):
+        try:
+            data, count = (
+                self.supabase.from_("credits")
+                .select("last_award_time")
+                .eq("user_id", user_id)
+                .execute()
+            )
+            return data[1][0]["last_award_time"]
         except Exception as e:
             raise Exception(
                 f"An error occurred during getting last login by user email {user_id}: {e}"

@@ -225,26 +225,6 @@ async def update_perm_credit(request: CreditRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/first_sign_in_of_the_day/{user_id}")
-async def get_first_sign_in(user_id: str):
-    try:
-        # if it is the first login of the day, increment the credit
-        last_sign_in = supabase.get_last_sign_in_by_user_id(user_id)
-        print(last_sign_in)
-        is_first_sign_in = not is_same_day(
-            datetime.strptime(last_sign_in, "%Y-%m-%dT%H:%M:%S.%f%z")
-        )
-        if is_first_sign_in:  # award the temp credit for first login
-            prev_temp_credit = supabase.get_temp_credit_by_user_id(user_id)
-            supabase.update_temp_credit_by_user_id(
-                user_id, prev_temp_credit + EVERY_DAY_CREDIT_INCREMENT
-            )
-        return {"first_sign_in": is_first_sign_in}
-    except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 async def event_generator(response, payload, chat_id):
     full_response = ""
     try:
@@ -262,7 +242,3 @@ async def event_generator(response, payload, chat_id):
         # Handle exceptions or end of stream
         logging.error(e)
         yield
-
-
-def is_same_day(date: datetime):
-    return date.date() == datetime.today().date()
