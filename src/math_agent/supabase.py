@@ -337,20 +337,28 @@ class Supabase:
     def grant_login_award(self, user_id):
         last_award_time = self.get_last_award_time_by_user_id(user_id)
         is_eligible = not is_same_day(
-            #datetime.strptime(last_award_time, "%Y-%m-%dT%H:%M:%S.%f%z")
+            # datetime.strptime(last_award_time, "%Y-%m-%dT%H:%M:%S.%f%z")
             datetime.strptime(last_award_time, "%Y-%m-%dT%H:%M:%S%z")
         )
         if not is_eligible:
             return
         prev_temp_credit = self.get_temp_credit_by_user_id(user_id)
-        self.update_temp_credit_by_user_id(user_id, prev_temp_credit + EVERY_DAY_CREDIT_INCREMENT)
+        self.update_temp_credit_by_user_id(
+            user_id, prev_temp_credit + EVERY_DAY_CREDIT_INCREMENT
+        )
         self.update_last_award_time_by_user_id(user_id)
 
     def update_last_award_time_by_user_id(self, user_id):
         try:
             response = (
                 self.supabase.table("credits")
-                .update({"last_award_time": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S%z")})
+                .update(
+                    {
+                        "last_award_time": datetime.now(timezone.utc).strftime(
+                            "%Y-%m-%d %H:%M:%S%z"
+                        )
+                    }
+                )
                 .eq("user_id", user_id)
                 .execute()
             )
