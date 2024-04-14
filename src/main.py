@@ -20,7 +20,8 @@ from src.interfaces import (
     parse_question_request,
     ChatRequest,
     AllChatsRequest,
-    Mode, CreditRequest,
+    Mode,
+    CreditRequest,
 )
 from src.utils import preprocess_image, bytes_to_base64
 
@@ -203,7 +204,9 @@ async def get_credit(user_id: str):
 @app.put("/credit/temp")
 async def update_temp_credit(request: CreditRequest):
     try:
-        response = supabase.update_temp_credit_by_user_id(request.user_id, request.credit)
+        response = supabase.update_temp_credit_by_user_id(
+            request.user_id, request.credit
+        )
         return {"credit": response}
     except Exception as e:
         logging.error(e)
@@ -213,7 +216,9 @@ async def update_temp_credit(request: CreditRequest):
 @app.put("/credit/perm")
 async def update_perm_credit(request: CreditRequest):
     try:
-        response = supabase.update_perm_credit_by_user_id(request.user_id, request.credit)
+        response = supabase.update_perm_credit_by_user_id(
+            request.user_id, request.credit
+        )
         return {"credit": response}
     except Exception as e:
         logging.error(e)
@@ -226,7 +231,9 @@ async def get_first_sign_in(user_id: str):
         # if it is the first login of the day, increment the credit
         last_sign_in = supabase.get_last_sign_in_by_user_id(user_id)
         print(last_sign_in)
-        is_first_sign_in = not is_same_day(datetime.strptime(last_sign_in, "%Y-%m-%dT%H:%M:%S.%f%z"))
+        is_first_sign_in = not is_same_day(
+            datetime.strptime(last_sign_in, "%Y-%m-%dT%H:%M:%S.%f%z")
+        )
         if is_first_sign_in:  # award the temp credit for first login
             prev_temp_credit = supabase.get_temp_credit_by_user_id(user_id)
             supabase.update_temp_credit_by_user_id(
