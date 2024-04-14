@@ -77,6 +77,7 @@ async def get_examples():
 async def prepare_question(request: QuestionRequest = Depends(parse_question_request)):
     try:
         question = ""
+        image_string = ""
         if request.image_file:
             image_bytes = await request.image_file.read()
             image_string = preprocess_image(image_bytes)

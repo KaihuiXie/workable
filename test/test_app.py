@@ -62,9 +62,10 @@ client = TestClient(app)
 #         "prompt": "There are chicken and rabbits in the cage. They are in total 10 heads and 20 feet. How many rabbits? ",
 #         "mode": "learner",
 #     }
-#     response = client.post("/question", json=payload)
+#     response = client.post("/question", data=payload)
 #     print(response.json())  # Log the JSON response
 #     assert response.status_code == 200
+
 
 # def test_examples():
 #     response = client.get("/examples")
