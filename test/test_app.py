@@ -14,9 +14,53 @@ from src.main import app
 
 client = TestClient(app)
 
+
 # def test_credit():
 #     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
 #     response = client.get(f"/credit/{user_id}")
+#     logging.error(response.json())
+#     assert response.status_code == 200
+
+
+# def test_create_credit():
+#     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
+#     response = client.post(f"/credit/{user_id}")
+#     print(response.json())
+#     logging.error(response.json())
+#     assert response.status_code == 200
+
+
+# def test_get_first_sign_in():
+#     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
+#     response = client.get(f"/first_sign_in_of_the_day/{user_id}")
+#     print(response.json())
+#     logging.error(response.json())
+#     assert response.status_code == 200
+
+# def test_update_temp_credit():
+#     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
+#     credit_amount = 12
+#
+#     payload = {
+#         "user_id": user_id,
+#         "credit": credit_amount,
+#     }
+#
+#     response = client.put("/credit/temp", json=payload)
+#     logging.error(response.json())
+#     assert response.status_code == 200
+
+
+# def test_update_perm_credit():
+#     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
+#     credit_amount = 12
+#
+#     payload = {
+#         "user_id": user_id,
+#         "credit": credit_amount,
+#     }
+#
+#     response = client.put("/credit/perm", json=payload)
 #     logging.error(response.json())
 #     assert response.status_code == 200
 

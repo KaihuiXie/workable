@@ -312,12 +312,12 @@ class Supabase:
         except Exception as e:
             raise Exception(f"An error occurred during creating a user credit: {e}")
 
-    def get_last_login_by_user_id(self, user_id):
+    def get_last_sign_in_by_user_id(self, user_id):
         try:
             data, count = (
-                self.supabase.auth.from_("users")
+                self.supabase.from_("credits")
                 .select("last_sign_in_at")
-                .eq("id", user_id)
+                .eq("user_id", user_id)
                 .execute()
             )
             return data[1][0]["last_sign_in_at"]

@@ -3,6 +3,7 @@ from fastapi import UploadFile, Form, HTTPException, File
 from pydantic import BaseModel, model_validator, ValidationError
 from typing import Optional, List
 
+
 # Define the Mode enumeration
 class Mode(Enum):
     LEARNER = "learner"
@@ -47,10 +48,10 @@ class QuestionRequest(BaseModel):
 
 # Dependency to parse QuestionRequest model from form data
 async def parse_question_request(
-    user_id: str = Form(...),
-    mode: Mode = Form(...),
-    prompt: Optional[str] = Form(None),
-    image_file: Optional[UploadFile] = File(None),
+        user_id: str = Form(...),
+        mode: Mode = Form(...),
+        prompt: Optional[str] = Form(None),
+        image_file: Optional[UploadFile] = File(None),
 ) -> QuestionRequest:
     try:
         # Construct the QuestionRequest object
@@ -69,3 +70,8 @@ class ChatRequest(BaseModel):
 
 class AllChatsRequest(BaseModel):
     user_id: str
+
+
+class CreditRequest(BaseModel):
+    user_id: str
+    credit: int
