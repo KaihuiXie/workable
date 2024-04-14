@@ -22,6 +22,9 @@ client = TestClient(app)
 #     assert response.status_code == 200
 
 
+# This test would fail for 2 reasons:
+# 1. credit record has been created. To pass: delete the old record in Supabase
+# 2. user_id doesn't exist in auth.users. To pass: need to use a existing user_id
 # def test_create_credit():
 #     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
 #     response = client.post(f"/credit/{user_id}")
