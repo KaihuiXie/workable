@@ -16,7 +16,7 @@ def is_same_day(date: datetime):
     return date.date() == datetime.today().date()
 
 
-def is_expired(timestamp):
+def is_invitation_expired(timestamp):
     invitation_expiration = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S%z")
     now = datetime.now(timezone.utc)
     # if now is greater than invitation expiration, then it is expired
@@ -407,7 +407,7 @@ class Supabase:
                 return self.create_invitation(user_id)
 
             # case2: if token expired, delete the old one, and then create a new token
-            if is_expired(expiration):
+            if is_invitation_expired(expiration):
                 self.delete_invitation_by_user_id(user_id)
                 return self.create_invitation(user_id)
 
@@ -461,10 +461,16 @@ class Supabase:
         try:
             data, count = (
                 self.supabase.from_("invitation")
-                .select("user_id")
+                .select("user_id, valid_until")
                 .eq("id", token)
                 .execute()
             )
+
+            user_id = data[1][0]["user_id"]
+            expiration = data[1][0]["valid_until"]
+
+            if is_invitation_expired(expiration):
+                return ""
             return data[1][0]["user_id"]
         except Exception as e:
             return ""
