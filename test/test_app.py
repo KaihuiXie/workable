@@ -15,6 +15,15 @@ from src.main import app
 client = TestClient(app)
 
 
+def test_get_referrer():
+    token = "3d9e633f-542b-47ab-9606-eb0f985b4082"
+
+    response = client.get(f"/referrer/{token}")
+    logging.error(response.json())
+    print(response.json())
+    assert response.status_code == 200
+
+
 # def test_get_invitation():
 #     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
 #     response = client.get(f"/invitation/{user_id}")
@@ -54,7 +63,6 @@ client = TestClient(app)
 #     response = client.put("/credit/temp", json=payload)
 #     logging.error(response.json())
 #     assert response.status_code == 200
-
 
 # def test_update_perm_credit():
 #     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"

@@ -415,7 +415,7 @@ class Supabase:
             return token
         except Exception as e:
             raise Exception(
-                f"An error occurred during getting user_id by user {user_id}: {e}"
+                f"An error occurred during getting invitation by user {user_id}: {e}"
             )
 
     def create_invitation(self, user_id):
@@ -426,8 +426,8 @@ class Supabase:
                     "%Y-%m-%dT%H:%M:%S%z"
                 ),
                 "valid_until": (
-                    datetime.now(timezone.utc)
-                    + dt.timedelta(days=INVITATION_TOKEN_EXPIRATION)
+                        datetime.now(timezone.utc)
+                        + dt.timedelta(days=INVITATION_TOKEN_EXPIRATION)
                 ).strftime("%Y-%m-%dT%H:%M:%S%z"),
             }
             data, count = self.supabase.table("invitation").insert(row_dict).execute()
@@ -439,7 +439,7 @@ class Supabase:
                     f"Unexpected number of records inserted: {len(data)}. Expected 1."
                 )
         except Exception as e:
-            raise Exception(f"An error occurred during creating a user credit: {e}")
+            raise Exception(f"An error occurred during creating invitation for user {user_id}: {e}")
 
     def delete_invitation_by_user_id(self, user_id):
         try:
@@ -454,3 +454,17 @@ class Supabase:
             raise Exception(
                 f"An error occurred during deleting invitation for user {user_id}: {e}"
             )
+
+    def get_referrer_id_by_invitation_token(self, token):
+        if token == "":
+            return ""
+        try:
+            data, count = (
+                self.supabase.from_("invitation")
+                .select("user_id")
+                .eq("id", token)
+                .execute()
+            )
+            return data[1][0]["user_id"]
+        except Exception as e:
+            return ""
