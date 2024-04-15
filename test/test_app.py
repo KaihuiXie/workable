@@ -15,9 +15,18 @@ from src.main import app
 client = TestClient(app)
 
 
+# def test_get_invitation():
+#     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
+#     response = client.get(f"/invitation/{user_id}")
+#     print(response.json())
+#     logging.error(response.json())
+#     assert response.status_code == 200
+
+
 # def test_credit():
 #     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
 #     response = client.get(f"/credit/{user_id}")
+#     print(response.json())
 #     logging.error(response.json())
 #     assert response.status_code == 200
 

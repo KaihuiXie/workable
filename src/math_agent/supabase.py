@@ -2,16 +2,24 @@ from supabase import create_client, Client, ClientOptions
 import uuid
 from datetime import datetime, timezone
 import json
+import datetime as dt
 
 from src.math_agent.constant import (
     EVERY_DAY_CREDIT_INCREMENT,
     COST_PER_QUESTION,
-    DEFAULT_CREDIT,
+    DEFAULT_CREDIT, INVITATION_TOKEN_EXPIRATION,
 )
 
 
 def is_same_day(date: datetime):
     return date.date() == datetime.today().date()
+
+
+def is_expired(timestamp):
+    invitation_expiration = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S%z")
+    now = datetime.now(timezone.utc)
+    # if now is greater than invitation expiration, then it is expired
+    return now > invitation_expiration
 
 
 class Supabase:
@@ -337,7 +345,6 @@ class Supabase:
     def grant_login_award(self, user_id):
         last_award_time = self.get_last_award_time_by_user_id(user_id)
         is_eligible = not is_same_day(
-            # datetime.strptime(last_award_time, "%Y-%m-%dT%H:%M:%S.%f%z")
             datetime.strptime(last_award_time, "%Y-%m-%dT%H:%M:%S%z")
         )
         if not is_eligible:
@@ -355,7 +362,7 @@ class Supabase:
                 .update(
                     {
                         "last_award_time": datetime.now(timezone.utc).strftime(
-                            "%Y-%m-%d %H:%M:%S%z"
+                            "%Y-%m-%dT%H:%M:%S%z"
                         )
                     }
                 )
@@ -381,3 +388,57 @@ class Supabase:
             raise Exception(
                 f"An error occurred during getting last login by user email {user_id}: {e}"
             )
+
+    def get_invitation_by_user_id(self, user_id):
+        try:
+            data, count = (
+                self.supabase.from_("invitation")
+                .select("id, valid_until")
+                .eq("user_id", user_id)
+                .execute()
+            )
+
+            token = data[1][0]["id"]
+            expiration = data[1][0]["valid_until"]
+
+            # case1, if token does not exist, then create a new token
+            if token == "":
+                return self.create_invitation(user_id)
+
+            # case2: if token expired, delete the old one, and then create a new token
+            if is_expired(expiration):
+                self.delete_invitation_by_user_id(user_id)
+                return self.create_invitation(user_id)
+
+            # case3: return a valid token
+            return token
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting user_id by user {user_id}: {e}"
+            )
+
+    def create_invitation(self, user_id):
+        try:
+            row_dict = {
+                "user_id": user_id,
+                "created_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S%z"),
+                "valid_until": (datetime.now(timezone.utc) + dt.timedelta(days=INVITATION_TOKEN_EXPIRATION))
+                .strftime("%Y-%m-%dT%H:%M:%S%z"),
+            }
+            data, count = self.supabase.table("invitation").insert(row_dict).execute()
+            # Check if exactly one record was inserted
+            if len(data[1]) == 1:
+                return data[1][0]["id"]
+            else:
+                raise ValueError(
+                    f"Unexpected number of records inserted: {len(data)}. Expected 1."
+                )
+        except Exception as e:
+            raise Exception(f"An error occurred during creating a user credit: {e}")
+
+    def delete_invitation_by_user_id(self, user_id):
+        try:
+            response = self.supabase.table("invitation").delete().eq("user_id", user_id).execute()
+            return response
+        except Exception as e:
+            raise Exception(f"An error occurred during deleting invitation for user {user_id}: {e}")

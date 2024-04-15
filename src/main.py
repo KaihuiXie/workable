@@ -226,6 +226,16 @@ async def update_perm_credit(request: CreditRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/invitation/{user_id}")
+async def get_invitation(user_id: str):
+    try:
+        response = supabase.get_invitation_by_user_id(user_id)
+        return {"token": response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 async def event_generator(response, payload, chat_id):
     full_response = ""
     try:
