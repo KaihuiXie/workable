@@ -471,6 +471,6 @@ class Supabase:
 
             if is_invitation_expired(expiration):
                 return ""
-            return data[1][0]["user_id"]
+            return user_id
         except Exception as e:
             return ""
