@@ -7,7 +7,8 @@ import datetime as dt
 from src.math_agent.constant import (
     EVERY_DAY_CREDIT_INCREMENT,
     COST_PER_QUESTION,
-    DEFAULT_CREDIT, INVITATION_TOKEN_EXPIRATION,
+    DEFAULT_CREDIT,
+    INVITATION_TOKEN_EXPIRATION,
 )
 
 
@@ -421,9 +422,13 @@ class Supabase:
         try:
             row_dict = {
                 "user_id": user_id,
-                "created_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S%z"),
-                "valid_until": (datetime.now(timezone.utc) + dt.timedelta(days=INVITATION_TOKEN_EXPIRATION))
-                .strftime("%Y-%m-%dT%H:%M:%S%z"),
+                "created_at": datetime.now(timezone.utc).strftime(
+                    "%Y-%m-%dT%H:%M:%S%z"
+                ),
+                "valid_until": (
+                    datetime.now(timezone.utc)
+                    + dt.timedelta(days=INVITATION_TOKEN_EXPIRATION)
+                ).strftime("%Y-%m-%dT%H:%M:%S%z"),
             }
             data, count = self.supabase.table("invitation").insert(row_dict).execute()
             # Check if exactly one record was inserted
@@ -438,7 +443,14 @@ class Supabase:
 
     def delete_invitation_by_user_id(self, user_id):
         try:
-            response = self.supabase.table("invitation").delete().eq("user_id", user_id).execute()
+            response = (
+                self.supabase.table("invitation")
+                .delete()
+                .eq("user_id", user_id)
+                .execute()
+            )
             return response
         except Exception as e:
-            raise Exception(f"An error occurred during deleting invitation for user {user_id}: {e}")
+            raise Exception(
+                f"An error occurred during deleting invitation for user {user_id}: {e}"
+            )
