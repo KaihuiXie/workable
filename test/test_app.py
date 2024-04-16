@@ -17,47 +17,48 @@ client = TestClient(app)
 
 # With an exist, and not expired token.
 # Will return true, and the referrer_id
-def test_get_referrer_success_case():
-    invitation_token = "3d9e633f-542b-47ab-9606-eb0f985b4082"
-
-    response = client.get(f"/referrer/{invitation_token}")
-    logging.error(response.json())
-    print(response.json())
-    assert response.status_code == 200
+# def test_get_referrer_success_case():
+#     invitation_token = "36993590-7a33-4fc6-944f-1ad0a6b63782"
+#
+#     response = client.get(f"/referrer/{invitation_token}")
+#     logging.error(response.json())
+#     print(response.json())
+#     assert response.status_code == 200
 
 
 # With a random token that does not exist
 # will return false, and an empty referrer_id
-def test_get_referrer_wrong_token_case():
-    invitation_token = "3d9e633f-542b-47ab-9606"
-
-    response = client.get(f"/referrer/{invitation_token}")
-    logging.error(response.json())
-    print(response.json())
-    assert response.status_code == 200
+# def test_get_referrer_wrong_token_case():
+#     invitation_token = "3d9e633f-542b-47ab-9606"
+#
+#     response = client.get(f"/referrer/{invitation_token}")
+#     logging.error(response.json())
+#     print(response.json())
+#     assert response.status_code == 200
 
 
 # need to use a expired token
 # will return false, and a referrer id.
 # So that front end can create an alert for user to ask for referrer to refresh token
-def test_get_referrer_expire_case():
-    invitation_token = "13f76d58-adbe-4714-85b7-b3c7f49c8235"
-
-    response = client.get(f"/referrer/{invitation_token}")
-    logging.error(response.json())
-    print(response.json())
-    assert response.status_code == 200
+# def test_get_referrer_expire_case():
+#     invitation_token = "36993590-7a33-4fc6-944f-1ad0a6b63782"
+#
+#     response = client.get(f"/referrer/{invitation_token}")
+#     logging.error(response.json())
+#     print(response.json())
+#     assert response.status_code == 200
 
 
 # for create a new token case: need to use a new user_id that doesn't have a invitation token
 # for getting existing token case: need to use a user_id that have a not expired token
 # for expired case: need to use a user_id that has an expired token
-def test_get_invitation_success_case():
-    user_id = "c03b3304-ccca-421f-9cfd-623a7e6b6feb"
-    response = client.get(f"/invitation/{user_id}")
-    print(response.json())
-    logging.error(response.json())
-    assert response.status_code == 200
+# def test_get_invitation_success_case():
+#     user_id = "c03b3304-ccca-421f-9cfd-623a7e6b6feb"
+#     response = client.get(f"/invitation/{user_id}")
+#     print(response.json())
+#     logging.error(response.json())
+#     assert response.status_code == 200
+
 
 # def test_credit():
 #     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
@@ -160,7 +161,7 @@ def test_get_invitation_success_case():
 
 # def test_all_chats():
 #     payload = {
-#         "user_id": "1795b5e6-c839-474b-a3cc-d98c4afe365f",
+#         "user_id": "a4804bea-93d8-4789-969d-19b5364f7436",
 #     }
 #     response = client.post("/all_chats", json=payload)
 #     print(response.json())

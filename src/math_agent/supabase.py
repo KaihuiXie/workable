@@ -311,6 +311,9 @@ class Supabase:
                 "user_id": user_id,
                 "temp_credit": DEFAULT_CREDIT,
                 "perm_credit": DEFAULT_CREDIT,
+                "last_award_time": datetime.now(timezone.utc).strftime(
+                    "%Y-%m-%dT%H:%M:%S%z"
+                ),
             }
             data, count = self.supabase.table("credits").insert(row_dict).execute()
             # Check if exactly one record was inserted
@@ -427,8 +430,8 @@ class Supabase:
                     "%Y-%m-%dT%H:%M:%S%z"
                 ),
                 "valid_until": (
-                        datetime.now(timezone.utc)
-                        + dt.timedelta(days=INVITATION_TOKEN_EXPIRATION)
+                    datetime.now(timezone.utc)
+                    + dt.timedelta(days=INVITATION_TOKEN_EXPIRATION)
                 ).strftime("%Y-%m-%dT%H:%M:%S%z"),
             }
             data, count = self.supabase.table("invitation").insert(row_dict).execute()
@@ -440,7 +443,9 @@ class Supabase:
                     f"Unexpected number of records inserted: {len(data)}. Expected 1."
                 )
         except Exception as e:
-            raise Exception(f"An error occurred during creating invitation for user {user_id}: {e}")
+            raise Exception(
+                f"An error occurred during creating invitation for user {user_id}: {e}"
+            )
 
     def delete_invitation_by_user_id(self, user_id):
         try:
