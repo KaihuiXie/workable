@@ -20,8 +20,7 @@ from src.interfaces import (
     parse_question_request,
     ChatRequest,
     AllChatsRequest,
-    Mode,
-    CreditRequest,
+    Mode, CreditRequest,
 )
 from src.utils import preprocess_image
 
@@ -220,6 +219,29 @@ async def update_perm_credit(request: CreditRequest):
             request.user_id, request.credit
         )
         return {"credit": response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/referrer/{invitation_token}")
+async def get_referrer(invitation_token: str):
+    try:
+        is_invited, referrer_id = supabase.get_referrer_id_by_invitation_token(invitation_token)
+        return {
+            "is_invited": is_invited,
+            "referrer_id": referrer_id
+        }
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/invitation/{user_id}")
+async def get_invitation(user_id: str):
+    try:
+        response = supabase.get_invitation_by_user_id(user_id)
+        return {"token": response}
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
