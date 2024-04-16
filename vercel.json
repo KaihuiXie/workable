@@ -12,8 +12,11 @@
         "dest": "src/main.py"
       }
     ],
+    "rewrites": [
+      { "source": "/src", "destination": "/api" }
+    ],
     "functions": {
-      "src/main.py": {
+      "api/main.py": {
         "maxDuration": 100
       }
     }
