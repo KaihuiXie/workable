@@ -8,9 +8,6 @@ from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 import logging
-import time
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request
 
 from src.math_agent.constant import EVERY_DAY_CREDIT_INCREMENT
 from src.math_agent.math_agent import MathAgent
@@ -22,6 +19,10 @@ from src.interfaces import (
     AllChatsRequest,
     Mode,
     CreditRequest,
+)
+from src.middlewares import (
+    ExtendTimeoutMiddleware,
+    TimerMiddleware,
 )
 from src.utils import preprocess_image
 
@@ -53,16 +54,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-
-class TimerMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        start_time = time.time()
-        response = await call_next(request)
-        process_time = time.time() - start_time
-        response.headers["X-Process-Time"] = str(process_time)
-        return response
-
-
+app.add_middleware(ExtendTimeoutMiddleware)
 app.add_middleware(TimerMiddleware)
 
 
