@@ -399,12 +399,12 @@ class Supabase:
                 .execute()
             )
 
+            # case1, if token does not exist, then create a new token
+            if len(data[1]) == 0 or not data[1]:
+                return self.create_invitation(user_id)
+
             token = data[1][0]["id"]
             expiration = data[1][0]["valid_until"]
-
-            # case1, if token does not exist, then create a new token
-            if token == "":
-                return self.create_invitation(user_id)
 
             # case2: if token expired, delete the old one, and then create a new token
             if is_invitation_expired(expiration):
@@ -457,7 +457,7 @@ class Supabase:
 
     def get_referrer_id_by_invitation_token(self, token):
         if token == "":
-            return ""
+            return False, ""
         try:
             data, count = (
                 self.supabase.from_("invitation")
@@ -470,7 +470,7 @@ class Supabase:
             expiration = data[1][0]["valid_until"]
 
             if is_invitation_expired(expiration):
-                return ""
-            return user_id
+                return False, user_id
+            return True, user_id
         except Exception as e:
-            return ""
+            return False, ""

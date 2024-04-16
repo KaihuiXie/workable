@@ -228,8 +228,11 @@ async def update_perm_credit(request: CreditRequest):
 @app.get("/referrer/{invitation_token}")
 async def get_referrer(invitation_token: str):
     try:
-        response = supabase.get_referrer_id_by_invitation_token(invitation_token)
-        return {"referrer_id": response}
+        is_invited, referrer_id = supabase.get_referrer_id_by_invitation_token(invitation_token)
+        return {
+            "is_invited": is_invited,
+            "referrer_id": referrer_id
+        }
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
