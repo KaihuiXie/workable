@@ -138,7 +138,6 @@ async def chat(request: ChatRequest):
         # Query db to get messages
         payload = supabase.get_chat_payload_by_id(request.chat_id)
         payload["messages"].append({"role": "user", "content": request.query})
-
         response = math_agent.query(payload["messages"])
 
         return StreamingResponse(

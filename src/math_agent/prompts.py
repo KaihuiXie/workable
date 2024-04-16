@@ -1,30 +1,30 @@
 LATEX_PROMPT = """
 ========
 LATEX REQUIREMENTS:
-1. Wrap LaTeX code with single dollar signs for inline LaTeX. For example: $x^2$ renders inline as \(x^2\).
-2. Use double dollar signs for equations that should appear centered on their own lines. For example:
-    $$
-    ax^2 + bx + c
-    $$
+1. Wrap LaTeX code with backticks for inline LaTeX. For example: `x^2` renders inline as \(x^2\).
+2. Use fenced code for equations that should appear centered on their own lines. For example:
+```math
+ax^2 + bx + c
+```
 renders as a centered equation \(ax^2 + bx + c\).
 
 3. Use the \dfrac{}{} command for display fractions, which renders fractions on separate lines. Here's how you can apply it:
-    $$
-    \dfrac{numerator}{denominator}
-    $$
+```math
+\dfrac{numerator}{denominator}
+```
 Replace 'numerator' and 'denominator' with the appropriate expressions.
 
-4. To correctly denote exponentiation, always use the caret (^) symbol. For instance, $2^x$ indicates \(2\) raised to the power of \(x\), distinctly different from $2x$, which represents \(2\) multiplied by \(x\).
+4. To correctly denote exponentiation, always use the caret (^) symbol. For instance, `2^x` indicates \(2\) raised to the power of \(x\), distinctly different from `2x`, which represents \(2\) multiplied by \(x\).
 
-5. When writing exponentiation with more than one term in the exponent, enclose the terms in curly braces. For example, $2^{x+1}$ renders as \(2^{x+1}\), which is correct.
+5. When writing exponentiation with more than one term in the exponent, enclose the terms in curly braces. For example, `2^{x+1}` renders as \(2^{x+1}\), which is correct.
 
 6. Be attentive to the placement of curly braces {} to ensure grouping of terms, especially in exponents and fractions.
 
 EXAMPLE:
 The equation
-$$
+```math
 \dfrac{66-2^x}{2^x+3} = \dfrac{4-2^x}{2^{x+1}+6}
-$$
+```
 should be input into LaTeX as shown to ensure correct rendering and interpretation by LaTeX compilers and mathematical software.
 
 Remember: Consistency and attention to detail in formatting are key to correctly rendering mathematical expressions in LaTeX.
@@ -55,21 +55,20 @@ Requriments:
 1. Evaluate the renference answer first!! If the reference answer DOES NOT make sense, COMPLETELY IGNORE the reference answer.
 2. NEVER mention the existance of the reference answer in your response.
 3. If there are image urls avaiable in the reference answer, include them in the answer in a markdown format with brief introduction. Example: ![Cute Puppy](https://example.com/path/to/puppy.jpg "A Cute Puppy")
+4. Finally, DOUBLE-CHECK your final answer and make sure it is correct!
 =======
 Now follow the following steps:
 {{mode_prompt}}
 
-Finally, DOUBLE-CHECK your final answer and make sure it is correct!
 =====
 <question>{{{{question}}}}</question><reference>{{{{reference}}}}</reference>
 """
 
 HELPER_PROMPT_PART = """
-1. If the problem has choices to select.
-First, please present the final answer within a single rectangular box. Then, provide a step-by-step explanation as concise as possible.
-
-2. If the problem does NOT have choices to select.
-First, provide a step-by-step explanation as concise as possible. Then, present the final answer within a single rectangular box.
+0. Return two sections. "Result" and "Step-by-Step Explanation"
+1. First, show the final answer within a rectangular box.
+2. Provide a step-by-step explanation with necessary knowledge point. Example: "According to **the order of operations**, the expression should be solved ..."
+3. Make the explaination as concise as possible.
 """
 
 HELPER_PROMPT = MODE_PROMPT_TEMPLATE.format(mode_prompt=HELPER_PROMPT_PART)
@@ -100,7 +99,7 @@ You are an expert in parsing and understanding wolfram alpha full result respons
 You will be provided with a JSON response, delimited with <response> and the question, delimited with <question>.
 Your task is to:
 1. extract the final result and summarize with brefit answers.
-2. extract related images urls from the pods.
+2. extract ONLY images urls that are related to plots and visualizations from the pods.
 Requirements:
 1. MUST only return the most relevant answer and image urls.
 2. Re-evalute the result based on the question, the input response could be wrong.

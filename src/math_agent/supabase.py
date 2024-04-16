@@ -136,8 +136,9 @@ class Supabase:
         try:
             response = (
                 self.supabase.from_("chats")
-                .select("id, question, learner_mode", count="exact")
+                .select("id, question, learner_mode, created_at", count="exact")
                 .eq("user_id", user_id)
+                .order("created_at", desc=True)
                 .execute()
             )
             self.grant_login_award(user_id)

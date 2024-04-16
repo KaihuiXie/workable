@@ -141,7 +141,10 @@ client = TestClient(app)
 
 
 # def test_chat():
-#     payload = {"chat_id": "2121490b-a396-45fd-aaa4-4abf785443e7", "query": "what's new"}
+#     payload = {
+#         "chat_id": "2121490b-a396-45fd-aaa4-4abf785443e7",
+#         "query": "what's new"
+#     }
 #     response = client.post("/chat", json=payload)
 #     assert response.status_code == 200
 

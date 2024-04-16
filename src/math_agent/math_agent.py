@@ -2,7 +2,6 @@ from openai import OpenAI
 import requests
 import logging
 
-
 from src.math_agent.prompts import (
     IMAGE_READING_PROMPT,
     HELPER_PROMPT,
