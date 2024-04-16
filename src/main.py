@@ -116,11 +116,14 @@ async def solve(request: ChatRequest):
             response = math_agent.helper(question, payload["messages"])
 
         # decrement credit for user
-        user_id = supabase.get_user_id_by_chat_id(request.chat_id)
-        supabase.decrement_credit(user_id)
+        def decrement_credit_callback():
+            user_id = supabase.get_user_id_by_chat_id(request.chat_id)
+            supabase.decrement_credit(user_id)
 
         return StreamingResponse(
-            event_generator(response, payload, request.chat_id),
+            event_generator(
+                response, payload, request.chat_id, callback=decrement_credit_callback
+            ),
             media_type="text/event-stream",
         )
 
@@ -244,7 +247,7 @@ async def get_invitation(user_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-async def event_generator(response, payload, chat_id):
+async def event_generator(response, payload, chat_id, callback=None):
     full_response = ""
     try:
         for event in response:
@@ -257,6 +260,8 @@ async def event_generator(response, payload, chat_id):
         # print(full_response)
         payload["messages"].append({"role": "assistant", "content": full_response})
         supabase.update_payload(chat_id, payload)
+        if callback:
+            callback()
     except Exception as e:
         # Handle exceptions or end of stream
         logging.error(e)
