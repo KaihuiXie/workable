@@ -120,11 +120,12 @@ class Supabase:
                 f"An error occurred during getting chat question by chat_id {chat_id}: {e}"
             )
 
-    def create_chat(self, image_str, user_id, question, is_learner_mode):
+    def create_chat(self, image_str, thumbnail_str, user_id, question, is_learner_mode):
         try:
             payload = self.question_to_payload(question)
             row_dict = {
                 "image_str": image_str,
+                "thumbnail_str": thumbnail_str,
                 "user_id": user_id,
                 "question": question,
                 "payload": payload,
@@ -145,7 +146,10 @@ class Supabase:
         try:
             response = (
                 self.supabase.from_("chats")
-                .select("id, question, learner_mode, created_at", count="exact")
+                .select(
+                    "id, thumbnail_str, question, learner_mode, created_at",
+                    count="exact",
+                )
                 .eq("user_id", user_id)
                 .order("created_at", desc=True)
                 .execute()

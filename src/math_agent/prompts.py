@@ -72,7 +72,7 @@ Now follow the following steps:
 
 HELPER_PROMPT_PART = """
 0. Return two sections. "Result" and "Step-by-Step Explanation"
-1. First, show the final answer within a rectangular box. Example: $$ \boxed{-\dfrac{1}{xy} + \log y = C} $$
+1. First, show the final answer within a rectangular box, including the answer and choice if possible. Example: $$ \boxed{ (b) -\dfrac{1}{xy} + \log y = C} $$
 2. Provide a step-by-step explanation with necessary knowledge point. Example: "According to **the order of operations**, the expression should be solved ..."
 3. Make the explaination as concise as possible.
 """

@@ -124,6 +124,7 @@ client = TestClient(app)
 #     except Exception as e:
 #         logging.error(e)
 
+
 # def test_image_with_prompt():
 #     image_file_path = "./2024.png"
 #     with open(image_file_path, "rb") as image_file:

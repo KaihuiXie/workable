@@ -76,9 +76,10 @@ async def prepare_question(request: QuestionRequest = Depends(parse_question_req
     try:
         question = ""
         image_string = ""
+        thumbnail_string = ""
         if request.image_file:
             image_bytes = await request.image_file.read()
-            image_string = preprocess_image(image_bytes)
+            image_string, thumbnail_string = preprocess_image(image_bytes)
             question = math_agent.query_vision(image_string, request.prompt)
         elif request.prompt:
             question = request.prompt
@@ -89,10 +90,11 @@ async def prepare_question(request: QuestionRequest = Depends(parse_question_req
             )
         # Upsert to db, assuming create_chat now correctly handles the parameters
         chat_id = supabase.create_chat(
-            image_string,
-            request.user_id,
-            question,
-            request.mode == Mode.LEARNER,
+            image_str=image_string,
+            thumbnail_str=thumbnail_string,
+            user_id=request.user_id,
+            question=question,
+            is_learner_mode=(request.mode == Mode.LEARNER),
         )
         return {"chat_id": chat_id, "question": question}
     except Exception as e:

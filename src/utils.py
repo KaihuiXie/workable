@@ -43,7 +43,20 @@ def bytes_to_base64(bytes):
 def preprocess_image(image_bytes, shrink_ratio=1.0):
     try:
         jpeg_bytes = convert_to_jpeg(image_bytes, shrink_ratio)
-        return bytes_to_base64(jpeg_bytes)
+        base64_str = bytes_to_base64(jpeg_bytes)
+        thumbnail_str = generate_thumbnail_string(jpeg_bytes)
+        return base64_str, thumbnail_str
     except Exception as e:
         logging.error(e)
         raise Exception(f"An error occurred preprocessing image: {e}")
+
+
+def generate_thumbnail_string(image_bytes, thumbnail_size=(128, 128)):
+    image = Image.open(BytesIO(image_bytes))
+    image.thumbnail(thumbnail_size)
+    # Save image to a bytes buffer instead of a file
+    img_byte_arr = BytesIO()
+    image.save(img_byte_arr, format=image.format)
+    # Encode the bytes buffer to Base64 string
+    base64_string = bytes_to_base64(img_byte_arr.getvalue())
+    return base64_string
