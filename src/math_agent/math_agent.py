@@ -131,9 +131,10 @@ class MathAgent:
             response_data = response.json()
             end_time = time.time()
             print("query wolfram took:", end_time - start_time)
-            if not response_data["queryresult"]["success"]:
+            if {"success", "pods"} <= response_data["queryresult"].keys():
+                return response_data["queryresult"]["pods"]
+            else:
                 return None
-            return response_data["queryresult"]["pods"]
         except KeyError as e:
             error_message = f"KeyError: The key {e} is missing in the response."
             logging.error(error_message)
