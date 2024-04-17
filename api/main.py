@@ -134,6 +134,7 @@ async def solve(request: ChatRequest):
         )
 
     except Exception as e:
+        print(e)
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 

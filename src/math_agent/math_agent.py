@@ -92,31 +92,34 @@ class MathAgent:
         return response_str
 
     def _solve(self, question, mode_prompt, messages):
+        try:
+            wolfram_alpha_response = self._query_wolfram_alpha(question)
 
-        wolfram_alpha_response = self._query_wolfram_alpha(question)
+            start_time = time.time()
 
-        start_time = time.time()
+            extracted_response = ""
+            if wolfram_alpha_response:
+                extracted_response = self._extract_wolfram_alpha_response(
+                    wolfram_alpha_response, question
+                )
 
-        extracted_response = ""
-        if wolfram_alpha_response:
-            extracted_response = self._extract_wolfram_alpha_response(
-                wolfram_alpha_response, question
+            end_time1 = time.time()
+            print("extract wolfram took:", end_time1 - start_time)
+
+            text_prompt = (mode_prompt).format(
+                question=question, reference=extracted_response
             )
 
-        end_time1 = time.time()
-        print("extract wolfram took:", end_time1 - start_time)
-
-        text_prompt = (mode_prompt).format(
-            question=question, reference=extracted_response
-        )
-
-        messages.extend(
-            [
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": text_prompt},
-            ]
-        )
-        return self.query(messages)
+            messages.extend(
+                [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": text_prompt},
+                ]
+            )
+            return self.query(messages)
+        except Exception as e:
+            print(e)
+            raise Exception(e)
 
     def _query_wolfram_alpha(self, query):
         url = "http://api.wolframalpha.com/v2/query"
@@ -131,8 +134,13 @@ class MathAgent:
             response_data = response.json()
             end_time = time.time()
             print("query wolfram took:", end_time - start_time)
-            if {"success", "pods"} <= response_data["queryresult"].keys():
-                return response_data["queryresult"]["pods"]
+            query_result = response_data["queryresult"]
+            if (
+                query_result.get("success")
+                and "pods" in query_result
+                and query_result["pods"]
+            ):
+                return query_result["pods"]
             else:
                 return None
         except KeyError as e:
