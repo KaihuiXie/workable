@@ -1,7 +1,7 @@
 LATEX_PROMPT = """
 ========
 LATEX REQUIREMENTS:
-1.Wrap LaTeX code with single dollar signs for inline LaTeX. For example: $x^2$ renders inline as \(x^2\).
+1.Wrap LaTeX code with single dollar signs for inline LaTeX. For example: use $x^2$ renders inlinefor x^2. Another example $\angle CAD% for angle CAD.
 2. Use fenced code for equations that should appear centered on their own lines. For example:
 ```math
 ax^2 + bx + c
