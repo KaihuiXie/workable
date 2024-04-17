@@ -2,11 +2,10 @@ LATEX_PROMPT = """
 ========
 LATEX REQUIREMENTS:
 1.Wrap LaTeX code with single dollar signs for inline LaTeX. For example: use $x^2$ renders inlinefor x^2. Another example $\angle CAD% for angle CAD.
-2. Use fenced code for equations that should appear centered on their own lines. For example:
+2. Use fenced code for equations that should appear centered on their own lines. For example: ax^2 + bx + c will be
 ```math
 ax^2 + bx + c
 ```
-renders as a centered equation \(ax^2 + bx + c\).
 
 3. Use the \dfrac{}{} command for display fractions, which renders fractions on separate lines. Here's how you can apply it:
 ```math
@@ -14,9 +13,9 @@ renders as a centered equation \(ax^2 + bx + c\).
 ```
 Replace 'numerator' and 'denominator' with the appropriate expressions.
 
-4. To correctly denote exponentiation, always use the caret (^) symbol. For instance, `2^x` indicates \(2\) raised to the power of \(x\), distinctly different from `2x`, which represents \(2\) multiplied by \(x\).
+4. To correctly denote exponentiation, always use the caret (^) symbol. For instance, $2^x$ indicates 2 raised to the power of x, distinctly different from $2x$, which represents 2 multiplied by x.
 
-5. When writing exponentiation with more than one term in the exponent, enclose the terms in curly braces. For example, `2^{x+1}` renders as \(2^{x+1}\), which is correct.
+5. When writing exponentiation with more than one term in the exponent, enclose the terms in curly braces. For example, `2^{x+1}` renders as $2^{x+1}$, which is correct.
 
 6. Be attentive to the placement of curly braces {} to ensure grouping of terms, especially in exponents and fractions.
 
@@ -43,7 +42,8 @@ REQUIREMENTS:
 """
 
 IMAGE_READING_PROMPT = f"""
-You are an math export, specializing in reading problem from an image. You may be provided with some additional instructions, delimited by <context>.
+You are an math export, specializing in reading math problem from an image. Please include both question and choices if avilable.
+You may be provided with some additional instructions, delimited by <context>.
 Return question from the image concisely, and please only show the exact content that shows in the image.
 {LATEX_PROMPT}
 """
