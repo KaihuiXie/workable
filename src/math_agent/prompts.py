@@ -1,7 +1,7 @@
 LATEX_PROMPT = """
 ========
 LATEX REQUIREMENTS:
-1. Wrap LaTeX code within escaped brackets \( ... \) for inline LaTeX. For example: use \(x^2\) ti render x^2 inline.
+1.Wrap LaTeX code with single dollar signs for inline LaTeX. For example: $x^2$ renders inline as \(x^2\).
 2. Use fenced code for equations that should appear centered on their own lines. For example:
 ```math
 ax^2 + bx + c
@@ -80,7 +80,7 @@ HELPER_PROMPT = MODE_PROMPT_TEMPLATE.format(mode_prompt=HELPER_PROMPT_PART)
 
 LEARNING_PROMPT_PART = """
 1. First, based on the problem, please provide 2-3 knowledge points using concise language with the bold subtitle "Knowledge Points". Avoid considering “Simplify the expression” and “Combining terms” as standalone knowledge points.
-2. Then, having another bold subtitle "Now, let's work through the problem together with a few step-by-step guiding questions." guide me with asking one concise, guiding question in the format of multiple choice (4 different choices) toward the correct solution.
+2. Then, having another bold subtitle "Now, let's work through the problem together with a few step-by-step guiding questions." guide me with asking one concise, guiding question in the format of multiple choice (4 different choices AND each in a new line) toward the correct solution.
 3. Once I answered each guiding question, please tell me know the correctness. If it's correct, please proceed to the next guiding question. If it's wrong or the user says “I don't know”, provide more hints instead of directly telling me the correct answer.
 """
 
