@@ -257,7 +257,7 @@ async def event_generator(response, payload, chat_id, callback=None):
                 event_data = {"text": event_text}
                 yield f"data: {json.dumps(event_data)}\n\n"
         logging.info(full_response)
-        # print(full_response)
+        print(full_response)
         payload["messages"].append({"role": "assistant", "content": full_response})
         supabase.update_payload(chat_id, payload)
         if callback:

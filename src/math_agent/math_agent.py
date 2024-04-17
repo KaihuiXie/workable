@@ -13,7 +13,7 @@ from src.math_agent.prompts import (
 )
 
 # Configure logging
-logging.basicConfig(level=logging.info)
+logging.basicConfig(level=logging.INFO)
 
 
 class MathAgent:

@@ -18,7 +18,7 @@ cp .env.example .env
 
 ```bash
 # How to run the application
-uvicorn src.main:app --reload --port=8080 --timeout-keep-alive 120
+uvicorn api.main:app --reload --port=8080 --timeout-keep-alive 120
 ```
 
 Check `http://127.0.0.1:8080/docs` for OPENAPI documentation.

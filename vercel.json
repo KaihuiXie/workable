@@ -1,19 +1,16 @@
 {
-    "devCommand": "uvicorn src.main:app --host 0.0.0.0 --port 8080",
+    "devCommand": "uvicorn api.main:app --host 0.0.0.0 --port 8080 --timeout-keep-alive 120",
     "builds": [
       {
-        "src": "src/main.py",
+        "src": "api/main.py",
         "use": "@vercel/python"
       }
     ],
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "src/main.py"
+        "dest": "api/main.py"
       }
-    ],
-    "rewrites": [
-      { "source": "/src", "destination": "/api" }
     ],
     "functions": {
       "api/main.py": {

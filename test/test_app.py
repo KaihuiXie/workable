@@ -10,7 +10,7 @@ import os
 logging.basicConfig(level=logging.info)
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from src.main import app
+from api.main import app
 
 client = TestClient(app)
 
