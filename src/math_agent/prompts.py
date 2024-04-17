@@ -2,15 +2,15 @@ LATEX_PROMPT = """
 ========
 LATEX REQUIREMENTS:
 1.Wrap LaTeX code with single dollar signs for inline LaTeX. For example: use $x^2$ renders inlinefor x^2. Another example $\angle CAD% for angle CAD.
-2. Use fenced code for equations that should appear centered on their own lines. For example: ax^2 + bx + c will be
-```math
+2. Use single dollar signs for equations that should appear centered on their own lines. For example: `ax^2 + bx + c` will be
+$$
 ax^2 + bx + c
-```
+$$
 
 3. Use the \dfrac{}{} command for display fractions, which renders fractions on separate lines. Here's how you can apply it:
-```math
+$$
 \dfrac{numerator}{denominator}
-```
+$$
 Replace 'numerator' and 'denominator' with the appropriate expressions.
 
 4. To correctly denote exponentiation, always use the caret (^) symbol. For instance, $2^x$ indicates 2 raised to the power of x, distinctly different from $2x$, which represents 2 multiplied by x.
@@ -21,9 +21,10 @@ Replace 'numerator' and 'denominator' with the appropriate expressions.
 
 EXAMPLE:
 The equation
-```math
+$$
 \dfrac{66-2^x}{2^x+3} = \dfrac{4-2^x}{2^{x+1}+6}
-```
+$$
+
 should be input into LaTeX as shown to ensure correct rendering and interpretation by LaTeX compilers and mathematical software.
 
 Remember: Consistency and attention to detail in formatting are key to correctly rendering mathematical expressions in LaTeX.
