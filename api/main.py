@@ -3,13 +3,13 @@ from dotenv import load_dotenv
 import yaml
 import os
 import json
+import time
 
-from fastapi import FastAPI, Request, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
-from src.math_agent.constant import EVERY_DAY_CREDIT_INCREMENT
 from src.math_agent.math_agent import MathAgent
 from src.math_agent.supabase import Supabase
 from src.interfaces import (
@@ -27,7 +27,7 @@ from src.middlewares import (
 from src.utils import preprocess_image
 
 # Configure logging
-logging.basicConfig(level=logging.info)
+logging.basicConfig(level=logging.INFO)
 
 # Initalization
 load_dotenv()
@@ -79,9 +79,7 @@ async def prepare_question(request: QuestionRequest = Depends(parse_question_req
         if request.image_file:
             image_bytes = await request.image_file.read()
             image_string = preprocess_image(image_bytes)
-            question = math_agent.query_vision(image_string)
-            if request.prompt:
-                question += f"\n Instruction: {request.prompt}"
+            question = math_agent.query_vision(image_string, request.prompt)
         elif request.prompt:
             question = request.prompt
         else:
@@ -106,6 +104,7 @@ async def prepare_question(request: QuestionRequest = Depends(parse_question_req
 @app.post("/solve")
 async def solve(request: ChatRequest):
     try:
+        start_time = time.time()  # Record the start time
         chat_info = supabase.get_chat_by_id(request.chat_id)
         question = chat_info["question"]
         payload = {"messages": []}
@@ -114,6 +113,11 @@ async def solve(request: ChatRequest):
             response = math_agent.learner(question, payload["messages"])
         else:
             response = math_agent.helper(question, payload["messages"])
+
+        end_time = time.time()  # Record the end time
+        time_taken = end_time - start_time  # Calculate the time taken
+        # Log or store the time taken
+        print("Time taken before first reponse received:", time_taken)
 
         # decrement credit for user
         def decrement_credit_callback():
@@ -136,10 +140,16 @@ async def solve(request: ChatRequest):
 async def chat(request: ChatRequest):
     try:
         # Query db to get messages
+        start_time0 = time.time()  # Record the start time
         payload = supabase.get_chat_payload_by_id(request.chat_id)
         payload["messages"].append({"role": "user", "content": request.query})
-        response = math_agent.query(payload["messages"])
 
+        start_time = time.time()  # Record the start time
+        print("Getting supabase:", start_time - start_time0)
+
+        response = math_agent.query(payload["messages"])
+        end_time = time.time()  # Record the end time
+        print("Chat before first reponse received:", end_time - start_time)
         return StreamingResponse(
             event_generator(response, payload, request.chat_id),
             media_type="text/event-stream",
@@ -258,10 +268,11 @@ async def event_generator(response, payload, chat_id, callback=None):
                 yield f"data: {json.dumps(event_data)}\n\n"
         logging.info(full_response)
         print(full_response)
-        payload["messages"].append({"role": "assistant", "content": full_response})
-        supabase.update_payload(chat_id, payload)
-        if callback:
-            callback()
+        if full_response:
+            payload["messages"].append({"role": "assistant", "content": full_response})
+            supabase.update_payload(chat_id, payload)
+            if callback:
+                callback()
     except Exception as e:
         # Handle exceptions or end of stream
         logging.error(e)

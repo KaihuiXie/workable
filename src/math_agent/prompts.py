@@ -1,7 +1,7 @@
 LATEX_PROMPT = """
 ========
 LATEX REQUIREMENTS:
-1. Wrap LaTeX code with backticks for inline LaTeX. For example: `x^2` renders inline as \(x^2\).
+1. Wrap LaTeX code within escaped brackets \( ... \) for inline LaTeX. For example: use \(x^2\) ti render x^2 inline.
 2. Use fenced code for equations that should appear centered on their own lines. For example:
 ```math
 ax^2 + bx + c
@@ -43,9 +43,14 @@ REQUIREMENTS:
 """
 
 IMAGE_READING_PROMPT = f"""
-You are an math export, specializing in reading problem from an image. Return question from the image concisely, and please only show the exact content that shows in the image. {LATEX_PROMPT}
+You are an math export, specializing in reading problem from an image. You may be provided with some additional instructions, delimited by <context>.
+Return question from the image concisely, and please only show the exact content that shows in the image.
+{LATEX_PROMPT}
 """
-
+IMAGE_CONTEXT_PROMPT = f"""
+=======
+<context>{{context}}</context>
+"""
 
 MODE_PROMPT_TEMPLATE = f"""
 You will be provided with a question, delimited with <question> and optional reference answer, delimited with <reference>.

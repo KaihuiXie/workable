@@ -1,9 +1,11 @@
 from openai import OpenAI
 import requests
 import logging
+import time
 
 from src.math_agent.prompts import (
     IMAGE_READING_PROMPT,
+    IMAGE_CONTEXT_PROMPT,
     HELPER_PROMPT,
     LEARNING_PROMPT,
     WOLFRAM_ALPHA_PROMPT,
@@ -36,27 +38,37 @@ class MathAgent:
             {"type": "text", "text": text_prompt},
             {
                 "type": "image_url",
-                "image_url": f"data:image/jpeg;base64,{image_base64_str}",
+                "image_url": {"url": f"data:image/jpeg;base64,{image_base64_str}"},
             },
         ]
 
-    def query_vision(self, image_base64_str):
+    def query_vision(self, image_base64_str, additional_prompt):
         session = self._cur_openai_client()
-        content = self._compose_image_content(image_base64_str, IMAGE_READING_PROMPT)
+        content = self._compose_image_content(
+            image_base64_str,
+            IMAGE_READING_PROMPT
+            + IMAGE_CONTEXT_PROMPT.format(context=additional_prompt),
+        )
         response = session.chat.completions.create(
-            model="gpt-4-vision-preview",
+            model="gpt-4-turbo",
             messages=[{"role": "user", "content": content}],
             max_tokens=1000,
         )
         return response.choices[0].message.content
 
     def query(self, messages):
+        start_time = time.time()  # Record the start time
         session = self._cur_openai_client()
         stream = session.chat.completions.create(
             model="gpt-4-turbo",
             messages=[{"role": m["role"], "content": m["content"]} for m in messages],
             stream=True,
         )
+        end_time = time.time()  # Record the end time
+        time_taken = end_time - start_time  # Calculate the time taken
+        # Log or store the time taken
+        print("OpenAI Query before first reponse received:", time_taken)
+
         return stream
 
     def helper(self, question, messages):
@@ -66,6 +78,7 @@ class MathAgent:
         return self._solve(question, LEARNING_PROMPT, messages)
 
     def _generate_wolfram_query(self, question):
+        start_time = time.time()  # Record the start time
         session = self._cur_openai_client()
         response = session.chat.completions.create(
             model="gpt-4-turbo",
@@ -73,16 +86,25 @@ class MathAgent:
                 {"role": "user", "content": WOLFRAM_ALPHA_PROMPT.format(question)}
             ],
         )
+        end_time = time.time()
+        print("generate wolfram query took:", end_time - start_time)
         response_str = response.choices[0].message.content
         return response_str
 
     def _solve(self, question, mode_prompt, messages):
+
         wolfram_alpha_response = self._query_wolfram_alpha(question)
+
+        start_time = time.time()
+
         extracted_response = ""
         if wolfram_alpha_response:
             extracted_response = self._extract_wolfram_alpha_response(
                 wolfram_alpha_response, question
             )
+
+        end_time1 = time.time()
+        print("extract wolfram took:", end_time1 - start_time)
 
         text_prompt = (mode_prompt).format(
             question=question, reference=extracted_response
@@ -103,13 +125,15 @@ class MathAgent:
             "appid": self.wolf_api_key,
             "output": "JSON",
         }
+        start_time = time.time()  # Record the start time
         try:
             response = requests.get(url, params=params)
             response_data = response.json()
-            # st.sidebar.write(response_data)
+            end_time = time.time()
+            print("query wolfram took:", end_time - start_time)
             if not response_data["queryresult"]["success"]:
                 return None
-            return response_data
+            return response_data["queryresult"]["pods"]
         except KeyError as e:
             error_message = f"KeyError: The key {e} is missing in the response."
             logging.error(error_message)
@@ -121,7 +145,7 @@ class MathAgent:
     def _extract_wolfram_alpha_response(self, wa_response, question):
         session = self._cur_openai_client()
         response = session.chat.completions.create(
-            model="gpt-4-turbo",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT},
                 {
