@@ -18,7 +18,7 @@ client = TestClient(app)
 # With an exist, and not expired token.
 # Will return true, and the referrer_id
 # def test_get_referrer_success_case():
-#     invitation_token = "36993590-7a33-4fc6-944f-1ad0a6b63782"
+#     invitation_token = "c99770af-f316-4377-ad28-a65c032e03ee"
 #
 #     response = client.get(f"/referrer/{invitation_token}")
 #     logging.error(response.json())
@@ -53,7 +53,7 @@ client = TestClient(app)
 # for getting existing token case: need to use a user_id that have a not expired token
 # for expired case: need to use a user_id that has an expired token
 # def test_get_invitation_success_case():
-#     user_id = "c03b3304-ccca-421f-9cfd-623a7e6b6feb"
+#     user_id = "a4804bea-93d8-4789-969d-19b5364f7436"
 #     response = client.get(f"/invitation/{user_id}")
 #     print(response.json())
 #     logging.error(response.json())

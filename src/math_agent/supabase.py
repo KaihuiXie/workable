@@ -3,6 +3,8 @@ import uuid
 from datetime import datetime, timezone
 import json
 import datetime as dt
+import dateutil.parser
+
 
 from src.math_agent.constant import (
     EVERY_DAY_CREDIT_INCREMENT,
@@ -13,11 +15,11 @@ from src.math_agent.constant import (
 
 
 def is_same_day(date: datetime):
-    return date.date() == datetime.today().date()
+    return date.date() == datetime.utcnow().date()
 
 
 def is_invitation_expired(timestamp):
-    invitation_expiration = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S%z")
+    invitation_expiration = dateutil.parser.parse(timestamp)
     now = datetime.now(timezone.utc)
     # if now is greater than invitation expiration, then it is expired
     return now > invitation_expiration
@@ -354,7 +356,7 @@ class Supabase:
     def grant_login_award(self, user_id):
         last_award_time = self.get_last_award_time_by_user_id(user_id)
         is_eligible = not is_same_day(
-            datetime.strptime(last_award_time, "%Y-%m-%dT%H:%M:%S%z")
+            dateutil.parser.parse(last_award_time)
         )
         if not is_eligible:
             return
@@ -484,3 +486,4 @@ class Supabase:
             return True, user_id
         except Exception as e:
             return False, ""
+
