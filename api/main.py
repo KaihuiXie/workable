@@ -49,6 +49,7 @@ app.add_middleware(
         "http://localhost:3000",
         "https://localhost:3000",
         "https://chat.mathsolver.top",
+        "http://chat.mathsolver.top",
     ],
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
