@@ -48,6 +48,7 @@ app.add_middleware(
         "http://react-learning-app-blush.vercel.app",
         "http://localhost:3000",
         "https://localhost:3000",
+        "https://chat.mathsolver.top",
     ],
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
