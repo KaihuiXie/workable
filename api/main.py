@@ -261,7 +261,7 @@ async def get_invitation(user_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def event_generator(response, payload, chat_id, callback=None):
+async def event_generator(response, payload, chat_id, callback=None):
     full_response = ""
     chat_again = check_message_size(payload["messages"])
     yield f"data: {json.dumps({'chat_again': chat_again})}\n\n"
