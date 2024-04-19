@@ -121,7 +121,6 @@ async def solve(request: ChatRequest):
         time_taken = end_time - start_time  # Calculate the time taken
         # Log or store the time taken
         print("Time taken before first reponse received:", time_taken)
-
         # decrement credit for user
         def decrement_credit_callback():
             user_id = supabase.get_user_id_by_chat_id(request.chat_id)
@@ -264,7 +263,10 @@ async def get_invitation(user_id: str):
 async def event_generator(response, payload, chat_id, callback=None):
     full_response = ""
     chat_again = check_message_size(payload["messages"])
+    yield f"event: type\n\n"
     yield f"data: {json.dumps({'chat_again': chat_again})}\n\n"
+
+    yield f"event: answer\n\n"
     try:
         for event in response:
             event_text = event.choices[0].delta.content
