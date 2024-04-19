@@ -263,8 +263,8 @@ async def get_invitation(user_id: str):
 
 async def event_generator(response, payload, chat_id, callback=None):
     full_response = ""
-    is_last_message = check_message_size(payload["messages"])
-    yield f"data: {json.dumps({'is_last': is_last_message})}\n\n"
+    chat_again = check_message_size(payload["messages"])
+    yield f"data: {json.dumps({'chat_again': chat_again})}\n\n"
     try:
         for event in response:
             event_text = event.choices[0].delta.content
