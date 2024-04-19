@@ -1,4 +1,3 @@
-from datetime import datetime
 from dotenv import load_dotenv
 import yaml
 import os
@@ -24,7 +23,7 @@ from src.middlewares import (
     ExtendTimeoutMiddleware,
     TimerMiddleware,
 )
-from src.utils import preprocess_image
+from src.utils import preprocess_image, check_message_size
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -264,6 +263,8 @@ async def get_invitation(user_id: str):
 
 async def event_generator(response, payload, chat_id, callback=None):
     full_response = ""
+    is_last_message = check_message_size(payload["messages"])
+    yield f"data: {json.dumps({'is_last': is_last_message})}\n\n"
     try:
         for event in response:
             event_text = event.choices[0].delta.content

@@ -1,7 +1,5 @@
 from supabase import create_client, Client, ClientOptions
-import uuid
 from datetime import datetime, timezone
-import json
 import datetime as dt
 import dateutil.parser
 
@@ -355,9 +353,7 @@ class Supabase:
     # 2.3 update last_award_time
     def grant_login_award(self, user_id):
         last_award_time = self.get_last_award_time_by_user_id(user_id)
-        is_eligible = not is_same_day(
-            dateutil.parser.parse(last_award_time)
-        )
+        is_eligible = not is_same_day(dateutil.parser.parse(last_award_time))
         if not is_eligible:
             return
         prev_temp_credit = self.get_temp_credit_by_user_id(user_id)
@@ -486,4 +482,3 @@ class Supabase:
             return True, user_id
         except Exception as e:
             return False, ""
-

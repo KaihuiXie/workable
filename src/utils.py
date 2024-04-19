@@ -5,6 +5,8 @@ import logging
 
 from pillow_heif import register_heif_opener
 
+from src.math_agent.constant import MAX_MESSAGE_SIZE
+
 register_heif_opener()
 # Configure logging
 logging.basicConfig(level=logging.info)
@@ -60,3 +62,7 @@ def generate_thumbnail_string(image_bytes, thumbnail_size=(128, 128)):
     # Encode the bytes buffer to Base64 string
     base64_string = bytes_to_base64(img_byte_arr.getvalue())
     return base64_string
+
+
+def check_message_size(messages):
+    return len(messages) < MAX_MESSAGE_SIZE
