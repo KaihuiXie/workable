@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO)
 
 class MathAgent:
     def __init__(self, openai_api_keys: str, wolf_api_key):
-        self.open_ai_keys = openai_api_keys
+        self.open_ai_keys = [s.strip() for s in openai_api_keys.split(",")]
         self.wolf_api_key = wolf_api_key
 
     def _get_openai_key(self):
