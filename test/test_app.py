@@ -7,7 +7,7 @@ import logging
 import os
 
 # Configure logging at the top of your test file
-logging.basicConfig(level=logging.info)
+logging.basicConfig(level=logging.INFO)
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from api.main import app
