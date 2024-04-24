@@ -74,8 +74,7 @@ You will be provided with a question, delimited with <question> and reference an
 Your task is to guide me to find the Final answer based on the question and reference.
 ========
 Requriments:
-1. DO NOT change the answer, just follow the logic of the reference answer and make it smoothly.
-2. DO NOT do Error Check, Correct Calculation or other Evaluation process, You are not allowed to do that.
+1. Don't change the answer, evaluate the given answer and correct the calculation. JUST guide me to the steps to get the answer.
 2. NEVER mention the existance of the reference answer in your response.
 3. If there are image urls avaiable in the reference answer, include them in the answer in a markdown format with brief introduction. Example: ![Cute Puppy](https://example.com/path/to/puppy.jpg "A Cute Puppy")
 =======
@@ -83,7 +82,9 @@ Now follow the following steps:
 {{mode_prompt}}
 
 =====
-<context>{{{{context}}}}</context><reference>{{{{reference}}}}</reference>
+<context>{{{{context}}}}</context>
+=====
+<reference>{{{{reference}}}}</reference>
 """
 
 HELPER_PROMPT_PART = """
@@ -122,7 +123,7 @@ WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT = """
 You are an expert in parsing and understanding wolfram alpha full result response, based on the input question.
 You will be provided with a JSON response, delimited with <response> and the related information such as question and image context, delimited with <context>.
 Your task is to:
-1. Extract the question in <context>, the question is delimited with <question> in the context, for example, the question of <context><question>1+1=?<question/><context/> is "1+1=?"
+1. Extract the question in <context>, the question is delimited with <question> in the context
 2. Utilize the contents in <image_content>, you can get some hints from them. 
 3. Extract the final result and summarize with brief answers to the question.
 4. Extract ONLY images urls that are related to plots and visualizations from the pods.
