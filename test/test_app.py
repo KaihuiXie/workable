@@ -189,6 +189,14 @@ client = TestClient(app)
 #     response = client.post("/solve", json=payload)
 #     assert response.status_code == 200
 
+# def test_helper_cn():
+#     payload = {
+#         "chat_id": "0786ddb2-001d-4635-9bd0-25ff23893f70",
+#         "language": "ZH"
+#     }
+#     response = client.post("/solve", json=payload)
+#     assert response.status_code == 200
+
 
 # def test_learner():
 #     payload = {

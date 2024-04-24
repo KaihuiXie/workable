@@ -18,6 +18,7 @@ from src.interfaces import (
     AllChatsRequest,
     Mode,
     UpdateCreditRequest, DecrementCreditRequest,
+    Language,
 )
 from src.middlewares import (
     ExtendTimeoutMiddleware,
@@ -111,11 +112,12 @@ async def solve(request: ChatRequest):
         chat_info = supabase.get_chat_by_id(request.chat_id)
         question = chat_info["question"]
         payload = {"messages": []}
-
+        language = str(request.language.name)
+        print(language)
         if chat_info["learner_mode"]:
-            response = math_agent.learner(question, payload["messages"])
+            response = math_agent.learner(question, payload["messages"], language)
         else:
-            response = math_agent.helper(question, payload["messages"])
+            response = math_agent.helper(question, payload["messages"], language)
 
         end_time = time.time()  # Record the end time
         time_taken = end_time - start_time  # Calculate the time taken
@@ -280,6 +282,7 @@ async def event_generator(response, payload, chat_id, callback=None):
                 event_data = {"text": event_text}
                 yield f"data: {json.dumps(event_data)}\n\n"
         logging.info(full_response)
+        print(full_response)
         if full_response:
             payload["messages"].append({"role": "assistant", "content": full_response})
             supabase.update_payload(chat_id, payload)

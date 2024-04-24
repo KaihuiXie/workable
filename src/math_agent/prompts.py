@@ -42,6 +42,12 @@ REQUIREMENTS:
 {LATEX_PROMPT}
 """
 
+LANGUGAE_PROMPT = f"""
+==========
+Language Requirement:
+Must response in language {{language}}.
+"""
+
 IMAGE_READING_PROMPT = f"""
 You are now an expert in reading images, able to easily comprehend the information contained within them.
 However, you're only responsible for processing images. I'll provide you with an image along with the following text prompt: {{Image_Context}}
