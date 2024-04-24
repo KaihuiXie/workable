@@ -118,7 +118,7 @@ client = TestClient(app)
 #     assert response.status_code == 200
 
 # def test_image():
-#     image_file_path = "./iphone.HEIC"
+#     image_file_path = "./limit.jpeg"
 #     # image_file_path = "./phone.jpeg"
 #     try:
 #         with open(image_file_path, "rb") as image_file:

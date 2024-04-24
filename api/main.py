@@ -17,7 +17,8 @@ from src.interfaces import (
     ChatRequest,
     AllChatsRequest,
     Mode,
-    UpdateCreditRequest, DecrementCreditRequest,
+    UpdateCreditRequest,
+    DecrementCreditRequest,
     Language,
 )
 from src.middlewares import (
@@ -112,8 +113,9 @@ async def solve(request: ChatRequest):
         chat_info = supabase.get_chat_by_id(request.chat_id)
         question = chat_info["question"]
         payload = {"messages": []}
-        language = str(request.language.name)
-        print(language)
+        language = None
+        if request.language:
+            language = request.language.name
         if chat_info["learner_mode"]:
             response = math_agent.learner(question, payload["messages"], language)
         else:
@@ -125,8 +127,7 @@ async def solve(request: ChatRequest):
         print("Time taken before first reponse received:", time_taken)
 
         return StreamingResponse(
-            event_generator(
-                response, payload, request.chat_id),
+            event_generator(response, payload, request.chat_id),
             media_type="text/event-stream",
         )
 
