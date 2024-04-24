@@ -63,9 +63,28 @@ async def parse_question_request(
         raise HTTPException(status_code=400, detail="Invalid request data")
 
 
+class Language(Enum):
+    ENGLISH = "EN"
+    SPANISH = "ES"
+    FRENCH = "FR"
+    GERMAN = "DE"
+    CHINESE = "ZH"
+    JAPANESE = "JA"
+
+    @staticmethod
+    def from_string(s):
+        if s is None:
+            return Language.ENGLISH
+        try:
+            return Language[s.upper()]
+        except KeyError:
+            raise ValueError(f"{s} is not a valid Language")
+
+
 class ChatRequest(BaseModel):
     query: Optional[str] = None
     chat_id: str
+    language: Optional[Language] = None
 
 
 class AllChatsRequest(BaseModel):

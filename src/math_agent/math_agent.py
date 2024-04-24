@@ -13,6 +13,7 @@ from src.math_agent.prompts import (
     WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT,
     SYSTEM_PROMPT,
     LATEX_PROMPT,
+    LANGUGAE_PROMPT,
 )
 
 # Configure logging
@@ -75,11 +76,11 @@ class MathAgent:
 
         return stream
 
-    def helper(self, question, messages):
-        return self._solve(question, HELPER_PROMPT, messages)
+    def helper(self, question, messages, language):
+        return self._solve(question, HELPER_PROMPT, messages, language)
 
-    def learner(self, question, messages):
-        return self._solve(question, LEARNING_PROMPT, messages)
+    def learner(self, question, messages, language):
+        return self._solve(question, LEARNING_PROMPT, messages, language)
 
     def _generate_wolfram_query(self, question):
         start_time = time.time()  # Record the start time
@@ -96,7 +97,7 @@ class MathAgent:
         response_str = response.choices[0].message.content
         return response_str
 
-    def _solve(self, question, mode_prompt, messages):
+    def _solve(self, question, mode_prompt, messages, language=None):
         try:
             wolfram_alpha_response = self._query_wolfram_alpha(question)
 
@@ -115,9 +116,14 @@ class MathAgent:
                 context=question, reference=extracted_response
             )
 
+            system_prompt = SYSTEM_PROMPT
+            if language:
+                system_prompt += LANGUGAE_PROMPT.format(language=language)
+
+            print(system_prompt)
             messages.extend(
                 [
-                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "system", "content": system_prompt},
                     {"role": "user", "content": text_prompt},
                 ]
             )
