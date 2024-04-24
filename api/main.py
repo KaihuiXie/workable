@@ -102,8 +102,8 @@ async def prepare_question(request: QuestionRequest = Depends(parse_question_req
         )
         if request.image_file:
             data = xmltodict.parse(question)
-            if 'question' in data:
-                question = data['question']
+            if "question" in data:
+                question = data["question"]
             else:
                 question = "Question not recognized"
         return {"chat_id": chat_id, "question": question}
