@@ -15,6 +15,18 @@ from api.main import app
 client = TestClient(app)
 
 
+# def test_decrement_credit():
+#     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
+#
+#     payload = {
+#         "user_id": user_id,
+#     }
+#
+#     response = client.put("/credit", json=payload)
+#     print(response.json)
+#     logging.error(response.json())
+#     assert response.status_code == 200
+
 # With an exist, and not expired token.
 # Will return true, and the referrer_id
 # def test_get_referrer_success_case():

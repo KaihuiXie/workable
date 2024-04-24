@@ -17,7 +17,7 @@ from src.interfaces import (
     ChatRequest,
     AllChatsRequest,
     Mode,
-    CreditRequest,
+    UpdateCreditRequest, DecrementCreditRequest,
 )
 from src.middlewares import (
     ExtendTimeoutMiddleware,
@@ -121,15 +121,10 @@ async def solve(request: ChatRequest):
         time_taken = end_time - start_time  # Calculate the time taken
         # Log or store the time taken
         print("Time taken before first reponse received:", time_taken)
-        # decrement credit for user
-        def decrement_credit_callback():
-            user_id = supabase.get_user_id_by_chat_id(request.chat_id)
-            supabase.decrement_credit(user_id)
 
         return StreamingResponse(
             event_generator(
-                response, payload, request.chat_id, callback=decrement_credit_callback
-            ),
+                response, payload, request.chat_id),
             media_type="text/event-stream",
         )
 
@@ -215,7 +210,7 @@ async def get_credit(user_id: str):
 
 
 @app.put("/credit/temp")
-async def update_temp_credit(request: CreditRequest):
+async def update_temp_credit(request: UpdateCreditRequest):
     try:
         response = supabase.update_temp_credit_by_user_id(
             request.user_id, request.credit
@@ -227,12 +222,22 @@ async def update_temp_credit(request: CreditRequest):
 
 
 @app.put("/credit/perm")
-async def update_perm_credit(request: CreditRequest):
+async def update_perm_credit(request: UpdateCreditRequest):
     try:
         response = supabase.update_perm_credit_by_user_id(
             request.user_id, request.credit
         )
         return {"credit": response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.put("/credit")
+async def decrement_credit(request: DecrementCreditRequest):
+    try:
+        supabase.decrement_credit(request.user_id)
+        return {"decremental": True}
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
