@@ -12,6 +12,7 @@ from src.math_agent.prompts import (
     WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE,
     WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT,
     SYSTEM_PROMPT,
+    LATEX_PROMPT,
 )
 
 # Configure logging
@@ -44,15 +45,17 @@ class MathAgent:
 
     def query_vision(self, image_base64_str, additional_prompt):
         session = self._cur_openai_client()
+        Image_Context = IMAGE_CONTEXT_PROMPT.format(context=additional_prompt)
         content = self._compose_image_content(
             image_base64_str,
-            IMAGE_READING_PROMPT
-            + IMAGE_CONTEXT_PROMPT.format(context=additional_prompt),
+            IMAGE_READING_PROMPT.format(
+                Image_Context=Image_Context, LATEX_PROMPT=LATEX_PROMPT
+            ),
         )
         response = session.chat.completions.create(
             model="gpt-4-turbo",
             messages=[{"role": "user", "content": content}],
-            max_tokens=1000,
+            max_tokens=2048,
         )
         return response.choices[0].message.content
 
@@ -61,6 +64,7 @@ class MathAgent:
         session = self._cur_openai_client()
         stream = session.chat.completions.create(
             model="gpt-4-turbo",
+            temperature=0.5,
             messages=[{"role": m["role"], "content": m["content"]} for m in messages],
             stream=True,
         )
@@ -82,6 +86,7 @@ class MathAgent:
         session = self._cur_openai_client()
         response = session.chat.completions.create(
             model="gpt-4-turbo",
+            temperature=0.1,
             messages=[
                 {"role": "user", "content": WOLFRAM_ALPHA_PROMPT.format(question)}
             ],
@@ -154,13 +159,14 @@ class MathAgent:
     def _extract_wolfram_alpha_response(self, wa_response, question):
         session = self._cur_openai_client()
         response = session.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4-turbo",
+            temperature=0.5,
             messages=[
                 {"role": "system", "content": WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT},
                 {
                     "role": "user",
                     "content": WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE.format(
-                        response=wa_response, question=question
+                        response=wa_response, context=question
                     ),
                 },
             ],
