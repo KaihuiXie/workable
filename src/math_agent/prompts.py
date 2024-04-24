@@ -71,17 +71,17 @@ IMAGE_CONTEXT_PROMPT = f"""
 
 MODE_PROMPT_TEMPLATE = f"""
 You will be provided with a question, delimited with <question> and reference answer, delimited with <reference>.
-Your task is to guide me to find the Final answer based on the question and reference.
+Your task is to guide me to find the Final answer in <reference>. The answer is delimited with <answer>.
 =====
 <context>{{{{context}}}}</context>
 =====
 <reference>{{{{reference}}}}</reference>
 ========
 Requriments:
-1. Don't change the answer, evaluate the given answer and correct the calculation. JUST guide me to the steps to get the answer that is delimited with <reference>.
-2. If there are choices provided in <image_content>, check all the choices. 
-3. You don't have any correct answer, the correct answer is in the <reference>. Don't judge and evaluate the answer. For example, the answer in <reference> is "4", you think the answer is "2", just regardless your answer "2" and never mention it!
-4. NEVER mention the existance of the reference answer in your response.
+1. Don't change the answer! Don't evaluate the given answer! Don't correct the calculation of the answer. JUST guide me to the steps to get the answer that is delimited with <answer>.
+2. You don't have any correct answer, the correct answer is in the <reference>. Don't judge and evaluate the answer. For example, the answer in <reference> is "4", you think the answer is "2", just regardless your answer "2" and never mention it!
+3. NEVER mention the existance of the reference answer in your response.
+4. If there are choices provided in <image_content>, tell me all the choices and conpare these choices to answer in <answer>.
 5. If there are image urls avaiable in the reference answer, include them in the answer in a markdown format with brief introduction. Example: ![Cute Puppy](https://example.com/path/to/puppy.jpg "A Cute Puppy")
 =======
 Now follow the following steps:
@@ -132,8 +132,10 @@ Requirements:
 1. MUST only return the most relevant answer and image urls.
 2. DO NOT mention you have been provided with some inputs.
 3. If there are no answer in <response>, generate your own answer to solve the question. But Remember, the answer in <response> has the highest priority.
-4. If there are choices in <image_content>, you must select the choices equal to the answer, if answer is not in the choices, select the one looks most like 
-5. There must be an answer to the question.
+4. If there are multiple choices provided in <image_content>:
+    a. you must select the choice equal to the answer. 
+    b. If the answer is not in the choices, just give your answer and do not select any choices. 
+5. After you extracting the answer, enclose the answer within <answer></answer> tags. For example, if the anwser is the choice "A", you should output <answer>A</answer>. If the anwser is value "4", you should output <answer>4</answer>.
 """
 
 WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE = f"""
