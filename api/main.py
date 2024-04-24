@@ -107,7 +107,6 @@ async def prepare_question(request: QuestionRequest = Depends(parse_question_req
                 question = match.group(1)
             else:
                 question = "Question undefined"
-            print("Question:", question)
         return {"chat_id": chat_id, "question": question}
     except Exception as e:
         raise HTTPException(
@@ -173,6 +172,12 @@ async def chat(request: ChatRequest):
 async def all_chats(request: AllChatsRequest):
     try:
         response = supabase.get_all_chats(request.user_id)
+        for record in response.data:
+            question = record['question']
+            match = re.search(r'<question>(.*?)</question>', question, re.DOTALL)
+            if match:
+                question = match.group(1)
+            record['question'] = question
         return {"data": response}
     except Exception as e:
         logging.error(e)
