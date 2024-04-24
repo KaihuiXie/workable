@@ -3,6 +3,7 @@ import yaml
 import os
 import json
 import time
+import xmltodict
 
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.responses import StreamingResponse
@@ -99,6 +100,12 @@ async def prepare_question(request: QuestionRequest = Depends(parse_question_req
             question=question,
             is_learner_mode=(request.mode == Mode.LEARNER),
         )
+        if request.image_file:
+            data = xmltodict.parse(question)
+            if "question" in data:
+                question = data["question"]
+            else:
+                question = "Question not recognized"
         return {"chat_id": chat_id, "question": question}
     except Exception as e:
         raise HTTPException(
