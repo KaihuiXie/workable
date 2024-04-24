@@ -72,19 +72,20 @@ IMAGE_CONTEXT_PROMPT = f"""
 MODE_PROMPT_TEMPLATE = f"""
 You will be provided with a question, delimited with <question> and reference answer, delimited with <reference>.
 Your task is to guide me to find the Final answer based on the question and reference.
-========
-Requriments:
-1. Don't change the answer, evaluate the given answer and correct the calculation. JUST guide me to the steps to get the answer.
-2. NEVER mention the existance of the reference answer in your response.
-3. If there are image urls avaiable in the reference answer, include them in the answer in a markdown format with brief introduction. Example: ![Cute Puppy](https://example.com/path/to/puppy.jpg "A Cute Puppy")
-=======
-Now follow the following steps:
-{{mode_prompt}}
-
 =====
 <context>{{{{context}}}}</context>
 =====
 <reference>{{{{reference}}}}</reference>
+========
+Requriments:
+1. Don't change the answer, evaluate the given answer and correct the calculation. JUST guide me to the steps to get the answer that is delimited with <reference>.
+2. If there are choices provided in <image_content>, check all the choices. 
+3. You don't have any correct answer, the correct answer is in the <reference>. Don't judge and evaluate the answer. For example, the answer in <reference> is "4", you think the answer is "2", just regardless your answer "2" and never mention it!
+4. NEVER mention the existance of the reference answer in your response.
+5. If there are image urls avaiable in the reference answer, include them in the answer in a markdown format with brief introduction. Example: ![Cute Puppy](https://example.com/path/to/puppy.jpg "A Cute Puppy")
+=======
+Now follow the following steps:
+{{mode_prompt}}
 """
 
 HELPER_PROMPT_PART = """
