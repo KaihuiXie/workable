@@ -78,7 +78,6 @@ Requriments:
 2. If the reference answer DOES NOT make sense, COMPLETELY IGNORE the reference answer and give your own answer.
 3. NEVER mention the existance of the reference answer in your response.
 4. If there are image urls avaiable in the reference answer, include them in the answer in a markdown format with brief introduction. Example: ![Cute Puppy](https://example.com/path/to/puppy.jpg "A Cute Puppy")
-5. Finally, DOUBLE-CHECK your final answer and make sure it is correct!
 =======
 Now follow the following steps:
 {{mode_prompt}}
