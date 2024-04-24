@@ -71,10 +71,10 @@ IMAGE_CONTEXT_PROMPT = f"""
 
 MODE_PROMPT_TEMPLATE = f"""
 You will be provided with a question, delimited with <question> and optional reference answer, delimited with <reference>.
-Your task is to guide me to find the final answer, after evaluate the question and reference answer.
+Your task is to guide me to find the final answer based on the question and reference answer.
 ========
 Requriments:
-1. If the reference answer DOES NOT make sense, COMPLETELY IGNORE the reference answer and give your own answer.
+1. DO NOT change the answer, just follow the logic of the reference answer and make it smoothly.
 2. NEVER mention the existance of the reference answer in your response.
 3. If there are image urls avaiable in the reference answer, include them in the answer in a markdown format with brief introduction. Example: ![Cute Puppy](https://example.com/path/to/puppy.jpg "A Cute Puppy")
 =======
