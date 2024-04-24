@@ -3,7 +3,7 @@ import yaml
 import os
 import json
 import time
-import xmltodict
+import re
 
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.responses import StreamingResponse
@@ -100,12 +100,14 @@ async def prepare_question(request: QuestionRequest = Depends(parse_question_req
             question=question,
             is_learner_mode=(request.mode == Mode.LEARNER),
         )
-        # if request.image_file:
-        #     data = xmltodict.parse(question)
-        #     if "question" in data:
-        #         question = data["question"]
-        #     else:
-        #         question = "Question not recognized"
+        if request.image_file:
+            match = re.search(r'<question>(.*?)</question>', question, re.DOTALL)
+
+            if match:
+                question = match.group(1)
+            else:
+                question = "Question undefined"
+            print("Question:", question)
         return {"chat_id": chat_id, "question": question}
     except Exception as e:
         raise HTTPException(
