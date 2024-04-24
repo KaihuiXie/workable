@@ -43,15 +43,20 @@ REQUIREMENTS:
 """
 
 IMAGE_READING_PROMPT = f"""
-You are an Image reading export. I will give you a image now.
-The image may contain a question, or it may contain an icon or some objects or charts. Everything is possible.
-You may be provided with some additional instructions, delimited by <context>.
-REQUIREMENTS:
-1. If the image is just showing a question, you just need to return the content of the question. And do not explain the question.
-2. If the picture shows something else, you need to describe the situation in detail and tell me what you saw. For example, if it is a chart, you need to tell me all the details first, and then analyze the data and attributes inside.
-3. If it is some items, you need to describe the characteristics, quantity and other attributes like materials of the items.
-4. If what you see is a geometric pattern, remember to describe all the points, lines, and surfaces in detail.
-{LATEX_PROMPT}"""
+You are now an expert in reading images, able to easily comprehend the information contained within them.
+However, you're only responsible for processing images. I'll provide you with an image along with the following text prompt: {{Image_Context}}
+I have no prior knowledge of the image's content. Your task is to read the image and combine it with the text prompt to provide me with details.
+The most crucial aspect is to extract any questions present, which may be within the image or the text prompt. Enclose the question within <question></question> tags. For example, <question>what is 1+1 = ?</question> would encompass "what is 1+1 = ?".
+In addition to extracting the question, you need to provide detailed information about what's in the image to aid my understanding or to provide a basis for answering questions. You may encounter the following scenarios:
+1. The image may contain a math problem, physics problem, text-based question, or another type. If it's a question, it may appear in the image or within text prompt. You must identify and extract it, enclosing it within <question></question>. When extracting the question, consider the following:
+    a. If it's a multiple-choice question, describe each option thoroughly. If the options include non-textual elements such as diagrams or tables, provide detailed and professional descriptions to aid comprehension. For example, if it is mathmatical question, use mathmatical word such as convex, increasing and some words like that.
+    b. If it's a fill-in-the-blank question, restate the question in its entirety and inform the next person about the nature of the question and what needs to be determined.
+    c. If it's a question that doesn't fall into the above categories, provide a comprehensive description of the content beyond the question.
+2. The image may depict scenes and characters. Please inform me about the objects or living beings present in the image and describe their features based on the information provided in text prompt.
+3. Do not attempt to answer the question. Enclose all information except the question within <image_content></image_content> tags. For instance, if the question is a multiple-choice question, the <image_content> tags should encompass all options. If the question is a short answer question, the <image_content> tags should include all the main content from the image as well as any hints provided in the question prompt. For example, if the question asks whether the car is in front of the tree, then the <image_content> tags should contain all detailed information from the image, such as <image_content>The car is in front of the tree.</image_content>.
+Whether it's a question or information you've extracted, please adhere to the provided format for output:
+{{LATEX_PROMPT}}
+"""
 
 IMAGE_CONTEXT_PROMPT = f"""
 =======
@@ -63,7 +68,7 @@ You will be provided with a question, delimited with <question> and optional ref
 Your task is to guide me to find the final answer, after evaluate the question and reference answer.
 ========
 Requriments:
-1. Evaluate the renference answer first and follow the anwer showing in reference, DO NOT change the anwer in the reference.
+1. Evaluate the renference answer first and follow the anwer showing in reference.
 2. If the reference answer DOES NOT make sense, COMPLETELY IGNORE the reference answer and give your own answer.
 3. NEVER mention the existance of the reference answer in your response.
 4. If there are image urls avaiable in the reference answer, include them in the answer in a markdown format with brief introduction. Example: ![Cute Puppy](https://example.com/path/to/puppy.jpg "A Cute Puppy")
@@ -73,7 +78,7 @@ Now follow the following steps:
 {{mode_prompt}}
 
 =====
-<question>{{{{question}}}}</question><reference>{{{{reference}}}}</reference>
+<context>{{{{context}}}}</context><reference>{{{{reference}}}}</reference>
 """
 
 HELPER_PROMPT_PART = """
@@ -94,12 +99,14 @@ LEARNING_PROMPT_PART = """
 LEARNING_PROMPT = MODE_PROMPT_TEMPLATE.format(mode_prompt=LEARNING_PROMPT_PART)
 
 WOLFRAM_ALPHA_PROMPT = """
-You will be provided with a question, I want you ALWAYS think step-by-step and MUST consider all the requirements:
-1) develop and return fine-grained Wolfram Language code that solves the problem
-(or part of it) and make the code as short as possible.
+You will be provided with a question which is delimited within <question><question/>,
+Don't extract other things, just stick to the question delimit with <question>. DO NOT LOOK AT the contents in <image_context>
+I want you ALWAYS think step-by-step and MUST consider all the requirements:
+1) develop and return fine-grained Wolfram Language code that solves the problem (or part of it) and make the code as short as possible.
 2) Re-evualte the code and make sure it works with Wolfram Language.
 3) Only Response the code, do not start with ```wolfram or use triple quotes.  Example response: Solve[30 + x/8 + x/4 == x && x > 0, x].
-4) If you can not generate a meaningful code, DO NOT RETURN ANYTHING.
+4) Double check the generated code is stick to the question.
+5) If you can not generate a meaningful code, DO NOT RETURN ANYTHING.
 =======
 Question: {}
 =======
@@ -108,11 +115,11 @@ Response:
 
 WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT = """
 You are an expert in parsing and understanding wolfram alpha full result response, based on the input question.
-You will be provided with a JSON response, delimited with <response> and the question, delimited with <question>.
+You will be provided with a JSON response, delimited with <response> and the related information such as question and image context, delimited with <context>.
 Your task is to:
-1. extract the question in <question>.
-1. extract the final result and summarize with brefit answers.
-2. extract ONLY images urls that are related to plots and visualizations from the pods.
+1. extract the question in <context>, the question is delimited with <question> in the context, for example, the question of <context><question>1+1=?<question/><context/> is "1+1=?"
+2. extract the final result and summarize with brief answers to the question.
+3. extract ONLY images urls that are related to plots and visualizations from the pods.
 Requirements:
 1. MUST only return the most relevant answer and image urls.
 2. Re-evalute the result based on the question, the input response could be wrong.
@@ -122,5 +129,5 @@ Requirements:
 """
 
 WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE = f"""
-<response>{{response}}</response> <question>{{question}}</question>
+<response>{{response}}</response> <context>{{context}}</context>
 """
