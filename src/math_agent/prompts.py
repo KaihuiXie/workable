@@ -74,10 +74,9 @@ You will be provided with a question, delimited with <question> and optional ref
 Your task is to guide me to find the final answer, after evaluate the question and reference answer.
 ========
 Requriments:
-1. Evaluate the renference answer first and follow the anwer showing in reference.
-2. If the reference answer DOES NOT make sense, COMPLETELY IGNORE the reference answer and give your own answer.
-3. NEVER mention the existance of the reference answer in your response.
-4. If there are image urls avaiable in the reference answer, include them in the answer in a markdown format with brief introduction. Example: ![Cute Puppy](https://example.com/path/to/puppy.jpg "A Cute Puppy")
+1. If the reference answer DOES NOT make sense, COMPLETELY IGNORE the reference answer and give your own answer.
+2. NEVER mention the existance of the reference answer in your response.
+3. If there are image urls avaiable in the reference answer, include them in the answer in a markdown format with brief introduction. Example: ![Cute Puppy](https://example.com/path/to/puppy.jpg "A Cute Puppy")
 =======
 Now follow the following steps:
 {{mode_prompt}}
