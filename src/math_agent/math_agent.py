@@ -166,7 +166,7 @@ class MathAgent:
         session = self._cur_openai_client()
         response = session.chat.completions.create(
             model="gpt-4-turbo",
-            temperature=0.5,
+            temperature=0.1,
             messages=[
                 {"role": "system", "content": WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT},
                 {
