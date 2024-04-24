@@ -55,7 +55,7 @@ class MathAgent:
         response = session.chat.completions.create(
             model="gpt-4-turbo",
             messages=[{"role": "user", "content": content}],
-            max_tokens=2048,
+            max_tokens=1024,
         )
         return response.choices[0].message.content
 
@@ -112,7 +112,7 @@ class MathAgent:
             print("extract wolfram took:", end_time1 - start_time)
 
             text_prompt = (mode_prompt).format(
-                question=question, reference=extracted_response
+                context=question, reference=extracted_response
             )
 
             messages.extend(
