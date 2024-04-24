@@ -125,14 +125,15 @@ You are an expert in parsing and understanding wolfram alpha full result respons
 You will be provided with a JSON response, delimited with <response> and the related information such as question and image context, delimited with <context>.
 Your task is to:
 1. Extract the question in <context>, the question is delimited with <question> in the context
-2. Utilize the contents in <image_content>, you can get some hints from them. 
-3. Extract the final result and summarize with brief answers to the question.
+2. Extract the final result and summarize with brief answers to the question.
+3. Utilize the contents in <image_content>, you can get some hints from them. 
 4. Extract ONLY images urls that are related to plots and visualizations from the pods.
 Requirements:
 1. MUST only return the most relevant answer and image urls.
 2. DO NOT mention you have been provided with some inputs.
-3. If there are no answer to the question in <response>, generate your own answer to solve the question.
-4. There must be an answer to the question.
+3. If there are no answer in <response>, generate your own answer to solve the question. But Remember, the answer in <response> has the highest priority.
+4. If there are choices in <image_content>, you must select the choices equal to the answer, if answer is not in the choices, select the one looks most like 
+5. There must be an answer to the question.
 """
 
 WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE = f"""
