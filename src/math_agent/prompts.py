@@ -71,18 +71,17 @@ IMAGE_CONTEXT_PROMPT = f"""
 
 MODE_PROMPT_TEMPLATE = f"""
 You will be provided with a question, delimited with <question> and reference answer, delimited with <reference>.
-Your task is to guide me to find the Final answer in <reference>. The answer is delimited with <answer>.
+Your task is to guide me to find the Final answer in <reference>.
 =====
 <context>{{{{context}}}}</context>
 =====
 <reference>{{{{reference}}}}</reference>
 ========
 Requriments:
-1. Don't change the answer! Don't evaluate the given answer! Don't correct the calculation of the answer. JUST guide me to the steps to get the answer that is delimited with <answer>.
-2. You don't have any correct answer, the correct answer is in the <reference>. Don't judge and evaluate the answer. For example, the answer in <reference> is "4", you think the answer is "2", just regardless your answer "2" and never mention it!
+1. Don't change the reference answer! Don't evaluate the reference answer! Don't correct the calculation of the reference answer. JUST guide me to the steps to get the reference answer.
+2. You don't have any standard answer, the only correct answer is in the <reference>. Don't judge, conclude and evaluate that answer. For example, the answer in <reference> is "4", you think the answer is "2", just regardless your answer "2" and never mention it!
 3. NEVER mention the existance of the reference answer in your response.
-4. If there are choices provided in <image_content>, tell me all the choices and conpare these choices to answer in <answer>.
-5. If there are image urls avaiable in the reference answer, include them in the answer in a markdown format with brief introduction. Example: ![Cute Puppy](https://example.com/path/to/puppy.jpg "A Cute Puppy")
+4. If there are image urls avaiable in the reference answer, include them in the answer in a markdown format with brief introduction. Example: ![Cute Puppy](https://example.com/path/to/puppy.jpg "A Cute Puppy")
 =======
 Now follow the following steps:
 {{mode_prompt}}
@@ -90,9 +89,11 @@ Now follow the following steps:
 
 HELPER_PROMPT_PART = """
 0. Return two sections. "Result" and "Step-by-Step Explanation"
-1. First, show the final answer within a rectangular box, including the answer and choice if possible. Example: "$$ \boxed{{ 1 }} $$" means the answer is 1 within a box, "$$ \boxed{{ A }} $$" means we select A for multiple choices question.
+1. First, show the final answer within a rectangular box, including the answer and choice if possible. Example: "$$ \\boxed{{ 1 }} $$" means the answer is 1 within a box, "$$ \\boxed{{ A }} $$" means we select A for the answer of multiple choices question.
 2. Provide a step-by-step explanation with necessary knowledge point. Example: "According to **the order of operations**, the expression should be solved ..."
 3. Make the explaination as concise as possible.
+4. Do not evaluate the final answer or correct the final answer because your opinion and calculation might be wrong.
+5. The conclusion part should be aligned with the final answer and answer provided in <reference>, tf there are multiple choices provided in <image_content>, tell me what is the question in <question> and show me all the choices. 
 """
 
 HELPER_PROMPT = MODE_PROMPT_TEMPLATE.format(mode_prompt=HELPER_PROMPT_PART)
@@ -100,7 +101,7 @@ HELPER_PROMPT = MODE_PROMPT_TEMPLATE.format(mode_prompt=HELPER_PROMPT_PART)
 LEARNING_PROMPT_PART = """
 1. First, based on the problem, please provide 2-3 knowledge points using concise language with the bold subtitle "Knowledge Points". Avoid considering “Simplify the expression” and “Combining terms” as standalone knowledge points.
 2. Then, having another bold subtitle "Now, let's work through the problem together with a few step-by-step guiding questions." guide me with asking one concise, guiding question in the format of multiple choice (4 different choices AND each in a new line) toward the correct solution.
-3. Once I answered each guiding question, please tell me know the correctness. If it's correct, please proceed to the next guiding question. If it's wrong or the user says “I don't know”, provide more hints instead of directly telling me the correct answer.
+3. Once I answered each guiding question, please let me know the correctness. If it's correct, please proceed to the next guiding question. If it's wrong or the user says “I don't know”, provide more hints instead of directly telling me the correct answer.
 """
 
 LEARNING_PROMPT = MODE_PROMPT_TEMPLATE.format(mode_prompt=LEARNING_PROMPT_PART)
@@ -133,9 +134,8 @@ Requirements:
 2. DO NOT mention you have been provided with some inputs.
 3. If there are no answer in <response>, generate your own answer to solve the question. But Remember, the answer in <response> has the highest priority.
 4. If there are multiple choices provided in <image_content>:
-    a. you must select the choice equal to the answer. 
+    a. After reviewing the question delimited with <question>, you should select the correct choice equal to the answer. 
     b. If the answer is not in the choices, just give your answer and do not select any choices. 
-5. After you extracting the answer, enclose the answer within <answer></answer> tags. For example, if the anwser is the choice "A", you should output <answer>A</answer>. If the anwser is value "4", you should output <answer>4</answer>.
 """
 
 WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE = f"""
