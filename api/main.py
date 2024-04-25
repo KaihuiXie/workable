@@ -119,7 +119,7 @@ async def solve(request: ChatRequest):
     try:
         start_time = time.time()  # Record the start time
         print(
-            "Time taken before first reponse received:",
+            "Solve request received:",
             time.asctime(time.localtime(start_time)),
         )
         chat_info = supabase.get_chat_by_id(request.chat_id)
@@ -137,7 +137,7 @@ async def solve(request: ChatRequest):
         time_taken = end_time - start_time  # Calculate the time taken
         # Log or store the time taken
         print("Time taken before first reponse received:", time_taken)
-
+        print("Solve request finished time:", time.asctime( time.localtime(time.time()) ))
         return StreamingResponse(
             event_generator(response, payload, request.chat_id),
             media_type="text/event-stream",
@@ -314,6 +314,7 @@ async def event_generator(response, payload, chat_id, callback=None):
 
     yield f"event: answer\n\n"
     try:
+        print("Event start time:", time.asctime( time.localtime(time.time()) ))
         for event in response:
             event_text = event.choices[0].delta.content
             if event_text is not None:
@@ -327,6 +328,7 @@ async def event_generator(response, payload, chat_id, callback=None):
             supabase.update_payload(chat_id, payload)
             if callback:
                 callback()
+        print("Event finished time:", time.asctime( time.localtime(time.time()) ))
     except Exception as e:
         # Handle exceptions or end of stream
         logging.error(e)
