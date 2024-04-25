@@ -226,6 +226,26 @@ async def get_credit(user_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/credit/temp/{user_id}")
+async def get_temp_credit(user_id: str):
+    try:
+        response = supabase.get_temp_credit_by_user_id(user_id)
+        return {"credit": response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/credit/perm/{user_id}")
+async def get_perm_credit(user_id: str):
+    try:
+        response = supabase.get_perm_credit_by_user_id(user_id)
+        return {"credit": response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.put("/credit/temp")
 async def update_temp_credit(request: UpdateCreditRequest):
     try:
