@@ -101,7 +101,7 @@ async def prepare_question(request: QuestionRequest = Depends(parse_question_req
             is_learner_mode=(request.mode == Mode.LEARNER),
         )
         if request.image_file:
-            match = re.search(r'<question>(.*?)</question>', question, re.DOTALL)
+            match = re.search(r"<question>(.*?)</question>", question, re.DOTALL)
 
             if match:
                 question = match.group(1)
@@ -173,11 +173,11 @@ async def all_chats(request: AllChatsRequest):
     try:
         response = supabase.get_all_chats(request.user_id)
         for record in response.data:
-            question = record['question']
-            match = re.search(r'<question>(.*?)</question>', question, re.DOTALL)
+            question = record["question"]
+            match = re.search(r"<question>(.*?)</question>", question, re.DOTALL)
             if match:
                 question = match.group(1)
-            record['question'] = question
+            record["question"] = question
         return {"data": response}
     except Exception as e:
         logging.error(e)
@@ -220,6 +220,26 @@ async def create_credit(user_id: str):
 async def get_credit(user_id: str):
     try:
         response = supabase.get_credit_by_user_id(user_id)
+        return {"credit": response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/credit/temp/{user_id}")
+async def get_temp_credit(user_id: str):
+    try:
+        response = supabase.get_temp_credit_by_user_id(user_id)
+        return {"credit": response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/credit/perm/{user_id}")
+async def get_perm_credit(user_id: str):
+    try:
+        response = supabase.get_perm_credit_by_user_id(user_id)
         return {"credit": response}
     except Exception as e:
         logging.error(e)

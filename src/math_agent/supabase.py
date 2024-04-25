@@ -11,6 +11,8 @@ from src.math_agent.constant import (
     INVITATION_TOKEN_EXPIRATION,
 )
 
+from src.utils import generate_thumbnail_string_from_image_string
+
 
 def is_same_day(date: datetime):
     return date.date() == datetime.utcnow().date()
@@ -161,11 +163,32 @@ class Supabase:
                 f"An error occurred getting all chats for user {user_id}: {e}"
             )
 
+    def backfill_thumbnail_str(self, chat_ids):
+        for chat_id in chat_ids:
+            try:
+                data, count = (
+                    self.supabase.from_("chats")
+                    .select("thumbnail_str, image_str", count="exact")
+                    .eq("id", chat_id)
+                    .execute()
+                )
+
+                if not data[1][0]["thumbnail_str"] and data[1][0]["image_str"]:
+                    print("Backfill thumbnail_str")
+                    thumbnail_str = generate_thumbnail_string_from_image_string(
+                        data[1][0]["image_str"]
+                    )
+                    self.update_thumbnail(chat_id, thumbnail_str)
+            except Exception as e:
+                raise Exception(
+                    f"An error occurred during backfilling thumbnail for chat {chat_id}: {e}"
+                )
+
     def get_chats_by_ids(self, chat_ids):
         try:
             response = (
                 self.supabase.from_("chats")
-                .select("id, question, learner_mode", count="exact")
+                .select("id, thumbnail_str, question, learner_mode", count="exact")
                 .in_("id", chat_ids)
                 .execute()
             )
@@ -187,6 +210,20 @@ class Supabase:
         except Exception as e:
             raise Exception(
                 f"An error occurred during upserting payload for chat {chat_id}: {e}"
+            )
+
+    def update_thumbnail(self, chat_id, thumbnail_str):
+        try:
+            response = (
+                self.supabase.table("chats")
+                .update({"thumbnail_str": thumbnail_str})
+                .eq("id", chat_id)
+                .execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during updating thumbnail_str for chat {chat_id}: {e}"
             )
 
     def delete_chat_by_id(self, chat_id):
