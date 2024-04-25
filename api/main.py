@@ -118,7 +118,10 @@ async def prepare_question(request: QuestionRequest = Depends(parse_question_req
 async def solve(request: ChatRequest):
     try:
         start_time = time.time()  # Record the start time
-        print("Time taken before first reponse received:", time.asctime( time.localtime(start_time) ))
+        print(
+            "Time taken before first reponse received:",
+            time.asctime(time.localtime(start_time)),
+        )
         chat_info = supabase.get_chat_by_id(request.chat_id)
         question = chat_info["question"]
         payload = {"messages": []}
