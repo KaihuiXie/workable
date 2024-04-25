@@ -93,7 +93,7 @@ HELPER_PROMPT_PART = """
 2. Provide a step-by-step explanation with necessary knowledge point. Example: "According to **the order of operations**, the expression should be solved ..."
 3. Make the explaination as concise as possible.
 4. Do not evaluate the final answer or correct the final answer because your opinion and calculation might be wrong.
-5. The conclusion part should be aligned with the final answer and answer provided in <reference>, tf there are multiple choices provided in <image_content>, tell me what is the question in <question> and show me all the choices. 
+5. The conclusion part should be aligned with the final answer and answer provided in <reference>, tf there are multiple choices provided in <image_content>, tell me what is the question in <question> and show me all the choices.
 """
 
 HELPER_PROMPT = MODE_PROMPT_TEMPLATE.format(mode_prompt=HELPER_PROMPT_PART)
@@ -127,15 +127,15 @@ You will be provided with a JSON response, delimited with <response> and the rel
 Your task is to:
 1. Extract the question in <context>, the question is delimited with <question> in the context
 2. Extract the final result and summarize with brief answers to the question.
-3. Utilize the contents in <image_content>, you can get some hints from them. 
+3. Utilize the contents in <image_content>, you can get some hints from them.
 4. Extract ONLY images urls that are related to plots and visualizations from the pods.
 Requirements:
 1. MUST only return the most relevant answer and image urls.
 2. DO NOT mention you have been provided with some inputs.
 3. If there are no answer in <response>, generate your own answer to solve the question. But Remember, the answer in <response> has the highest priority.
 4. If there are multiple choices provided in <image_content>:
-    a. After reviewing the question delimited with <question>, you should select the correct choice equal to the answer. 
-    b. If the answer is not in the choices, just give your answer and do not select any choices. 
+    a. After reviewing the question delimited with <question>, you should select the correct choice equal to the answer.
+    b. If the answer is not in the choices, just give your answer and do not select any choices.
 """
 
 WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE = f"""

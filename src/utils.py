@@ -42,6 +42,16 @@ def bytes_to_base64(bytes):
     return base64_str
 
 
+def base64_to_bytes(base64_str):
+    """
+    Converts a Base64-encoded string back to bytes.
+    """
+    # Decode the Base64 string to bytes
+    original_bytes = base64.b64decode(base64_str)
+
+    return original_bytes
+
+
 def preprocess_image(image_bytes, shrink_ratio=1.0):
     try:
         jpeg_bytes = convert_to_jpeg(image_bytes, shrink_ratio)
@@ -62,6 +72,11 @@ def generate_thumbnail_string(image_bytes, thumbnail_size=(128, 128)):
     # Encode the bytes buffer to Base64 string
     base64_string = bytes_to_base64(img_byte_arr.getvalue())
     return base64_string
+
+
+def generate_thumbnail_string_from_image_string(image_string):
+    image_bytes = base64_to_bytes(image_string)
+    return generate_thumbnail_string(image_bytes)
 
 
 def check_message_size(messages):
