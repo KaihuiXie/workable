@@ -225,8 +225,9 @@ async def create_credit(user_id: str):
 @app.get("/credit/{user_id}")
 async def get_credit(user_id: str):
     try:
-        response = supabase.get_credit_by_user_id(user_id)
-        return {"credit": response}
+        temp_credit = supabase.get_temp_credit_by_user_id(user_id)
+        perm_credit = supabase.get_perm_credit_by_user_id(user_id)
+        return {"temp_credit": temp_credit, "perm_credit": perm_credit}
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
