@@ -37,9 +37,11 @@ class Supabase:
     def auth(self):
         return self.auth
 
-    def sign_up(self, email: str, password: str):
+    def sign_up(self, email: str, phone: str, password: str):
         try:
-            res = self.supabase.auth.sign_up({"email": email, "password": password})
+            res = self.supabase.auth.sign_up(
+                {"email": email, "phone": phone, "password": password}
+            )
 
             # create a credit record for the account
             self.create_credit(res.user.user_id)
@@ -50,19 +52,11 @@ class Supabase:
                 f"An error occurred during signing up user with email {email}: {e}"
             )
 
-    def sign_in_with_password(self, email: str, password: str):
+    def sign_in_with_password(self, email: str, phone: str, password: str):
         try:
             res = self.supabase.auth.sign_in_with_password(
-                {"email": email, "password": password}
+                {"email": email, "phone": phone, "password": password}
             )
-            # if it is the first login of the day, increment the credit
-            user_id = res.user.user_id
-            last_login = res.user.last_sign_in_at
-            if not is_same_day(last_login):
-                prev_credit = self.get_credit_by_user_id(user_id)
-                self.update_temp_credit_by_user_id(
-                    user_id, prev_credit + EVERY_DAY_CREDIT_INCREMENT
-                )
             return res
         except Exception as e:
             raise Exception(
