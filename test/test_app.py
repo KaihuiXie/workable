@@ -283,6 +283,19 @@ client = TestClient(app)
 #     assert response.status_code == 200
 
 
+# def __login_oauth(request):
+#     response = client.post(f"/login/oauth", json=request)
+#     print(response.json())
+#     logging.error(response.json())
+#     assert response.status_code == 200
+#
+#
+# def test_login():
+#     request = {
+#         "provider": "google",
+#     }
+#     __login_oauth(request)
+
 # def test_signup():
 #     request = {
 #         "email": "test19@xxmail.com",
@@ -293,3 +306,4 @@ client = TestClient(app)
 #     print(response.json())
 #     logging.error(response.json())
 #     assert response.status_code == 200
+

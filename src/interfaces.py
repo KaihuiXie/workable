@@ -32,6 +32,10 @@ class SignInRequest(BaseModel):
     password: str
 
 
+class OAuthSignInRequest(BaseModel):
+    provider: str
+
+
 class QuestionRequest(BaseModel):
     user_id: str
     mode: Mode

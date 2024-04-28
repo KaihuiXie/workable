@@ -22,6 +22,7 @@ from src.interfaces import (
     DecrementCreditRequest,
     Language,
     SignInRequest,
+    OAuthSignInRequest,
     SignUpRequest,
 )
 from src.middlewares import (
@@ -345,6 +346,18 @@ async def logout():
     try:
         auth_response = supabase.sign_out()
         return {"auth_response": auth_response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/login/oauth")
+async def login_oauth(request: OAuthSignInRequest):
+    try:
+        oauth_response = supabase.sign_in_with_oauth(request.provider)
+        return {
+            "oauth_response": oauth_response,
+        }
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
