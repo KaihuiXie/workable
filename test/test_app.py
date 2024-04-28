@@ -6,6 +6,8 @@ from PIL import Image
 import logging
 import os
 
+from src.interfaces import SignInRequest
+
 # Configure logging at the top of your test file
 logging.basicConfig(level=logging.INFO)
 
@@ -239,4 +241,43 @@ client = TestClient(app)
 #     chat_id = "f1d30395-91c4-4e0a-8753-43ee99fa9b4f"
 #     response = client.get(f"/chat/{chat_id}")
 #     print(response.json())
+#     assert response.status_code == 200
+
+
+# def __login(request):
+#     response = client.post(f"/login", json=request)
+#     print(response.json())
+#     logging.error(response.json())
+#     assert response.status_code == 200
+#
+#
+# def test_login():
+#     request = {
+#         "email": "bowen.shawn.xiao@gmail.com",
+#         "phone": None,
+#         "password": "Shengdian123",
+#     }
+#     __login(request)
+#     request = {
+#         "email": "bowen.shawn.xiao@gmail.com",
+#         "password": "Shengdian123",
+#     }
+#     __login(request)
+#     request = {
+#         "email": "bowen.shawn.xiao@gmail.com",
+#         "phone": "1234567890",
+#         "password": "Shengdian123",
+#     }
+#     __login(request)
+#
+#
+# def test_logout():
+#     request = {
+#         "email": "bowen.shawn.xiao@gmail.com",
+#         "password": "Shengdian123",
+#     }
+#     client.post(f"/login", json=request)
+#     response = client.post("/logout")
+#     print(response.json())
+#     logging.error(response.json())
 #     assert response.status_code == 200

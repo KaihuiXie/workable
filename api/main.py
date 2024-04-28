@@ -21,6 +21,7 @@ from src.interfaces import (
     UpdateCreditRequest,
     DecrementCreditRequest,
     Language,
+    SignInRequest,
 )
 from src.middlewares import (
     ExtendTimeoutMiddleware,
@@ -304,6 +305,35 @@ async def get_invitation(user_id: str):
     try:
         response = supabase.get_invitation_by_user_id(user_id)
         return {"token": response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/login")
+async def login(request: SignInRequest):
+    try:
+        auth_response = supabase.sign_in_with_password(
+            request.email, request.phone, request.password
+        )
+        user_id = auth_response.user.id
+        temp_credit = supabase.get_temp_credit_by_user_id(user_id)
+        perm_credit = supabase.get_perm_credit_by_user_id(user_id)
+        return {
+            "auth_response": auth_response,
+            "temp_credit": temp_credit,
+            "perm_credit": perm_credit,
+        }
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/logout")
+async def logout():
+    try:
+        auth_response = supabase.sign_out()
+        return {"auth_response": auth_response}
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
