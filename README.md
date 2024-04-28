@@ -30,3 +30,15 @@ Check `http://127.0.0.1:8080/docs` for OPENAPI documentation.
 ```
 pre-commit run --all-files
 ```
+
+#### Create a Pull Request
+Always create a branch based off of `main`.
+When merging the PR, select `Squash and merge`.
+
+#### Deploy to production
+```
+git checkout production
+git pull --rebase
+git merge origin/main
+git push
+```
