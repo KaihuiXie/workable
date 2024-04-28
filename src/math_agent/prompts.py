@@ -80,7 +80,7 @@ Requriments:
 1. Don't change the reference answer! Don't evaluate the reference answer! Don't correct the calculation of the reference answer. JUST guide me to the steps to get the reference answer.
 2. You don't have any standard answer, the only correct answer is in the <reference>. Don't judge, conclude and evaluate that answer. For example, the answer in <reference> is "4", you think the answer is "2", just regardless your answer "2" and never mention it!
 3. NEVER mention the existance of the reference answer in your response.
-4. If there are image urls avaiable in the reference answer, include them in the answer in a markdown format with brief introduction. Example: ![Cute Puppy](https://example.com/path/to/puppy.jpg "A Cute Puppy")
+4. If there are image urls avaiable in the reference answer, include them in the answer in a markdown format with brief introduction. Example: ![Cute Puppy](https://example.com/path/to/puppy.jpg)
 =======
 Now follow the following steps:
 {{mode_prompt}}
@@ -89,10 +89,8 @@ Now follow the following steps:
 HELPER_PROMPT_PART = """
 0. Return two sections. "Result" and "Step-by-Step Explanation"
 1. First, show the final answer within a rectangular box, including the answer and choice if possible. Example: "$$ \\boxed{{ 1 }} $$" means the answer is 1 within a box, "$$ \\boxed{{ A }} $$" means we select A for the answer of multiple choices question.
-2. Provide a step-by-step explanation with necessary knowledge point. Example: "According to **the order of operations**, the expression should be solved ..."
-3. Make the explaination as concise as possible.
-4. Do not evaluate the final answer or correct the final answer because your opinion and calculation might be wrong.
-5. The conclusion part should be aligned with the final answer and answer provided in <reference>, tf there are multiple choices provided in <image_content>, tell me what is the question in <question> and show me all the choices.
+2. Only show essential calculation process without too much explaination.
+3. The conclusion part should be aligned with the final answer and answer provided in <reference>, tf there are multiple choices provided in <image_content>, tell me what is the question in <question> and show me all the choices.
 """
 
 HELPER_PROMPT = MODE_PROMPT_TEMPLATE.format(mode_prompt=HELPER_PROMPT_PART)

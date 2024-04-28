@@ -120,7 +120,6 @@ class MathAgent:
             if language:
                 system_prompt += LANGUGAE_PROMPT.format(language=language)
 
-            print(system_prompt)
             messages.extend(
                 [
                     {"role": "system", "content": system_prompt},
