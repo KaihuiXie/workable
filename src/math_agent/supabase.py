@@ -42,10 +42,6 @@ class Supabase:
             res = self.supabase.auth.sign_up(
                 {"email": email, "phone": phone, "password": password}
             )
-
-            # create a credit record for the account
-            self.create_credit(res.user.user_id)
-
             return res
         except Exception as e:
             raise Exception(

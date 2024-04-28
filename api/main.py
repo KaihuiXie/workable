@@ -22,6 +22,7 @@ from src.interfaces import (
     DecrementCreditRequest,
     Language,
     SignInRequest,
+    SignUpRequest,
 )
 from src.middlewares import (
     ExtendTimeoutMiddleware,
@@ -305,6 +306,16 @@ async def get_invitation(user_id: str):
     try:
         response = supabase.get_invitation_by_user_id(user_id)
         return {"token": response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/signup")
+async def signup(request: SignUpRequest):
+    try:
+        auth_response = supabase.sign_up(request.email, request.phone, request.password)
+        return {"auth_response": auth_response}
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))

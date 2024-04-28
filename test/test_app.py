@@ -281,3 +281,15 @@ client = TestClient(app)
 #     print(response.json())
 #     logging.error(response.json())
 #     assert response.status_code == 200
+
+
+# def test_signup():
+#     request = {
+#         "email": "test19@xxmail.com",
+#         "phone": None,
+#         "password": "test123",
+#     }
+#     response = client.post(f"/signup", json=request)
+#     print(response.json())
+#     logging.error(response.json())
+#     assert response.status_code == 200
