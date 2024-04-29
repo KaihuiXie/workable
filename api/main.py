@@ -363,6 +363,16 @@ async def login_oauth(request: OAuthSignInRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/session")
+async def get_session():
+    try:
+        session = supabase.get_session()
+        return {"session": session}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 async def event_generator(response, payload, chat_id, callback=None):
     full_response = ""
     chat_again = check_message_size(payload["messages"])

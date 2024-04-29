@@ -3,7 +3,6 @@ from datetime import datetime, timezone
 import datetime as dt
 import dateutil.parser
 
-
 from src.math_agent.constant import (
     EVERY_DAY_CREDIT_INCREMENT,
     COST_PER_QUESTION,
@@ -72,6 +71,13 @@ class Supabase:
             return user
         except Exception as e:
             raise Exception(f"An error occurred during getting user: {e}")
+
+    def get_session(self):
+        try:
+            session = self.supabase.auth.get_session()
+            return session
+        except Exception as e:
+            raise Exception(f"An error occurred during getting session: {e}")
 
     def get_chat_payload_by_id(self, chat_id):
         try:
@@ -459,8 +465,8 @@ class Supabase:
                     "%Y-%m-%dT%H:%M:%S%z"
                 ),
                 "valid_until": (
-                    datetime.now(timezone.utc)
-                    + dt.timedelta(days=INVITATION_TOKEN_EXPIRATION)
+                        datetime.now(timezone.utc)
+                        + dt.timedelta(days=INVITATION_TOKEN_EXPIRATION)
                 ).strftime("%Y-%m-%dT%H:%M:%S%z"),
             }
             data, count = self.supabase.table("invitation").insert(row_dict).execute()

@@ -249,6 +249,8 @@ client = TestClient(app)
 #     print(response.json())
 #     logging.error(response.json())
 #     assert response.status_code == 200
+
+
 #
 #
 # def test_login():
@@ -282,19 +284,16 @@ client = TestClient(app)
 #     logging.error(response.json())
 #     assert response.status_code == 200
 
-
-# def __login_oauth(request):
+#
+#
+# def test_oauth_login():
+#     request = {
+#         "provider": "google",
+#     }
 #     response = client.post(f"/login/oauth", json=request)
 #     print(response.json())
 #     logging.error(response.json())
 #     assert response.status_code == 200
-#
-#
-# def test_login():
-#     request = {
-#         "provider": "google",
-#     }
-#     __login_oauth(request)
 
 # def test_signup():
 #     request = {
@@ -306,3 +305,17 @@ client = TestClient(app)
 #     print(response.json())
 #     logging.error(response.json())
 #     assert response.status_code == 200
+
+# def test_get_session():
+#     request = {
+#         "email": "bowen.shawn.xiao@gmail.com",
+#         "phone": None,
+#         "password": "Shengdian123",
+#     }
+#     __login(request)
+#
+#     response = client.get(f"/session")
+#     print(response.json())
+#     logging.error(response.json())
+#     assert response.status_code == 200
+
