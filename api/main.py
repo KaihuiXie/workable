@@ -67,6 +67,15 @@ app.add_middleware(ExtendTimeoutMiddleware)
 app.add_middleware(TimerMiddleware)
 
 
+@app.get("/health")
+async def health_check():
+    try:
+        return {"status": "up"}
+    except Exception as e:
+        logging.error(f"Health Check Failed: {e}")
+        raise HTTPException(status_code=500, detail="Service unavailable")
+
+
 @app.get("/examples")
 async def get_examples():
     try:

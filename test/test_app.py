@@ -318,4 +318,3 @@ client = TestClient(app)
 #     print(response.json())
 #     logging.error(response.json())
 #     assert response.status_code == 200
-

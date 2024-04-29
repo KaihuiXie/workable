@@ -465,8 +465,8 @@ class Supabase:
                     "%Y-%m-%dT%H:%M:%S%z"
                 ),
                 "valid_until": (
-                        datetime.now(timezone.utc)
-                        + dt.timedelta(days=INVITATION_TOKEN_EXPIRATION)
+                    datetime.now(timezone.utc)
+                    + dt.timedelta(days=INVITATION_TOKEN_EXPIRATION)
                 ).strftime("%Y-%m-%dT%H:%M:%S%z"),
             }
             data, count = self.supabase.table("invitation").insert(row_dict).execute()
