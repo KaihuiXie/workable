@@ -91,6 +91,10 @@ async def get_examples():
 
 @app.post("/question")
 async def prepare_question(request: QuestionRequest = Depends(parse_question_request)):
+    ## TO_BE_DELETED
+    start_time = time.time()
+    ## TO_BE_DELETED
+
     try:
         question = ""
         image_string = ""
@@ -98,7 +102,18 @@ async def prepare_question(request: QuestionRequest = Depends(parse_question_req
         if request.image_file:
             image_bytes = await request.image_file.read()
             image_string, thumbnail_string = preprocess_image(image_bytes)
+
+            ## TO_BE_DELETED
+            start_time1 = time.time()
+            print("Prerocessing image took:", start_time1 - start_time)
+            ## TO_BE_DELETED
+
             question = math_agent.query_vision(image_string, request.prompt)
+
+            ## TO_BE_DELETED
+            print("query_vision image took:", time.time() - start_time1)
+            ## TO_BE_DELETED
+
         elif request.prompt:
             question = request.prompt
         else:
@@ -131,11 +146,14 @@ async def prepare_question(request: QuestionRequest = Depends(parse_question_req
 @app.post("/solve")
 async def solve(request: ChatRequest):
     try:
+        ## TO_BE_DELETED
         start_time = time.time()  # Record the start time
         print(
             "Solve request received:",
             time.asctime(time.localtime(start_time)),
         )
+        ## TO_BE_DELETED
+
         chat_info = supabase.get_chat_by_id(request.chat_id)
         question = chat_info["question"]
         payload = {"messages": []}
@@ -147,11 +165,9 @@ async def solve(request: ChatRequest):
         else:
             response = math_agent.helper(question, payload["messages"], language)
 
-        end_time = time.time()  # Record the end time
-        time_taken = end_time - start_time  # Calculate the time taken
-        # Log or store the time taken
-        print("Time taken before first reponse received:", time_taken)
-        print("Solve request finished time:", time.asctime(time.localtime(time.time())))
+        ## TO_BE_DELETED
+        print("Time taken before first reponse received:", time.time() - start_time)
+        ## TO_BE_DELETED
         return StreamingResponse(
             event_generator(response, payload, request.chat_id),
             media_type="text/event-stream",
@@ -167,16 +183,22 @@ async def solve(request: ChatRequest):
 async def chat(request: ChatRequest):
     try:
         # Query db to get messages
-        start_time0 = time.time()  # Record the start time
+        ## TO_BE_DELETED
+        start_time = time.time()  # Record the start time
+        ## TO_BE_DELETED
+
         payload = supabase.get_chat_payload_by_id(request.chat_id)
         payload["messages"].append({"role": "user", "content": request.query})
 
-        start_time = time.time()  # Record the start time
-        print("Getting supabase:", start_time - start_time0)
-
         response = math_agent.query(payload["messages"])
-        end_time = time.time()  # Record the end time
-        print("Chat before first reponse received:", end_time - start_time)
+
+        ## TO_BE_DELETED
+        print(
+            f"Chat {request.chat_id} before first reponse received:",
+            time.time() - start_time,
+        )
+        ## TO_BE_DELETED
+
         return StreamingResponse(
             event_generator(response, payload, request.chat_id),
             media_type="text/event-stream",
@@ -390,7 +412,6 @@ async def event_generator(response, payload, chat_id, callback=None):
 
     yield f"event: answer\n\n"
     try:
-        print("Event start time:", time.asctime(time.localtime(time.time())))
         for event in response:
             event_text = event.choices[0].delta.content
             if event_text is not None:
@@ -398,13 +419,11 @@ async def event_generator(response, payload, chat_id, callback=None):
                 event_data = {"text": event_text}
                 yield f"data: {json.dumps(event_data)}\n\n"
         logging.info(full_response)
-        print(full_response)
         if full_response:
             payload["messages"].append({"role": "assistant", "content": full_response})
             supabase.update_payload(chat_id, payload)
             if callback:
                 callback()
-        print("Event finished time:", time.asctime(time.localtime(time.time())))
     except Exception as e:
         # Handle exceptions or end of stream
         logging.error(e)
