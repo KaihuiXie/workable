@@ -21,6 +21,9 @@ from src.interfaces import (
     UpdateCreditRequest,
     DecrementCreditRequest,
     Language,
+    SignInRequest,
+    OAuthSignInRequest,
+    SignUpRequest,
 )
 from src.middlewares import (
     ExtendTimeoutMiddleware,
@@ -50,6 +53,7 @@ app.add_middleware(
         "http://react-learning-app-blush.vercel.app",
         "https://react-learning-app-u7tw.vercel.app",
         "http://react-learning-app-u7tw.vercel.app",
+        "https://uat-cqomi71sh-asian-math-top.vercel.app",
         "http://localhost:3000",
         "https://localhost:3000",
         "https://chat.mathsolver.top",
@@ -62,6 +66,15 @@ app.add_middleware(
 
 app.add_middleware(ExtendTimeoutMiddleware)
 app.add_middleware(TimerMiddleware)
+
+
+@app.get("/health")
+async def health_check():
+    try:
+        return {"status": "up"}
+    except Exception as e:
+        logging.error(f"Health Check Failed: {e}")
+        raise HTTPException(status_code=500, detail="Service unavailable")
 
 
 @app.get("/examples")
@@ -79,6 +92,10 @@ async def get_examples():
 
 @app.post("/question")
 async def prepare_question(request: QuestionRequest = Depends(parse_question_request)):
+    ## TO_BE_DELETED
+    start_time = time.time()
+    ## TO_BE_DELETED
+
     try:
         question = ""
         image_string = ""
@@ -86,7 +103,18 @@ async def prepare_question(request: QuestionRequest = Depends(parse_question_req
         if request.image_file:
             image_bytes = await request.image_file.read()
             image_string, thumbnail_string = preprocess_image(image_bytes)
+
+            ## TO_BE_DELETED
+            start_time1 = time.time()
+            print("Prerocessing image took:", start_time1 - start_time)
+            ## TO_BE_DELETED
+
             question = math_agent.query_vision(image_string, request.prompt)
+
+            ## TO_BE_DELETED
+            print("query_vision image took:", time.time() - start_time1)
+            ## TO_BE_DELETED
+
         elif request.prompt:
             question = request.prompt
         else:
@@ -119,11 +147,14 @@ async def prepare_question(request: QuestionRequest = Depends(parse_question_req
 @app.post("/solve")
 async def solve(request: ChatRequest):
     try:
+        ## TO_BE_DELETED
         start_time = time.time()  # Record the start time
         print(
             "Solve request received:",
             time.asctime(time.localtime(start_time)),
         )
+        ## TO_BE_DELETED
+
         chat_info = supabase.get_chat_by_id(request.chat_id)
         question = chat_info["question"]
         payload = {"messages": []}
@@ -135,11 +166,9 @@ async def solve(request: ChatRequest):
         else:
             response = math_agent.helper(question, payload["messages"], language)
 
-        end_time = time.time()  # Record the end time
-        time_taken = end_time - start_time  # Calculate the time taken
-        # Log or store the time taken
-        print("Time taken before first reponse received:", time_taken)
-        print("Solve request finished time:", time.asctime(time.localtime(time.time())))
+        ## TO_BE_DELETED
+        print("Time taken before first reponse received:", time.time() - start_time)
+        ## TO_BE_DELETED
         return StreamingResponse(
             event_generator(response, payload, request.chat_id),
             media_type="text/event-stream",
@@ -155,16 +184,22 @@ async def solve(request: ChatRequest):
 async def chat(request: ChatRequest):
     try:
         # Query db to get messages
-        start_time0 = time.time()  # Record the start time
+        ## TO_BE_DELETED
+        start_time = time.time()  # Record the start time
+        ## TO_BE_DELETED
+
         payload = supabase.get_chat_payload_by_id(request.chat_id)
         payload["messages"].append({"role": "user", "content": request.query})
 
-        start_time = time.time()  # Record the start time
-        print("Getting supabase:", start_time - start_time0)
-
         response = math_agent.query(payload["messages"])
-        end_time = time.time()  # Record the end time
-        print("Chat before first reponse received:", end_time - start_time)
+
+        ## TO_BE_DELETED
+        print(
+            f"Chat {request.chat_id} before first reponse received:",
+            time.time() - start_time,
+        )
+        ## TO_BE_DELETED
+
         return StreamingResponse(
             event_generator(response, payload, request.chat_id),
             media_type="text/event-stream",
@@ -196,7 +231,7 @@ async def get_chat(chat_id: str):
         payload = supabase.get_chat_payload_by_id(chat_id)
         # Hide the two messages
         messages = payload["messages"]
-        return {"payload": messages[2:]}
+        return {"payload": messages}
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
@@ -309,6 +344,67 @@ async def get_invitation(user_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/signup")
+async def signup(request: SignUpRequest):
+    try:
+        auth_response = supabase.sign_up(request.email, request.phone, request.password)
+        return {"auth_response": auth_response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/login")
+async def login(request: SignInRequest):
+    try:
+        auth_response = supabase.sign_in_with_password(
+            request.email, request.phone, request.password
+        )
+        user_id = auth_response.user.id
+        temp_credit = supabase.get_temp_credit_by_user_id(user_id)
+        perm_credit = supabase.get_perm_credit_by_user_id(user_id)
+        return {
+            "auth_response": auth_response,
+            "temp_credit": temp_credit,
+            "perm_credit": perm_credit,
+        }
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/logout")
+async def logout():
+    try:
+        auth_response = supabase.sign_out()
+        return {"auth_response": auth_response}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/login/oauth")
+async def login_oauth(request: OAuthSignInRequest):
+    try:
+        oauth_response = supabase.sign_in_with_oauth(request.provider)
+        return {
+            "oauth_response": oauth_response,
+        }
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/session")
+async def get_session():
+    try:
+        session = supabase.get_session()
+        return {"session": session}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 async def event_generator(response, payload, chat_id, callback=None):
     full_response = ""
     chat_again = check_message_size(payload["messages"])
@@ -317,7 +413,6 @@ async def event_generator(response, payload, chat_id, callback=None):
 
     yield f"event: answer\n\n"
     try:
-        print("Event start time:", time.asctime(time.localtime(time.time())))
         for event in response:
             event_text = event.choices[0].delta.content
             if event_text is not None:
@@ -325,13 +420,11 @@ async def event_generator(response, payload, chat_id, callback=None):
                 event_data = {"text": event_text}
                 yield f"data: {json.dumps(event_data)}\n\n"
         logging.info(full_response)
-        print(full_response)
         if full_response:
             payload["messages"].append({"role": "assistant", "content": full_response})
             supabase.update_payload(chat_id, payload)
             if callback:
                 callback()
-        print("Event finished time:", time.asctime(time.localtime(time.time())))
     except Exception as e:
         # Handle exceptions or end of stream
         logging.error(e)

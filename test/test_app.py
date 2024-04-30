@@ -6,6 +6,8 @@ from PIL import Image
 import logging
 import os
 
+from src.interfaces import SignInRequest
+
 # Configure logging at the top of your test file
 logging.basicConfig(level=logging.INFO)
 
@@ -236,7 +238,83 @@ client = TestClient(app)
 
 
 # def test_get_chat():
-#     chat_id = "f1d30395-91c4-4e0a-8753-43ee99fa9b4f"
+#     chat_id = "d4531219-bbd3-4613-8142-01cb0c50a29d"
 #     response = client.get(f"/chat/{chat_id}")
 #     print(response.json())
+#     assert response.status_code == 200
+
+
+# def __login(request):
+#     response = client.post(f"/login", json=request)
+#     print(response.json())
+#     logging.error(response.json())
+#     assert response.status_code == 200
+
+
+#
+#
+# def test_login():
+#     request = {
+#         "email": "bowen.shawn.xiao@gmail.com",
+#         "phone": None,
+#         "password": "Shengdian123",
+#     }
+#     __login(request)
+#     request = {
+#         "email": "bowen.shawn.xiao@gmail.com",
+#         "password": "Shengdian123",
+#     }
+#     __login(request)
+#     request = {
+#         "email": "bowen.shawn.xiao@gmail.com",
+#         "phone": "1234567890",
+#         "password": "Shengdian123",
+#     }
+#     __login(request)
+#
+#
+# def test_logout():
+#     request = {
+#         "email": "bowen.shawn.xiao@gmail.com",
+#         "password": "Shengdian123",
+#     }
+#     client.post(f"/login", json=request)
+#     response = client.post("/logout")
+#     print(response.json())
+#     logging.error(response.json())
+#     assert response.status_code == 200
+
+#
+#
+# def test_oauth_login():
+#     request = {
+#         "provider": "google",
+#     }
+#     response = client.post(f"/login/oauth", json=request)
+#     print(response.json())
+#     logging.error(response.json())
+#     assert response.status_code == 200
+
+# def test_signup():
+#     request = {
+#         "email": "test19@xxmail.com",
+#         "phone": None,
+#         "password": "test123",
+#     }
+#     response = client.post(f"/signup", json=request)
+#     print(response.json())
+#     logging.error(response.json())
+#     assert response.status_code == 200
+
+# def test_get_session():
+#     request = {
+#         "email": "bowen.shawn.xiao@gmail.com",
+#         "phone": None,
+#         "password": "Shengdian123",
+#     }
+#     __login(request)
+#
+#     response = client.get(f"/session")
+#     print(response.json())
+#     logging.error(response.json())
 #     assert response.status_code == 200

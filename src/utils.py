@@ -2,6 +2,7 @@ from PIL import Image
 from io import BytesIO
 import base64
 import logging
+import time
 
 from pillow_heif import register_heif_opener
 
