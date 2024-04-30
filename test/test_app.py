@@ -238,7 +238,7 @@ client = TestClient(app)
 
 
 # def test_get_chat():
-#     chat_id = "f1d30395-91c4-4e0a-8753-43ee99fa9b4f"
+#     chat_id = "d4531219-bbd3-4613-8142-01cb0c50a29d"
 #     response = client.get(f"/chat/{chat_id}")
 #     print(response.json())
 #     assert response.status_code == 200

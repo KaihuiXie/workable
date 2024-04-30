@@ -230,7 +230,7 @@ async def get_chat(chat_id: str):
         payload = supabase.get_chat_payload_by_id(chat_id)
         # Hide the two messages
         messages = payload["messages"]
-        return {"payload": messages[2:]}
+        return {"payload": messages}
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
