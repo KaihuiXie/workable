@@ -58,6 +58,19 @@ class Supabase:
                 f"An error occurred during signing in user with email {email}: {e}"
             )
 
+    def sign_in_with_oauth(self, provider: str):
+        try:
+            res = self.supabase.auth.sign_in_with_oauth(
+                {
+                    "provider": provider,
+                }
+            )
+            return res
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during signing in user with oauth provider {provider}: {e}"
+            )
+
     def sign_out(self):
         try:
             res = self.supabase.auth.sign_out()
