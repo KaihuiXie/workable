@@ -13,7 +13,7 @@ import logging
 from src.math_agent.math_agent import MathAgent
 from src.math_agent.supabase import Supabase
 from src.interfaces import (
-    QuestionRequest,
+    UploadQuestionRequest,
     parse_question_request,
     ChatRequest,
     AllChatsRequest,
@@ -91,14 +91,29 @@ async def get_examples():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/question")
-async def prepare_question(request: QuestionRequest = Depends(parse_question_request)):
+@app.get("/new_chat_id/{user_id}")
+async def get_new_chat_id(user_id: str):
+    try:
+        chat_id = supabase.create_empty_chat(
+            user_id=user_id,
+        )
+        return {"chat_id": chat_id}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"An error occurred during creating new chat id: {str(e)}",
+        )
+
+
+@app.post("/question_photo")
+async def upload_question_photo(
+    request: UploadQuestionRequest = Depends(parse_question_request),
+):
     ## TO_BE_DELETED
     start_time = time.time()
     ## TO_BE_DELETED
 
     try:
-        question = ""
         image_string = ""
         thumbnail_string = ""
         if request.image_file:
@@ -123,22 +138,15 @@ async def prepare_question(request: QuestionRequest = Depends(parse_question_req
                 status_code=500,
                 detail=f"At least one of `image_file` or `prompt` are required!",
             )
-        # Upsert to db, assuming create_chat now correctly handles the parameters
-        chat_id = supabase.create_chat(
+
+        response = supabase.fulfill_empty_chat(
+            chat_id=request.chat_id,
             image_str=image_string,
             thumbnail_str=thumbnail_string,
-            user_id=request.user_id,
             question=question,
             is_learner_mode=(request.mode == Mode.LEARNER),
         )
-        if request.image_file:
-            match = re.search(r"<question>(.*?)</question>", question, re.DOTALL)
-
-            if match:
-                question = match.group(1)
-            else:
-                question = "Question undefined"
-        return {"chat_id": chat_id, "question": question}
+        return response
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"An error occurred during reading image: {str(e)}"
