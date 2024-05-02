@@ -230,9 +230,11 @@ async def all_chats(request: AllChatsRequest):
 async def get_chat(chat_id: str):
     try:
         payload = supabase.get_chat_payload_by_id(chat_id)
+        question = supabase.get_chat_question_by_id(chat_id)
+        image_str = supabase.get_chat_Qimage_by_id(chat_id)
         # Hide the two messages
-        messages = payload["messages"]
-        return {"payload": messages}
+        # messages = payload["messages"]
+        return {"payload": payload, "question":question, "image_str":image_str}
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
