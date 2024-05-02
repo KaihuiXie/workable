@@ -145,16 +145,15 @@ class Supabase:
                 f"An error occurred during getting chat question by chat_id {chat_id}: {e}"
             )
 
-    def create_chat(self, image_str, thumbnail_str, user_id, question, is_learner_mode):
+    def create_empty_chat(self, user_id):
         try:
-            payload = self.question_to_payload(question)
             row_dict = {
-                "image_str": image_str,
-                "thumbnail_str": thumbnail_str,
+                "image_str": "",
+                "thumbnail_str": "",
                 "user_id": user_id,
-                "question": question,
-                "payload": payload,
-                "learner_mode": is_learner_mode,
+                "question": "",
+                "payload": "",
+                "learner_mode": False,
             }
             data, count = self.supabase.table("chats").insert(row_dict).execute()
             # Check if exactly one record was inserted
@@ -165,7 +164,32 @@ class Supabase:
                     f"Unexpected number of records inserted: {len(data)}. Expected 1."
                 )
         except Exception as e:
-            raise Exception(f"An error occurred during creating a chat: {e}")
+            raise Exception(f"An error occurred during creating an empty chat: {e}")
+
+    def fulfill_empty_chat(
+        self, chat_id, image_str, thumbnail_str, question, is_learner_mode
+    ):
+        try:
+            payload = self.question_to_payload(question)
+            response = (
+                self.supabase.table("chats")
+                .update(
+                    {
+                        "image_str": image_str,
+                        "thumbnail_str": thumbnail_str,
+                        "payload": payload,
+                        "question": question,
+                        "learner_mode": is_learner_mode,
+                    }
+                )
+                .eq("id", chat_id)
+                .execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during fulfill fields for chat {chat_id}: {e}"
+            )
 
     def get_all_chats(self, user_id):
         try:

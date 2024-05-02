@@ -318,3 +318,13 @@ client = TestClient(app)
 #     print(response.json())
 #     logging.error(response.json())
 #     assert response.status_code == 200
+
+# def test_get_new_chat_id():
+#     user_id = "88257e09-ce6f-4165-bc34-31bf0c873f29"
+#     response = client.get(f"/new_chat_id/{user_id}")
+#     chat_id = response.json().get("chat_id")
+#     print(response.json())
+#     logging.error(response.json())
+#     assert response.status_code == 200
+#     response = client.delete(f"/chat/{chat_id}")
+#     assert response.status_code == 200

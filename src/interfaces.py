@@ -36,8 +36,8 @@ class OAuthSignInRequest(BaseModel):
     provider: str
 
 
-class QuestionRequest(BaseModel):
-    user_id: str
+class UploadQuestionRequest(BaseModel):
+    chat_id: str
     mode: Mode
     prompt: Optional[str] = None
     image_file: Optional[UploadFile] = None
@@ -52,15 +52,15 @@ class QuestionRequest(BaseModel):
 
 # Dependency to parse QuestionRequest model from form data
 async def parse_question_request(
-    user_id: str = Form(...),
+    chat_id: str = Form(...),
     mode: Mode = Form(...),
     prompt: Optional[str] = Form(None),
     image_file: Optional[UploadFile] = File(None),
-) -> QuestionRequest:
+) -> UploadQuestionRequest:
     try:
         # Construct the QuestionRequest object
-        return QuestionRequest(
-            user_id=user_id, mode=mode, prompt=prompt, image_file=image_file
+        return UploadQuestionRequest(
+            chat_id=chat_id, mode=mode, prompt=prompt, image_file=image_file
         )
     except ValidationError as e:
         # Handle validation errors, e.g., by raising an HTTP exception
