@@ -6,7 +6,7 @@ import time
 
 from pillow_heif import register_heif_opener
 
-from src.math_agent.constant import MAX_MESSAGE_SIZE
+from common.constant import MAX_MESSAGE_SIZE
 
 register_heif_opener()
 # Configure logging

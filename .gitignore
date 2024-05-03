@@ -11,3 +11,6 @@ __pycache__/
 
 # Ignore .DS_store
 *.DS_store
+
+# Ignore IDE config files
+.idea

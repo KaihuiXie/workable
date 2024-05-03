@@ -10,8 +10,8 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
-from src.math_agent.math_agent import MathAgent
-from src.math_agent.supabase import Supabase
+from common.object import supabase, math_agent
+from api.routers import shared_chats
 from src.interfaces import (
     UploadQuestionRequest,
     parse_question_request,
@@ -34,17 +34,15 @@ from src.utils import preprocess_image, check_message_size
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
-# Initalization
-load_dotenv()
-OPENAI_API_KEYS = os.getenv("OPENAI_API_KEYS")
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-WOLFRAM_ALPHA_APP_ID = os.getenv("WOLFRAM_ALPHA_APP_ID")
-supabase = Supabase(SUPABASE_URL, SUPABASE_KEY)
-math_agent = MathAgent(OPENAI_API_KEYS, WOLFRAM_ALPHA_APP_ID)
+tags_metadata = [
+    {
+        "name": "shared_chat",
+        "description": "Operations with sharing chat.",
+    },
+]
 
 # FastAPI
-app = FastAPI()
+app = FastAPI(openapi_tags=tags_metadata)
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
@@ -67,6 +65,7 @@ app.add_middleware(
 
 app.add_middleware(ExtendTimeoutMiddleware)
 app.add_middleware(TimerMiddleware)
+app.include_router(shared_chats.router)
 
 
 @app.get("/health")

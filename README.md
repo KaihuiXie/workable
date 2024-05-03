@@ -26,9 +26,9 @@ Check `http://127.0.0.1:8080/docs` for OPENAPI documentation.
 
 ### Contribute
 
-#### Formatting before commit
+#### Run presubmit before commit
 ```
-pre-commit run --all-files
+./tools/presubmit.sh
 ```
 
 #### Create a Pull Request
