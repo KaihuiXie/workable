@@ -35,14 +35,8 @@ class SharedChatsTest(unittest.TestCase):
 
     @classmethod
     def __create_chat(cls):
-        image_str = "image_str_test"
-        thumbnail_str = "thumbnail_str_test"
         user_id = "88257e09-ce6f-4165-bc34-31bf0c873f29"  # lck2048@gmail.com
-        question = "1 + 1 = ?"
-        is_learner_mode = "False"
-        cls.chat_id = cls.supabase.create_chat(
-            image_str, thumbnail_str, user_id, question, is_learner_mode
-        )
+        cls.chat_id = cls.supabase.create_empty_chat(user_id)
 
     @classmethod
     def __delete_chat(cls):

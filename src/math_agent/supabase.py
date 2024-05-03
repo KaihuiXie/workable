@@ -107,8 +107,8 @@ class Supabase:
             raise Exception(
                 f"An error occurred during getting chat payload by chat_id {chat_id}: {e}"
             )
-        
-    def get_chat_Qimage_by_id(self, chat_id):
+
+    def get_chat_image_by_id(self, chat_id):
         try:
             data, count = (
                 self.supabase.from_("chats")
@@ -121,7 +121,7 @@ class Supabase:
             raise Exception(
                 f"An error occurred during getting question image by chat_id {chat_id}: {e}"
             )
-        
+
     def get_chat_question_by_id(self, chat_id):
         try:
             data, count = (
