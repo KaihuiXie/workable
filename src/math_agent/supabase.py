@@ -582,6 +582,12 @@ class Supabase:
         )
         self.update_last_award_time_by_user_id(user_id)
 
+    def get_bonus(self, user_id):
+        prev_perm_credit = self.get_perm_credit_by_user_id(user_id)
+        self.update_perm_credit_by_user_id(
+            user_id, prev_perm_credit + INVITATION_BONUES
+        )
+
     def update_last_award_time_by_user_id(self, user_id):
         try:
             response = (
@@ -669,21 +675,31 @@ class Supabase:
                 f"An error occurred during creating invitation for user {user_id}: {e}"
             )
         
-    def if_email_existed(self,email):
+    def is_eligible_for_reward(self,token, user_id):
         try:
             data, count = (
                 self.supabase.table("user_profile")
-                .select("user_email")
-                .eq("user_email", email)
+                .select("is_rewarded","created_at","user_email")
+                .eq("user_id", user_id)
                 .execute()
             )
-            if len(data[1]) == 1:
-                return True
-            else:
-                return False
+            is_rewarded,created_at,user_email = data[1][0]["is_rewarded"],data[1][0]["created_at"],data[1][0]["user_email"]
+            data, count = (
+                self.supabase.table("invitation")
+                .select("created_at")
+                .eq("id", token)
+                .execute()
+            )
+            token_date = data[1][0]["created_at"]
+            print(is_rewarded,created_at,user_email,token_date,token_date < created_at)
+            if is_rewarded:
+                return False,user_email
+            if token_date < created_at:
+                return False,user_email
+            return True,user_email
         except Exception as e:
             raise Exception(
-                f"An error occurred during getting information from email {email}: {e}"
+                f"An error occurred during getting information from user_id {user_id}: {e}"
             )
         
     def get_referee_list(self, user_id):
@@ -703,7 +719,7 @@ class Supabase:
     def update_referee_list(self, user_id, guest_email):
         try:
             row_dict = {
-                "user_id": user_id,
+                "referrer_id": user_id,
                 "guest_email":guest_email,
                 "join_date": datetime.now(timezone.utc).strftime(
                     "%Y-%m-%dT%H:%M:%S%z"
@@ -713,7 +729,7 @@ class Supabase:
             data, count = self.supabase.table("referee_list").insert(row_dict).execute()
             # Check if exactly one record was inserted
             if len(data[1]) == 1:
-                return data[1][0]["user_id"]
+                return data[1][0]
             else:
                 raise ValueError(
                     f"Unexpected number of records inserted: {len(data)}. Expected 1."
