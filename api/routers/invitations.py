@@ -32,3 +32,12 @@ async def get_invitation(user_id: str):
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/invitation/verify_user/{user_email}")
+async def get_invitation(user_email: str):
+    try:
+        response = supabase.if_email_existed(user_email)
+        return response
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
