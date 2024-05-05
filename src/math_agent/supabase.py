@@ -10,6 +10,7 @@ from common.constant import (
     COST_PER_QUESTION,
     DEFAULT_CREDIT,
     INVITATION_TOKEN_EXPIRATION,
+    INVITATION_BONUES,
 )
 
 from src.utils import generate_thumbnail_string_from_image_string
@@ -79,13 +80,6 @@ class Supabase:
             return res
         except Exception as e:
             raise Exception(f"An error occurred during signing out: {e}")
-
-    def get_user(self):
-        try:
-            user = self.supabase.auth.get_user()
-            return user
-        except Exception as e:
-            raise Exception(f"An error occurred during getting user: {e}")
 
     def get_session(self):
         try:
@@ -674,7 +668,61 @@ class Supabase:
             raise Exception(
                 f"An error occurred during creating invitation for user {user_id}: {e}"
             )
-
+        
+    def if_email_existed(self,email):
+        try:
+            data, count = (
+                self.supabase.table("user_profile")
+                .select("user_email")
+                .eq("user_email", email)
+                .execute()
+            )
+            if len(data[1]) == 1:
+                return True
+            else:
+                return False
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting information from email {email}: {e}"
+            )
+        
+    def get_referee_list(self, user_id):
+        try:
+            response = (
+                self.supabase.table("referee_list")
+                .select("user_id, guest_email, join_date, bonus")
+                .eq("user_id", user_id)
+                .execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during deleting invitation for user {user_id}: {e}"
+            )
+        
+    def update_referee_list(self, user_id, guest_email):
+        try:
+            row_dict = {
+                "user_id": user_id,
+                "guest_email":guest_email,
+                "join_date": datetime.now(timezone.utc).strftime(
+                    "%Y-%m-%dT%H:%M:%S%z"
+                ),
+                "bonus": INVITATION_BONUES,
+            }
+            data, count = self.supabase.table("referee_list").insert(row_dict).execute()
+            # Check if exactly one record was inserted
+            if len(data[1]) == 1:
+                return data[1][0]["user_id"]
+            else:
+                raise ValueError(
+                    f"Unexpected number of records inserted: {len(data)}. Expected 1."
+                )
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during updateing referee list for user {user_id} and guest {guest_email}: {e}"
+            )
+        
     def delete_invitation_by_user_id(self, user_id):
         try:
             response = (
