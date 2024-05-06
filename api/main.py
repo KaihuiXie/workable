@@ -45,10 +45,7 @@ app.add_middleware(
     allow_origins=[
         "https://react-learning-app-blush.vercel.app",
         "http://react-learning-app-blush.vercel.app",
-        "https://react-learning-app-u7tw.vercel.app",
-        "http://react-learning-app-u7tw.vercel.app",
-        "https://uat-cqomi71sh-asian-math-top.vercel.app",
-        "https://uat-asian-math-top.vercel.app/",
+        "https://react-learning-app-prod.vercel.app",
         "http://localhost:3000",
         "https://localhost:3000",
         "https://chat.mathsolver.top",

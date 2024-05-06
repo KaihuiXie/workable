@@ -57,6 +57,7 @@ async def get_invitation(invitation_token: str, user_id: str):
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/invitation/list/{user_id}")
 async def get_invitation(user_id: str):
     try:
