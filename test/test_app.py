@@ -24,12 +24,15 @@ def test_get_credit():
     logging.error(response.json())
     assert response.status_code == 200
 
+
 def test_get_temp_credit():
     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
     response = client.get(f"/credit/temp/{user_id}")
     print(response.json())
     logging.error(response.json())
     assert response.status_code == 200
+
+
 #
 #
 def test_get_perm_credit():
@@ -51,6 +54,7 @@ def test_decrement_credit():
     print(response.json)
     logging.error(response.json())
     assert response.status_code == 200
+
 
 # With an exist, and not expired token.
 # Will return true, and the referrer_id
@@ -129,6 +133,7 @@ def test_update_temp_credit():
     logging.error(response.json())
     assert response.status_code == 200
 
+
 def test_update_perm_credit():
     user_id = "450f6a7f-8f91-406b-b130-571abbdcef4d"
     credit_amount = 12
@@ -141,53 +146,6 @@ def test_update_perm_credit():
     response = client.put("/credit/perm", json=payload)
     logging.error(response.json())
     assert response.status_code == 200
-
-def test_image():
-    image_file_path = "./limit.jpeg"
-    # image_file_path = "./phone.jpeg"
-    try:
-        with open(image_file_path, "rb") as image_file:
-            data = {
-                "user_id": "6e0d1fed-8845-488e-832d-4c767f0f5bb0",
-                "mode": "learner",
-                # "prompt": "Optional prompt here if needed",
-            }
-            files = {
-                "image_file": image_file,
-            }
-            response = client.post("/question", data=data, files=files)
-            print(response.json())
-            assert response.status_code == 200
-    except Exception as e:
-        logging.error(e)
-
-
-# def test_image_with_prompt():
-#     image_file_path = "./2024.png"
-#     with open(image_file_path, "rb") as image_file:
-#         data = {
-#             "user_id": "6e0d1fed-8845-488e-832d-4c767f0f5bb0",
-#             "mode": "helper",
-#             "prompt": "Solve this",
-#         }
-#         files = {
-#             "image_file": image_file,
-#         }
-#         response = client.post("/question", data=data, files=files)
-#         print(response.json())
-#         assert response.status_code == 200
-
-
-# def test_no_image():
-#
-#     payload = {
-#         "user_id": "6e0d1fed-8845-488e-832d-4c767f0f5bb0",
-#         "prompt": "There are chicken and rabbits in the cage. They are in total 10 heads and 20 feet. How many rabbits? ",
-#         "mode": "learner",
-#     }
-#     response = client.post("/question", data=payload)
-#     print(response.json())  # Log the JSON response
-#     assert response.status_code == 200
 
 
 def test_examples():
@@ -214,11 +172,9 @@ def test_helper():
     response = client.post("/solve", json=payload)
     assert response.status_code == 200
 
+
 def test_helper_cn():
-    payload = {
-        "chat_id": "0786ddb2-001d-4635-9bd0-25ff23893f70",
-        "language": "ZH"
-    }
+    payload = {"chat_id": "0786ddb2-001d-4635-9bd0-25ff23893f70", "language": "ZH"}
     response = client.post("/solve", json=payload)
     assert response.status_code == 200
 
@@ -249,8 +205,6 @@ def __login(request):
     print(response.json())
     logging.error(response.json())
     assert response.status_code == 200
-
-
 
 
 def test_login():
@@ -285,7 +239,6 @@ def test_logout():
     assert response.status_code == 200
 
 
-
 def test_oauth_login():
     request = {
         "provider": "google",
@@ -295,16 +248,18 @@ def test_oauth_login():
     logging.error(response.json())
     assert response.status_code == 200
 
-# def test_signup():
-#     request = {
-#         "email": "test19@xxmail.com",
-#         "phone": None,
-#         "password": "test123",
-#     }
-#     response = client.post(f"/signup", json=request)
-#     print(response.json())
-#     logging.error(response.json())
-#     assert response.status_code == 200
+
+def test_signup():
+    request = {
+        "email": "test19@xxmail.com",
+        "phone": None,
+        "password": "test123",
+    }
+    response = client.post(f"/signup", json=request)
+    print(response.json())
+    logging.error(response.json())
+    assert response.status_code == 200
+
 
 def test_get_session():
     request = {
@@ -317,14 +272,4 @@ def test_get_session():
     response = client.get(f"/session")
     print(response.json())
     logging.error(response.json())
-    assert response.status_code == 200
-
-def test_get_new_chat_id():
-    user_id = "88257e09-ce6f-4165-bc34-31bf0c873f29"
-    response = client.get(f"/new_chat_id/{user_id}")
-    chat_id = response.json().get("chat_id")
-    print(response.json())
-    logging.error(response.json())
-    assert response.status_code == 200
-    response = client.delete(f"/chat/{chat_id}")
     assert response.status_code == 200

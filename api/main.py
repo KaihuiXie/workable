@@ -68,7 +68,6 @@ app.include_router(invitations.router)
 app.include_router(credits.router)
 
 
-
 @app.get("/health")
 async def health_check():
     try:
