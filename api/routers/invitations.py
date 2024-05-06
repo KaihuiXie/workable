@@ -40,18 +40,28 @@ async def get_invitation(invitation_token: str, user_id: str):
         is_invited, referrer_id = supabase.get_referrer_id_by_invitation_token(
             invitation_token
         )
+        if referrer_id == user_id:
+            return False
         is_eligible = False
         if is_invited:
             is_eligible, user_email = supabase.is_eligible_for_reward(
                 invitation_token, user_id
             )
-            print(is_eligible)
             if is_eligible:
                 response = supabase.update_referee_list(referrer_id, user_email)
                 supabase.get_bonus(user_id)
                 supabase.get_bonus(referrer_id)
 
         return is_eligible
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/invitation/list/{user_id}")
+async def get_invitation(user_id: str):
+    try:
+        response = supabase.get_referee_list(user_id)
+        return response
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
