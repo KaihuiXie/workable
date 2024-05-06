@@ -674,16 +674,20 @@ class Supabase:
             raise Exception(
                 f"An error occurred during creating invitation for user {user_id}: {e}"
             )
-        
-    def is_eligible_for_reward(self,token, user_id):
+
+    def is_eligible_for_reward(self, token, user_id):
         try:
             data, count = (
                 self.supabase.table("user_profile")
-                .select("is_rewarded","created_at","user_email")
+                .select("is_rewarded", "created_at", "user_email")
                 .eq("user_id", user_id)
                 .execute()
             )
-            is_rewarded,created_at,user_email = data[1][0]["is_rewarded"],data[1][0]["created_at"],data[1][0]["user_email"]
+            is_rewarded, created_at, user_email = (
+                data[1][0]["is_rewarded"],
+                data[1][0]["created_at"],
+                data[1][0]["user_email"],
+            )
             data, count = (
                 self.supabase.table("invitation")
                 .select("created_at")
@@ -692,16 +696,18 @@ class Supabase:
             )
             token_date = data[1][0]["created_at"]
             if is_rewarded:
-                return False,user_email
+                return False, user_email
             if token_date < created_at:
-                return False,user_email
-            self.supabase.table("user_profile").update({"is_rewarded": True}).eq("user_id", user_id).execute()
-            return True,user_email
+                return False, user_email
+            self.supabase.table("user_profile").update({"is_rewarded": True}).eq(
+                "user_id", user_id
+            ).execute()
+            return True, user_email
         except Exception as e:
             raise Exception(
                 f"An error occurred during getting information from user_id {user_id}: {e}"
             )
-        
+
     def get_referee_list(self, user_id):
         try:
             response = (
@@ -715,15 +721,13 @@ class Supabase:
             raise Exception(
                 f"An error occurred during deleting invitation for user {user_id}: {e}"
             )
-        
+
     def update_referee_list(self, user_id, guest_email):
         try:
             row_dict = {
                 "referrer_id": user_id,
-                "guest_email":guest_email,
-                "join_date": datetime.now(timezone.utc).strftime(
-                    "%Y-%m-%dT%H:%M:%S%z"
-                ),
+                "guest_email": guest_email,
+                "join_date": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S%z"),
                 "bonus": INVITATION_BONUES,
             }
             data, count = self.supabase.table("referee_list").insert(row_dict).execute()
@@ -738,7 +742,7 @@ class Supabase:
             raise Exception(
                 f"An error occurred during updateing referee list for user {user_id} and guest {guest_email}: {e}"
             )
-        
+
     def delete_invitation_by_user_id(self, user_id):
         try:
             response = (

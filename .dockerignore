@@ -1,0 +1,34 @@
+# Ignore all log files
+*.log
+
+# Ignore environment variable files
+*.env
+
+# Ignore Python bytecodes and caches
+__pycache__/
+*.pyc
+*.pytest_cache
+
+# Ignore system files
+*.DS_Store
+
+# Ignore IDE configuration files
+.idea/
+
+# Additional common exclusions for Docker builds
+
+# Ignore virtual environment directories
+venv/
+env/
+
+# Ignore build outputs and test artifacts
+build/
+dist/
+*.egg-info/
+
+# Ignore Git directory
+.git/
+
+# Optionally ignore large data files or directories not needed in the build
+# data/
+# models/

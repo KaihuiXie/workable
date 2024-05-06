@@ -33,18 +33,21 @@ async def get_invitation(user_id: str):
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/invitation/verify_user/{invitation_token}/{user_id}")
-async def get_invitation(invitation_token:str,user_id: str):
+async def get_invitation(invitation_token: str, user_id: str):
     try:
         is_invited, referrer_id = supabase.get_referrer_id_by_invitation_token(
             invitation_token
         )
         is_eligible = False
         if is_invited:
-            is_eligible,user_email = supabase.is_eligible_for_reward(invitation_token,user_id)
+            is_eligible, user_email = supabase.is_eligible_for_reward(
+                invitation_token, user_id
+            )
             print(is_eligible)
             if is_eligible:
-                response = supabase.update_referee_list(referrer_id,user_email)
+                response = supabase.update_referee_list(referrer_id, user_email)
                 supabase.get_bonus(user_id)
                 supabase.get_bonus(referrer_id)
 
@@ -52,4 +55,3 @@ async def get_invitation(invitation_token:str,user_id: str):
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
-    
