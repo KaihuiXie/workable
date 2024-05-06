@@ -712,8 +712,8 @@ class Supabase:
         try:
             response = (
                 self.supabase.table("referee_list")
-                .select("user_id, guest_email, join_date, bonus")
-                .eq("user_id", user_id)
+                .select("referrer_id, guest_email, join_date, bonus")
+                .eq("referrer_id", user_id)
                 .execute()
             )
             return response
