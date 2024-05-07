@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from pathlib import Path
 from api.main import app
 from src.math_agent.supabase import Supabase
-from common.constant import EXPIRE_TIME
+from common.constants import SHARED_CHAT_EXPIRE_TIME
 from datetime import datetime, timezone
 
 
@@ -18,7 +18,7 @@ class SharedChatsTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        logging.basicConfig(level=logging.INFO)
+        logging.disable(level=logging.ERROR)
         sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
         cls.test_client = TestClient(app)
         cls.__init_supabase()
@@ -191,7 +191,7 @@ class SharedChatsTest(unittest.TestCase):
         self.supabase.update_thumbnail(self.chat_id, thumbnail)
 
     def __update_shared_chat_create_time(self, shared_chat_id: str):
-        updated_at = (datetime.now(timezone.utc) - EXPIRE_TIME).strftime(
+        updated_at = (datetime.now(timezone.utc) - SHARED_CHAT_EXPIRE_TIME).strftime(
             "%Y-%m-%dT%H:%M:%S.%f%z"
         )
         self.supabase.update_shared_chat_create_time(shared_chat_id, updated_at)

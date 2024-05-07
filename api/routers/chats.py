@@ -2,7 +2,7 @@ import logging
 
 from fastapi import HTTPException, APIRouter, Depends
 
-from common.object import chats
+from common.objects import chats
 from src.chats.interfaces import (
     UploadQuestionRequest,
     NewChatRequest,

@@ -1,16 +1,16 @@
 from supabase import create_client, Client, ClientOptions
 from datetime import datetime, timezone
-from common.constant import TIME_FORMAT
+from common.constants import TIME_FORMAT
 import datetime as dt
 import dateutil.parser
 
 
-from common.constant import (
+from common.constants import (
     EVERY_DAY_CREDIT_INCREMENT,
     COST_PER_QUESTION,
     DEFAULT_CREDIT,
     INVITATION_TOKEN_EXPIRATION,
-    INVITATION_BONUES,
+    INVITATION_BONUS,
 )
 
 from src.utils import generate_thumbnail_string_from_image_string
@@ -550,6 +550,17 @@ class Supabase:
         except Exception as e:
             raise Exception(f"An error occurred during creating a user credit: {e}")
 
+    def delete_credit(self, user_id):
+        try:
+            response = (
+                self.supabase.table("credits").delete().eq("user_id", user_id).execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during deleting credits for user {user_id}: {e}"
+            )
+
     def get_last_sign_in_by_user_id(self, user_id):
         try:
             data, count = (
@@ -584,9 +595,7 @@ class Supabase:
 
     def get_bonus(self, user_id):
         prev_perm_credit = self.get_perm_credit_by_user_id(user_id)
-        self.update_perm_credit_by_user_id(
-            user_id, prev_perm_credit + INVITATION_BONUES
-        )
+        self.update_perm_credit_by_user_id(user_id, prev_perm_credit + INVITATION_BONUS)
 
     def update_last_award_time_by_user_id(self, user_id):
         try:
@@ -728,7 +737,7 @@ class Supabase:
                 "referrer_id": user_id,
                 "guest_email": guest_email,
                 "join_date": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S%z"),
-                "bonus": INVITATION_BONUES,
+                "bonus": INVITATION_BONUS,
             }
             data, count = self.supabase.table("referee_list").insert(row_dict).execute()
             # Check if exactly one record was inserted

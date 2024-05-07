@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import HTTPException, APIRouter
-from common.object import supabase
+from common.objects import supabase
 from src.interfaces import OAuthSignInRequest, SignInRequest, SignUpRequest
 
 

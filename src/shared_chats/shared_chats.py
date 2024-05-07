@@ -1,7 +1,7 @@
 import json
 import logging
 from datetime import datetime, timezone
-from common.constant import EXPIRE_TIME, TIME_FORMAT
+from common.constants import SHARED_CHAT_EXPIRE_TIME, TIME_FORMAT
 from src.math_agent.supabase import Supabase
 from src.shared_chats.interfaces import (
     CreateSharedChatRequest,
@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 class SharedChat:
     def __init__(self, supabase: Supabase):
         self.supabase = supabase
-        self.expire_time = EXPIRE_TIME
+        self.expire_time = SHARED_CHAT_EXPIRE_TIME
 
     def create_shared_chat(self, request: CreateSharedChatRequest):
         chat = self.supabase.get_chat_by_id(request.chat_id)

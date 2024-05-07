@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import logging
-from common.object import supabase
+from common.objects import supabase
 from api.routers import shared_chats, users, chats, invitations, credits
 from src.middlewares import (
     ExtendTimeoutMiddleware,

@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import HTTPException, APIRouter
-from common.object import shared_chats
+from common.objects import shared_chats
 from src.shared_chats.interfaces import (
     CreateSharedChatRequest,
 )

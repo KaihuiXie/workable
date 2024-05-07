@@ -1,4 +1,4 @@
-from common.object import supabase
+from common.objects import supabase
 
 
 class Supabase:

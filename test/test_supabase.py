@@ -10,3 +10,7 @@ class SupabaseTest(unittest.TestCase):
         self.assertEqual(
             id(credits_supabase.client()), id(shared_chats_supabase.client())
         )
+
+
+if __name__ == "__main__":
+    unittest.main()

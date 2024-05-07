@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import HTTPException, APIRouter
-from common.object import supabase
+from common.objects import invitations
 
 router = APIRouter(
     # prefix="/invitations",
@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 @router.get("/referrer/{invitation_token}")
 async def get_referrer(invitation_token: str):
     try:
-        is_invited, referrer_id = supabase.get_referrer_id_by_invitation_token(
+        is_invited, referrer_id = invitations.get_referrer_id_by_invitation_token(
             invitation_token
         )
         return {"is_invited": is_invited, "referrer_id": referrer_id}
@@ -25,9 +25,9 @@ async def get_referrer(invitation_token: str):
 
 
 @router.get("/invitation/{user_id}")
-async def get_invitation(user_id: str):
+async def get_invitation_by_user_id(user_id: str):
     try:
-        response = supabase.get_invitation_by_user_id(user_id)
+        response = invitations.get_invitation_by_user_id(user_id)
         return {"token": response}
     except Exception as e:
         logging.error(e)
@@ -35,34 +35,18 @@ async def get_invitation(user_id: str):
 
 
 @router.get("/invitation/verify_user/{invitation_token}/{user_id}")
-async def get_invitation(invitation_token: str, user_id: str):
+async def get_invitation_by_token(invitation_token: str, user_id: str):
     try:
-        is_invited, referrer_id = supabase.get_referrer_id_by_invitation_token(
-            invitation_token
-        )
-        if referrer_id == user_id:
-            return False
-        is_eligible = False
-        if is_invited:
-            is_eligible, user_email = supabase.is_eligible_for_reward(
-                invitation_token, user_id
-            )
-            if is_eligible:
-                response = supabase.update_referee_list(referrer_id, user_email)
-                supabase.get_bonus(user_id)
-                supabase.get_bonus(referrer_id)
-
-        return is_eligible
+        return invitations.get_invitation_by_token(invitation_token, user_id)
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/invitation/list/{user_id}")
-async def get_invitation(user_id: str):
+async def get_referee_list(user_id: str):
     try:
-        response = supabase.get_referee_list(user_id)
-        return response
+        return invitations.get_referee_list(user_id)
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))

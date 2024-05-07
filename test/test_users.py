@@ -12,7 +12,7 @@ class UsersTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        logging.basicConfig(level=logging.INFO)
+        logging.disable(level=logging.ERROR)
         sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
         cls.test_client = TestClient(app)
 
@@ -25,3 +25,7 @@ class UsersTest(unittest.TestCase):
 
     def tearDown(self):
         ...
+
+
+if __name__ == "__main__":
+    unittest.main()
