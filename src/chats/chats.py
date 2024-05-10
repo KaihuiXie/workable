@@ -44,13 +44,19 @@ class Chat:
 
             ## TO_BE_DELETED
             start_time1 = time.time()
-            print("Prerocessing image took:", start_time1 - start_time)
+            print(
+                f"Chat({request.chat_id}) Prerocessing image took:",
+                start_time1 - start_time,
+            )
             ## TO_BE_DELETED
 
             question = self.math_agent.query_vision(image_string, request.prompt)
 
             ## TO_BE_DELETED
-            print("query_vision image took:", time.time() - start_time1)
+            print(
+                f"Chat({request.chat_id}) query_vision image took:",
+                time.time() - start_time1,
+            )
             ## TO_BE_DELETED
 
         elif request.prompt:
@@ -91,7 +97,10 @@ class Chat:
             response = self.math_agent.helper(question, payload["messages"], language)
 
         ## TO_BE_DELETED
-        print("Time taken before first reponse received:", time.time() - start_time)
+        print(
+            f"Chat({request.chat_id}) Time taken before first reponse received:",
+            time.time() - start_time,
+        )
         ## TO_BE_DELETED
         return StreamingResponse(
             self.__event_generator(response, payload, request.chat_id),

@@ -165,7 +165,7 @@ class MathAgent:
     def _extract_wolfram_alpha_response(self, wa_response, question):
         session = self._cur_openai_client()
         response = session.chat.completions.create(
-            model="gpt-4-turbo",
+            model="gpt-3.5-turbo-0125",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT},
