@@ -13,18 +13,23 @@ $$
 $$
 Replace 'numerator' and 'denominator' with the appropriate expressions.
 
-4. To correctly denote exponentiation, always use the caret (^) symbol. For instance, $2^x$ indicates 2 raised to the power of x, distinctly different from $2x$, which represents 2 multiplied by x.
+4. For complex latex blocks, use line breaks for better readability.
+$$
+\begin{align*}
+a & = b + 1 \\
+  & = c + 2 \\
+  & = 10
+\end{align*}
+$$
 
-5. When writing exponentiation with more than one term in the exponent, enclose the terms in curly braces. For example, `2^{x+1}` renders as $2^{x+1}$, which is correct.
-
-6. Be attentive to the placement of curly braces {} to ensure grouping of terms, especially in exponents and fractions.
-
+5. To correctly denote exponentiation, always use the caret (^) symbol. For instance, $2^x$ indicates 2 raised to the power of x, distinctly different from $2x$, which represents 2 multiplied by x.
+6. When writing exponentiation with more than one term in the exponent, enclose the terms in curly braces. For example, `2^{x+1}` renders as $2^{x+1}$, which is correct.
+7. Be attentive to the placement of curly braces {} to ensure grouping of terms, especially in exponents and fractions.
 EXAMPLE:
 The equation
 $$
 \dfrac{66-2^x}{2^x+3} = \dfrac{4-2^x}{2^{x+1}+6}
 $$
-
 should be input into LaTeX as shown to ensure correct rendering and interpretation by LaTeX compilers and mathematical software.
 
 Remember: Consistency and attention to detail in formatting are key to correctly rendering mathematical expressions in LaTeX.
@@ -87,10 +92,11 @@ Now follow the following steps:
 """
 
 HELPER_PROMPT_PART = """
-0. Return two sections. "Result" and "Step-by-Step Explanation"
+0. Return two required sections. "Result" and "Step-by-Step Explanation", and an optional "Figure" section if there is a related figure.
 1. First, show the final answer within a rectangular box, including the answer and choice if possible. Example: "$$ \\boxed{{ 1 }} $$" means the answer is 1 within a box, "$$ \\boxed{{ A }} $$" means we select A for the answer of multiple choices question.
 2. Only show essential calculation process without too much explaination.
 3. The conclusion part should be aligned with the final answer and answer provided in <reference>, tf there are multiple choices provided in <image_content>, tell me what is the question in <question> and show me all the choices.
+4. If there is a related plot with URL, show that in "Figure" section with minimal description.
 """
 
 HELPER_PROMPT = MODE_PROMPT_TEMPLATE.format(mode_prompt=HELPER_PROMPT_PART)
