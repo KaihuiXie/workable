@@ -1,7 +1,9 @@
 from enum import Enum
-from fastapi import UploadFile, Form, HTTPException, File
-from pydantic import BaseModel, model_validator, ValidationError
 from typing import Optional
+
+from fastapi import File, Form, HTTPException, UploadFile
+from pydantic import BaseModel, ValidationError, model_validator
+
 
 # Define the Mode enumeration
 class Mode(Enum):

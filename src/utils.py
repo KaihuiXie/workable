@@ -1,9 +1,9 @@
-from PIL import Image
-from io import BytesIO
 import base64
 import logging
 import time
+from io import BytesIO
 
+from PIL import Image
 from pillow_heif import register_heif_opener
 
 from common.constants import MAX_MESSAGE_SIZE

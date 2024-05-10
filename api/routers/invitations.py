@@ -1,6 +1,7 @@
 import logging
 
-from fastapi import HTTPException, APIRouter
+from fastapi import APIRouter, HTTPException
+
 from common.objects import invitations
 
 router = APIRouter(

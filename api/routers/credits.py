@@ -1,8 +1,9 @@
 import logging
 
-from fastapi import HTTPException, APIRouter
+from fastapi import APIRouter, HTTPException
+
 from common.objects import credits
-from src.interfaces import DecrementCreditRequest, UpdateCreditRequest
+from src.credits.interfaces import DecrementCreditRequest, UpdateCreditRequest
 
 router = APIRouter(
     # prefix="/credits",

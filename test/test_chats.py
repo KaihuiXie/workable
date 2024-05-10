@@ -1,16 +1,17 @@
-import os
 import json
-import sys
 import logging
+import os
+import sys
 import unittest
-from dotenv import load_dotenv
-from fastapi.testclient import TestClient
 from pathlib import Path
 
+from dotenv import load_dotenv
+from fastapi.testclient import TestClient
+
 from api.main import app
-from src.math_agent.supabase import Supabase
-from src.math_agent.math_agent import MathAgent
 from common.constants import ROOT_DIR
+from src.math_agent.math_agent import MathAgent
+from src.math_agent.supabase import Supabase
 
 
 class ChatsTest(unittest.TestCase):

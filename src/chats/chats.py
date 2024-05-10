@@ -1,19 +1,16 @@
 import json
 import logging
-from datetime import datetime, timezone
-from fastapi import HTTPException, Depends
-import time
-from starlette.responses import StreamingResponse
 import re
+import time
+from datetime import datetime, timezone
 
-from src.utils import check_message_size, preprocess_image
-from src.math_agent.supabase import Supabase
+from fastapi import Depends, HTTPException
+from starlette.responses import StreamingResponse
+
+from src.chats.interfaces import ChatRequest, Mode, UploadQuestionRequest
 from src.math_agent.math_agent import MathAgent
-from src.chats.interfaces import (
-    ChatRequest,
-    UploadQuestionRequest,
-    Mode,
-)
+from src.math_agent.supabase import Supabase
+from src.utils import check_message_size, preprocess_image
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

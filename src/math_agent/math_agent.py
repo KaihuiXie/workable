@@ -1,19 +1,20 @@
-from openai import OpenAI
-import requests
 import logging
 import time
 
+import requests
+from openai import OpenAI
+
 from src.math_agent.prompts import (
-    IMAGE_READING_PROMPT,
-    IMAGE_CONTEXT_PROMPT,
     HELPER_PROMPT,
-    LEARNING_PROMPT,
-    WOLFRAM_ALPHA_PROMPT,
-    WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE,
-    WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT,
-    SYSTEM_PROMPT,
-    LATEX_PROMPT,
+    IMAGE_CONTEXT_PROMPT,
+    IMAGE_READING_PROMPT,
     LANGUGAE_PROMPT,
+    LATEX_PROMPT,
+    LEARNING_PROMPT,
+    SYSTEM_PROMPT,
+    WOLFRAM_ALPHA_PROMPT,
+    WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT,
+    WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE,
 )
 
 # Configure logging

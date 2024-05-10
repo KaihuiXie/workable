@@ -1,5 +1,6 @@
 import logging
-from src.interfaces import UpdateCreditRequest, DecrementCreditRequest
+
+from src.credits.interfaces import DecrementCreditRequest, UpdateCreditRequest
 from src.math_agent.supabase import Supabase
 
 # Configure logging

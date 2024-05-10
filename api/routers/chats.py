@@ -1,13 +1,9 @@
 import logging
 
-from fastapi import HTTPException, APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from common.objects import chats
-from src.chats.interfaces import (
-    UploadQuestionRequest,
-    NewChatRequest,
-    ChatRequest,
-)
+from src.chats.interfaces import ChatRequest, NewChatRequest, UploadQuestionRequest
 
 router = APIRouter(
     # prefix="/chats",

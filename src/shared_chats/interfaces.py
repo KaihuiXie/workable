@@ -1,7 +1,8 @@
 from datetime import datetime
 from enum import IntEnum
-from pydantic import BaseModel
 from typing import Optional
+
+from pydantic import BaseModel
 
 
 class CreateSharedChatRequest(BaseModel):

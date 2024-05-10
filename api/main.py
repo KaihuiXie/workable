@@ -1,15 +1,13 @@
-import yaml
+import logging
 import os
+
+import yaml
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import logging
-from common.objects import supabase
-from api.routers import shared_chats, users, chats, invitations, credits
-from src.middlewares import (
-    ExtendTimeoutMiddleware,
-    TimerMiddleware,
-)
 
+from api.routers import chats, credits, invitations, shared_chats, users
+from common.objects import supabase
+from src.middlewares import ExtendTimeoutMiddleware, TimerMiddleware
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

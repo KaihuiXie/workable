@@ -1,15 +1,17 @@
+import logging
 import os
 import sys
-import logging
 import time
 import unittest
+from datetime import datetime, timezone
+from pathlib import Path
+
 from dotenv import load_dotenv
 from fastapi.testclient import TestClient
-from pathlib import Path
+
 from api.main import app
-from src.math_agent.supabase import Supabase
 from common.constants import SHARED_CHAT_EXPIRE_TIME
-from datetime import datetime, timezone
+from src.math_agent.supabase import Supabase
 
 
 class SharedChatsTest(unittest.TestCase):

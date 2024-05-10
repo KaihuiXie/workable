@@ -1,5 +1,5 @@
-import io
 import base64
+import io
 
 
 def encode_image_to_base64(image):

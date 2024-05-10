@@ -1,14 +1,15 @@
+import logging
 import os
 import sys
-import logging
-import unittest
 import time
+import unittest
+from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi.testclient import TestClient
-from src.math_agent.supabase import Supabase
-from pathlib import Path
+
 from api.main import app
+from src.math_agent.supabase import Supabase
 
 
 class CreditsTest(unittest.TestCase):

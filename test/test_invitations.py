@@ -1,8 +1,10 @@
-import sys
 import logging
+import sys
 import unittest
-from fastapi.testclient import TestClient
 from pathlib import Path
+
+from fastapi.testclient import TestClient
+
 from api.main import app
 
 
