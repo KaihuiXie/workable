@@ -55,7 +55,7 @@ class MathAgent:
             ),
         )
         response = session.chat.completions.create(
-            model="gpt-4-turbo",
+            model="gpt-4o",
             messages=[{"role": "user", "content": content}],
             max_tokens=1024,
         )
@@ -65,7 +65,7 @@ class MathAgent:
         start_time = time.time()  # Record the start time
         session = self._cur_openai_client()
         stream = session.chat.completions.create(
-            model="gpt-4-turbo",
+            model="gpt-4o",
             temperature=0.1,
             messages=[{"role": m["role"], "content": m["content"]} for m in messages],
             stream=True,
@@ -87,7 +87,7 @@ class MathAgent:
         start_time = time.time()  # Record the start time
         session = self._cur_openai_client()
         response = session.chat.completions.create(
-            model="gpt-4-turbo",
+            model="gpt-4o",
             temperature=0.1,
             messages=[
                 {"role": "user", "content": WOLFRAM_ALPHA_PROMPT.format(question)}
@@ -165,7 +165,7 @@ class MathAgent:
     def _extract_wolfram_alpha_response(self, wa_response, question):
         session = self._cur_openai_client()
         response = session.chat.completions.create(
-            model="gpt-3.5-turbo-0125",
+            model="gpt-4o",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT},
