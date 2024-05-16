@@ -54,7 +54,7 @@ Must response in language {{language}}.
 
 IMAGE_READING_PROMPT = f"""
 You are now an expert in reading images, able to easily comprehend the information contained within them.
-However, you're only responsible for processing images. I'll provide you with an image along with the following text prompt: {{Image_Context}}
+However, you're only responsible for processing images. I'll provide you with an image along with the following text prompt: {{Question_Context}}. Remember to return the original text prompt.
 I have no prior knowledge of the image's content. Your task is to read the image and combine it with the text prompt to provide me with details.
 The most crucial aspect is to extract any questions present, which may be within the image or the text prompt. Enclose the question within <question></question> tags. For example, <question>what is 1+1 = ?</question> would encompass "what is 1+1 = ?".
 In addition to extracting the question, you need to provide detailed information about what's in the image to aid my understanding or to provide a basis for answering questions. You may encounter the following scenarios:
@@ -68,9 +68,9 @@ Whether it's a question or information you've extracted, please adhere to the pr
 {{LATEX_PROMPT}}
 """
 
-IMAGE_CONTEXT_PROMPT = f"""
+QUESTION_CONTEXT_PROMPT = f"""
 =======
-<context>{{context}}</context>
+<question_context>{{context}}</question_context>
 """
 
 MODE_PROMPT_TEMPLATE = f"""
@@ -93,7 +93,7 @@ Now follow the following steps:
 
 HELPER_PROMPT_PART = """
 0. Return two required sections. "Result" and "Step-by-Step Explanation", and an optional "Figure" section if there is a related figure.
-1. First, show the final answer within a rectangular box, including the answer and choice if possible. Example: "$$ \\boxed{{ 1 }} $$" means the answer is 1 within a box, "$$ \\boxed{{ A }} $$" means we select A for the answer of multiple choices question.
+1. First, show the final answer in <reference> within a rectangular box, including the answer and choice if possible. Example: "$$ \\boxed{{ 1 }} $$" means the answer is 1 within a box, "$$ \\boxed{{ A }} $$" means we select A for the answer of multiple choices question.
 2. Only show essential calculation process without too much explaination.
 3. The conclusion part should be aligned with the final answer and answer provided in <reference>, tf there are multiple choices provided in <image_content>, tell me what is the question in <question> and show me all the choices.
 4. If there is a related plot with URL, show that in "Figure" section with minimal description.
@@ -124,18 +124,39 @@ Question: {}
 Response:
 """
 
+WOLFRAM_ALPHA_PROMPT = """
+You will be provided with a math question, 
+the question word is delimited within <question></question>, 
+the question context is delimited whithin <question_context></question_context>,
+the image description is delimited within <image_content></image_content>.
+Both these information is written in LATEX format.
+Based on the information provided above, extract the key point of solving the question.
+I want you ALWAYS think step-by-step and MUST consider all the requirements:
+1) develop and return fine-grained Wolfram Language code that solves the problem.
+2) Re-evualte the code and make sure it works with Wolfram Language.
+3) Only Response the code, do not start with ```wolfram or use triple quotes.  Example response: Solve[30 + x/8 + x/4 == x && x > 0, x].
+4) If the question is not showing the equation, understanding the text and generate related equation and transform it to walfrom language code
+5) Double check the generated code is stick to the question. For example, the question is "When the area in square units of an expanding circle is increasing twice as fast as its radius in linear units, the radius is ?", you should understand what question ask and generate answer "Solve[D[π r^2, r] == 2, r]".
+6) If you can not generate a meaningful code, DO NOT RETURN ANYTHING.
+=======
+Question: {}
+=======
+Response:
+"""
+
 WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT = """
 You are an expert in parsing and understanding wolfram alpha full result response, based on the input question.
 You will be provided with a JSON response, delimited with <response> and the related information such as question and image context, delimited with <context>.
 Your task is to:
-1. Extract the question in <context>, the question is delimited with <question> in the context
-2. Extract the final result and summarize with brief answers to the question.
+1. Extract the question in <context>
+2. Extract the final result to the question.
 3. Utilize the contents in <image_content>, you can get some hints from them.
-4. Extract ONLY images urls that are related to plots and visualizations from the pods.
+4. Extract ONLY images urls that are plots and visualizations representations. For example, the name of the title or alt is [plot], [Visual Representation], [3D plot], [Contour plot] and [Plot Image], etc.
+5. DO NOT extract the result url such as: [result],[final_result],[result images],etc.
 Requirements:
-1. MUST only return the most relevant answer and image urls.
+1. MUST only return the most relevant answer and image urls from <response>.
 2. DO NOT mention you have been provided with some inputs.
-3. If there are no answer in <response>, generate your own answer to solve the question. But Remember, the answer in <response> has the highest priority.
+3. If there are no answer in <response>, generate your own answer to solve the question.
 4. If there are multiple choices provided in <image_content>:
     a. After reviewing the question delimited with <question>, you should select the correct choice equal to the answer.
     b. If the answer is not in the choices, just give your answer and do not select any choices.

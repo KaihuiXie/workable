@@ -6,7 +6,7 @@ from openai import OpenAI
 
 from src.math_agent.prompts import (
     HELPER_PROMPT,
-    IMAGE_CONTEXT_PROMPT,
+    QUESTION_CONTEXT_PROMPT,
     IMAGE_READING_PROMPT,
     LANGUGAE_PROMPT,
     LATEX_PROMPT,
@@ -47,11 +47,11 @@ class MathAgent:
 
     def query_vision(self, image_base64_str, additional_prompt):
         session = self._cur_openai_client()
-        Image_Context = IMAGE_CONTEXT_PROMPT.format(context=additional_prompt)
+        Question_Context = QUESTION_CONTEXT_PROMPT.format(context=additional_prompt)
         content = self._compose_image_content(
             image_base64_str,
             IMAGE_READING_PROMPT.format(
-                Image_Context=Image_Context, LATEX_PROMPT=LATEX_PROMPT
+                Question_Context=Question_Context, LATEX_PROMPT=LATEX_PROMPT
             ),
         )
         response = session.chat.completions.create(
@@ -68,7 +68,6 @@ class MathAgent:
             model="gpt-4o",
             temperature=0.1,
             messages=[{"role": m["role"], "content": m["content"]} for m in messages],
-            stream=True,
         )
         end_time = time.time()  # Record the end time
         time_taken = end_time - start_time  # Calculate the time taken
@@ -134,11 +133,14 @@ class MathAgent:
 
     def _query_wolfram_alpha(self, query):
         url = "http://api.wolframalpha.com/v2/query"
+        generated_wolfram = self._generate_wolfram_query(query)
         params = {
-            "input": self._generate_wolfram_query(query),
+            "input": generated_wolfram,
             "appid": self.wolf_api_key,
             "output": "JSON",
         }
+        print(generated_wolfram)
+        print("==========================")
         start_time = time.time()  # Record the start time
         try:
             response = requests.get(url, params=params)
