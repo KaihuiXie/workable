@@ -125,8 +125,8 @@ Response:
 """
 
 WOLFRAM_ALPHA_PROMPT = """
-You will be provided with a math question, 
-the question word is delimited within <question></question>, 
+You will be provided with a math question,
+the question word is delimited within <question></question>,
 the question context is delimited whithin <question_context></question_context>,
 the image description is delimited within <image_content></image_content>.
 Both these information is written in LATEX format.

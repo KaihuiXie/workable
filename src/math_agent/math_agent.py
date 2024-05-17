@@ -6,11 +6,11 @@ from openai import OpenAI
 
 from src.math_agent.prompts import (
     HELPER_PROMPT,
-    QUESTION_CONTEXT_PROMPT,
     IMAGE_READING_PROMPT,
     LANGUGAE_PROMPT,
     LATEX_PROMPT,
     LEARNING_PROMPT,
+    QUESTION_CONTEXT_PROMPT,
     SYSTEM_PROMPT,
     WOLFRAM_ALPHA_PROMPT,
     WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT,
@@ -68,6 +68,7 @@ class MathAgent:
             model="gpt-4o",
             temperature=0.1,
             messages=[{"role": m["role"], "content": m["content"]} for m in messages],
+            stream=True,
         )
         end_time = time.time()  # Record the end time
         time_taken = end_time - start_time  # Calculate the time taken
