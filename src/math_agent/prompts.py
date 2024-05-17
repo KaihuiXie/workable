@@ -64,8 +64,12 @@ In addition to extracting the question, you need to provide detailed information
     c. If it's a question that doesn't fall into the above categories, provide a comprehensive description of the content beyond the question.
 2. The image may depict scenes and characters. Please inform me about the objects or living beings present in the image and describe their features based on the information provided in text prompt.
 3. Do not attempt to answer the question. Enclose all information except the question within <image_content></image_content> tags. For instance, if the question is a multiple-choice question, the <image_content> tags should encompass all options. If the question is a short answer question, the <image_content> tags should include all the main content from the image as well as any hints provided in the question prompt. For example, if the question asks whether the car is in front of the tree, then the <image_content> tags should contain all detailed information from the image, such as <image_content>The car is in front of the tree.</image_content>.
-Whether it's a question or information you've extracted, please adhere to the provided format for output:
+Whether it's a question or information you've extracted, please adhere to the provided format:
 {{LATEX_PROMPT}}
+After that following the LATEX format, remember to follow the following structure for output:
+<question_context></question_context>
+<question></question>
+<image_content></image_content>
 """
 
 QUESTION_CONTEXT_PROMPT = f"""
@@ -110,23 +114,8 @@ LEARNING_PROMPT_PART = """
 LEARNING_PROMPT = MODE_PROMPT_TEMPLATE.format(mode_prompt=LEARNING_PROMPT_PART)
 
 WOLFRAM_ALPHA_PROMPT = """
-You will be provided with a question which is delimited within <question><question/>,
-Don't extract other things, just stick to the question delimit with <question>. DO NOT LOOK AT the contents in <image_context>
-I want you ALWAYS think step-by-step and MUST consider all the requirements:
-1) develop and return fine-grained Wolfram Language code that solves the problem (or part of it) and make the code as short as possible.
-2) Re-evualte the code and make sure it works with Wolfram Language.
-3) Only Response the code, do not start with ```wolfram or use triple quotes.  Example response: Solve[30 + x/8 + x/4 == x && x > 0, x].
-4) Double check the generated code is stick to the question.
-5) If you can not generate a meaningful code, DO NOT RETURN ANYTHING.
-=======
-Question: {}
-=======
-Response:
-"""
-
-WOLFRAM_ALPHA_PROMPT = """
-You will be provided with a math question,
-the question word is delimited within <question></question>,
+You will be provided with a math question, 
+the question word is delimited within <question></question>, 
 the question context is delimited whithin <question_context></question_context>,
 the image description is delimited within <image_content></image_content>.
 Both these information is written in LATEX format.
@@ -151,8 +140,7 @@ Your task is to:
 1. Extract the question in <context>
 2. Extract the final result to the question.
 3. Utilize the contents in <image_content>, you can get some hints from them.
-4. Extract ONLY images urls that are plots and visualizations representations. For example, the name of the title or alt is [plot], [Visual Representation], [3D plot], [Contour plot] and [Plot Image], etc.
-5. DO NOT extract the result url such as: [result],[final_result],[result images],etc.
+4. Extract images urls in subpods that are plots and visualizations representations. 
 Requirements:
 1. MUST only return the most relevant answer and image urls from <response>.
 2. DO NOT mention you have been provided with some inputs.
@@ -160,6 +148,14 @@ Requirements:
 4. If there are multiple choices provided in <image_content>:
     a. After reviewing the question delimited with <question>, you should select the correct choice equal to the answer.
     b. If the answer is not in the choices, just give your answer and do not select any choices.
+5. Only extract 'img' urls whose title and alt contain 'plot', 'Visual Representation', '3D plot', 'Contour plot' and 'Plot Image', etc. Remember to give a breif introduction: Example: ![Line plot](https://example.com/path/to/line.jpg). 
+6. If the extracted image urls are about result, functions. Regardless of the urls.
+The output format show follow below:
+**Question**: the question
+**Final Result**: the answer of the question
+**Relevant Image URLs**:
+   - ![Plot]( the url of the plot )
+**Choice**: the correct choice of the question if there are choice
 """
 
 WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE = f"""
