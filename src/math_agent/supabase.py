@@ -331,7 +331,7 @@ class Supabase:
             response = (
                 self.supabase.from_("chats")
                 .select(
-                    "id, thumbnail_str, question, learner_mode, created_at, payload",
+                    "id, thumbnail_str, question, learner_mode, created_at",
                     count="exact",
                 )
                 .eq("user_id", user_id)
