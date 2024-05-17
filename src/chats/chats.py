@@ -133,6 +133,9 @@ class Chat:
     def get_all_chats(self, user_id: str):
         response = self.supabase.get_all_chats(user_id)
         for record in response.data:
+            if record["payload"] == "":
+                self.supabase.delete_chat_by_id(record["id"])
+                continue
             question = record["question"]
             match = re.search(r"<question>(.*?)</question>", question, re.DOTALL)
             if match:
