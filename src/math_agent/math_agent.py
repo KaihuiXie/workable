@@ -162,7 +162,7 @@ class MathAgent:
             logging.error(error_message)
             return None
         except IndexError as e:
-            logging.error(error_message)
+            logging.error(e)
             return None
 
     def _extract_wolfram_alpha_response(self, wa_response, question):

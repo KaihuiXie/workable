@@ -45,7 +45,7 @@ class Chat:
             ## TO_BE_DELETED
             start_time1 = time.time()
             print(
-                f"Chat({request.chat_id}) Prerocessing image took:",
+                f"Chat({request.chat_id}) Preprocessing image took:",
                 start_time1 - start_time,
             )
             ## TO_BE_DELETED
