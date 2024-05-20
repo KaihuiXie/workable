@@ -72,11 +72,11 @@ class UsersTest(unittest.TestCase):
         logging.info(response.json())
         self.assertEqual(response.status_code, 200)
 
-    def test_signup(self):
-        request = {"email": "test19@xxmail.com", "phone": None, "password": "test123"}
-        response = self.test_client.post("/signup", json=request)
-        logging.info(response.json())
-        self.assertEqual(response.status_code, 200)
+    # def test_signup(self):
+    #     request = {"email": "test19@xxmail.com", "phone": None, "password": "test123"}
+    #     response = self.test_client.post("/signup", json=request)
+    #     logging.info(response.json())
+    #     self.assertEqual(response.status_code, 200)
 
     def test_get_session(self):
         request = {

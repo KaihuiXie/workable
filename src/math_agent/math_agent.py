@@ -16,6 +16,7 @@ from src.math_agent.prompts import (
     WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT,
     WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE,
 )
+from src.math_agent.utils import replace_wolfram_image
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -58,6 +59,7 @@ class MathAgent:
             model="gpt-4o",
             messages=[{"role": "user", "content": content}],
             max_tokens=1024,
+            stop=["###SYSTEM_PROMPT"],
         )
         return response.choices[0].message.content
 
@@ -68,6 +70,7 @@ class MathAgent:
             model="gpt-4o",
             temperature=0.1,
             messages=[{"role": m["role"], "content": m["content"]} for m in messages],
+            stop=["###SYSTEM_PROMPT"],
             stream=True,
         )
         end_time = time.time()  # Record the end time
@@ -109,6 +112,7 @@ class MathAgent:
                 extracted_response = self._extract_wolfram_alpha_response(
                     wolfram_alpha_response, question
                 )
+                extracted_response = replace_wolfram_image(extracted_response)
 
             end_time1 = time.time()
             print("extract wolfram took:", end_time1 - start_time)
@@ -179,5 +183,6 @@ class MathAgent:
                     ),
                 },
             ],
+            stop=["###SYSTEM_PROMPT"],
         )
         return response.choices[0].message.content
