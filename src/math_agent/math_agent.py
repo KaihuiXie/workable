@@ -113,6 +113,7 @@ class MathAgent:
                     wolfram_alpha_response, question
                 )
                 extracted_response = replace_wolfram_image(extracted_response)
+                print(extracted_response)
 
             end_time1 = time.time()
             print("extract wolfram took:", end_time1 - start_time)

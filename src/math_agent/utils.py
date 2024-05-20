@@ -12,6 +12,17 @@ def encode_image_to_base64(image):
     return base64.b64encode(buffer.read()).decode("utf-8")
 
 
+def shorten_url(url):
+    api_url = f"http://tinyurl.com/api-create.php?url={url}"
+    response = requests.get(api_url)
+    if response.status_code != 200:
+        print(
+            f"Failed to shorten the image from {url}. Status code: {response.status_code}"
+        )
+
+    return response.text
+
+
 def replace_wolfram_image(markdown_text):
     # Regular expression to find the image URL starting with the specific pattern
     img_url_pattern = r"!\[(.*?)\]\((https://www6b3\.wolframalpha\.com/[^\)]+)\)"
@@ -22,22 +33,9 @@ def replace_wolfram_image(markdown_text):
         return markdown_text
 
     for alt_text, img_url in matches:
-        # Fetch the image
-        response = requests.get(img_url)
-        if response.status_code != 200:
-            print(
-                f"Failed to fetch the image from {img_url}. Status code: {response.status_code}"
-            )
-            continue
-
-        # Encode the image as base64
-        image_base64 = base64.b64encode(response.content).decode("utf-8")
-        image_base64_str = f"data:image/gif;base64,{image_base64}"  # Assuming the image is in GIF format
-
-        # Create the HTML <img> tag
-        img_tag = f'<img src="{image_base64_str}" alt="{alt_text}"/>'
+        short_url = shorten_url(img_url)
 
         # Replace the original markdown image with the HTML <img> tag
-        markdown_text = markdown_text.replace(f"![{alt_text}]({img_url})", img_tag)
+        markdown_text = markdown_text.replace(f"{img_url}", short_url)
 
     return markdown_text
