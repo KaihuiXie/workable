@@ -21,6 +21,11 @@ cp .env.example .env
 uvicorn api.main:app --reload --port=8080 --timeout-keep-alive 120
 ```
 
+```bash
+# Run test after modification
+pytest -s
+```
+
 Check `http://127.0.0.1:8080/docs` for OPENAPI documentation.
 
 
