@@ -155,10 +155,11 @@ Requirements:
     b. If the answer is not in the choices, just give your answer and do not select any choices.
 5. Only extract 'img' urls whose title and alt contain 'plot', 'Visual Representation', '3D plot', 'Contour plot' and 'Plot Image', etc. Remember to give a breif introduction: Example: ![Line plot](https://example.com/path/to/line.jpg).
 6. If the extracted image urls are about result, functions, discard the urls.
+7. If there are no relevant image URL, just regardless this session.
 The output format show follow below:
 **Question**: the question
 **Final Result**: the answer of the question
-**Relevant Image URL**:
+**Relevant Image URL**: (if there are no plot and images in this session, regardless it)
    - ![Plot]( the url of the plot )
 **Choice**: the correct choice of the question if there are choice
 """
