@@ -114,8 +114,8 @@ LEARNING_PROMPT_PART = """
 LEARNING_PROMPT = MODE_PROMPT_TEMPLATE.format(mode_prompt=LEARNING_PROMPT_PART)
 
 WOLFRAM_ALPHA_PROMPT = """
-You will be provided with a math question, 
-the question word is delimited within <question></question>, 
+You will be provided with a math question,
+the question word is delimited within <question></question>,
 the question context is delimited whithin <question_context></question_context>,
 the image description is delimited within <image_content></image_content>.
 Both these information is written in LATEX format.
@@ -140,7 +140,7 @@ Your task is to:
 1. Extract the question in <context>
 2. Extract the final result to the question.
 3. Utilize the contents in <image_content>, you can get some hints from them.
-4. Extract images urls in subpods that are plots and visualizations representations. 
+4. Extract images urls in subpods that are plots and visualizations representations.
 Requirements:
 1. MUST only return the most relevant answer and image urls from <response>.
 2. DO NOT mention you have been provided with some inputs.
@@ -148,7 +148,7 @@ Requirements:
 4. If there are multiple choices provided in <image_content>:
     a. After reviewing the question delimited with <question>, you should select the correct choice equal to the answer.
     b. If the answer is not in the choices, just give your answer and do not select any choices.
-5. Only extract 'img' urls whose title and alt contain 'plot', 'Visual Representation', '3D plot', 'Contour plot' and 'Plot Image', etc. Remember to give a breif introduction: Example: ![Line plot](https://example.com/path/to/line.jpg). 
+5. Only extract 'img' urls whose title and alt contain 'plot', 'Visual Representation', '3D plot', 'Contour plot' and 'Plot Image', etc. Remember to give a breif introduction: Example: ![Line plot](https://example.com/path/to/line.jpg).
 6. If the extracted image urls are about result, functions. Regardless of the urls.
 The output format show follow below:
 **Question**: the question

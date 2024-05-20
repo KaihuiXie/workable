@@ -16,9 +16,7 @@ logging.basicConfig(level=logging.INFO)
 @router.get("/referrer/{invitation_token}")
 async def get_referrer(invitation_token: str):
     try:
-        is_invited, referrer_id = invitations.get_referrer(
-            invitation_token
-        )
+        is_invited, referrer_id = invitations.get_referrer(invitation_token)
         return {"is_invited": is_invited, "referrer_id": referrer_id}
     except Exception as e:
         logging.error(e)
