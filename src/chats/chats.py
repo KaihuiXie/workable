@@ -163,15 +163,18 @@ class Chat:
                     full_response += event_text
                     event_data = {"text": event_text}
                     yield f"data: {json.dumps(event_data)}\n\n"
-            logging.info(full_response)
-            if full_response:
-                payload["messages"].append(
-                    {"role": "assistant", "content": full_response}
-                )
-                self.supabase.update_payload(chat_id, payload)
-                if callback:
-                    callback()
         except Exception as e:
             # Handle exceptions or end of stream
             logging.error(e)
             yield
+        finally:
+            if full_response:
+                try:
+                    payload["messages"].append(
+                        {"role": "assistant", "content": full_response}
+                    )
+                    self.supabase.update_payload(chat_id, payload)
+                    if callback:
+                        callback()
+                except Exception as db_error:
+                    logging.error("Error updating payload to database: %s", db_error)
