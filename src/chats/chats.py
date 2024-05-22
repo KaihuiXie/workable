@@ -146,7 +146,15 @@ class Chat:
         payload = self.supabase.get_chat_payload_by_id(chat_id)
         question = self.supabase.get_chat_question_by_id(chat_id)
         image_str = self.supabase.get_chat_image_by_id(chat_id)
-        return {"payload": payload, "question": question, "image_str": image_str}
+        chat_again = ("messages" not in payload) or check_message_size(
+            payload["messages"]
+        )
+        return {
+            "payload": payload,
+            "question": question,
+            "image_str": image_str,
+            "chat_again": chat_again,
+        }
 
     def delete_chat(self, chat_id: str):
         self.supabase.delete_chat_by_id(chat_id)

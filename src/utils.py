@@ -81,4 +81,6 @@ def generate_thumbnail_string_from_image_string(image_string):
 
 
 def check_message_size(messages):
+    if messages is None:
+        return True
     return len(messages) < MAX_MESSAGE_SIZE
