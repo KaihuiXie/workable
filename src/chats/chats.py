@@ -138,6 +138,8 @@ class Chat:
             if match:
                 question = match.group(1)
             record["question"] = question
+        # if record["question"] == "", we filter the record out
+        response.data = [record for record in response.data if record["question"] != ""]
         return response
 
     def get_chat(self, chat_id: str):
