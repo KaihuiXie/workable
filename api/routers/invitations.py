@@ -51,7 +51,7 @@ async def get_referee_list(user_id: str):
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/invitation/isNotified/{user_id}")
+@router.get("/invitation/is_notified/{user_id}")
 async def get_referee_list(user_id: str):
     try:
         return invitations.get_notification_list(user_id)
@@ -59,7 +59,7 @@ async def get_referee_list(user_id: str):
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
     
-@router.put("/invitation/isNotified")
+@router.put("/invitation/is_notified")
 async def update_isNotified(request:UpdateInvitationNotificationRequest):
     try:
         return invitations.update_notification(request.user_id, request.guest_email)
