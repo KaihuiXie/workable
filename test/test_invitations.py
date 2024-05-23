@@ -67,7 +67,7 @@ class InvitationsTest(unittest.TestCase):
 
     # need to use user_id
     # for getting referee list for that user invited
-    def test_get_invitation_success_case(self):
+    def test_get_invitation_referee_list_case(self):
         user_id = "a7b79c1e-712e-4eb1-9695-f59b5916aef2"
         response = self.test_client.get(f"/invitation/list/{user_id}")
         logging.error(response.json())
