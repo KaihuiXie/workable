@@ -8,6 +8,8 @@ from src.invitations.invitations import Invitations
 from src.math_agent.math_agent import MathAgent
 from src.math_agent.supabase import Supabase
 from src.shared_chats.shared_chats import SharedChat
+from src.url_platforms.supabase import UrlPlatformsSupabase
+from src.url_platforms.url_platforms import UrlPlatforms
 from src.users.users import User
 
 # Initalization
@@ -19,3 +21,5 @@ chats = Chat(supabase, math_agent=math_agent)
 credits = Credit(supabase)
 invitations = Invitations(supabase)
 users = User(supabase)
+# URL Platforms
+url_platforms = UrlPlatforms(UrlPlatformsSupabase(supabase))

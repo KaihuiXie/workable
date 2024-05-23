@@ -1,6 +1,5 @@
 import logging
 
-from src.interfaces import DecrementCreditRequest, UpdateCreditRequest
 from src.math_agent.supabase import Supabase
 
 # Configure logging
@@ -41,11 +40,11 @@ class Invitations(Supabase):
         referee_list = self.get_referee_list(user_id)
         response_list = []
         for referee in referee_list.data:
-            if not referee['isNotify']:
-                response_list.append(referee['guest_email'])
+            if not referee["isNotify"]:
+                response_list.append(referee["guest_email"])
         return response_list
-    
+
     def update_notification(self, user_id: str, guest_email: list):
         for email in guest_email:
-            self.supabase.update_notification(user_id,email)
+            self.supabase.update_notification(user_id, email)
         return True

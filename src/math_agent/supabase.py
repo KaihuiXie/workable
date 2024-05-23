@@ -789,11 +789,7 @@ class Supabase:
         try:
             response = (
                 self.supabase.table("referee_list")
-                .update(
-                    {
-                        "isNotify": True
-                    }
-                )
+                .update({"isNotify": True})
                 .eq("referrer_id", user_id)
                 .eq("guest_email", email)
                 .execute()

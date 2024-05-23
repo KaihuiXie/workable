@@ -5,7 +5,7 @@ import yaml
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routers import chats, credits, invitations, shared_chats, users
+from api.routers import chats, credits, invitations, shared_chats, url_platforms, users
 from common.objects import supabase
 from src.middlewares import ExtendTimeoutMiddleware, TimerMiddleware
 
@@ -32,6 +32,10 @@ tags_metadata = [
     {
         "name": "invitations",
         "description": "TODO",  # TODO: add description
+    },
+    {
+        "name": "url_platforms",
+        "description": "Tracking user source platform",
     },
 ]
 
@@ -61,6 +65,7 @@ app.include_router(users.router)
 app.include_router(chats.router)
 app.include_router(invitations.router)
 app.include_router(credits.router)
+app.include_router(url_platforms.router)
 
 
 @app.get("/health")
