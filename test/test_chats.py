@@ -89,12 +89,26 @@ class ChatsTest(unittest.TestCase):
         self.assertEqual(response_json["payload"], "")
         self.assertEqual(response_json["question"], "")
         self.assertEqual(response_json["image_str"], "")
+        self.assertEqual(response_json["chat_again"], True)
+        self.__delete_chat(chat_id)
+
+    def test_get_chat_false_chat_again(self):
+        chat_id = self.__create_chat()
+        payload = {"messages": " " * 20}
+        self.supabase.update_payload(chat_id, payload=payload)
+        response = self.test_client.get(f"/chat/{chat_id}")
+        self.assertEqual(response.status_code, 200)
+        response_json = json.load(response)
+        self.assertEqual(response_json["payload"], payload)
+        self.assertEqual(response_json["question"], "")
+        self.assertEqual(response_json["image_str"], "")
+        self.assertEqual(response_json["chat_again"], False)
         self.__delete_chat(chat_id)
 
     # def test_all_chats(self):
     #     chat_id_1 = self.__create_chat()
     #     chat_id_2 = self.__create_chat()
-    #
+
     #     response = self.test_client.get(f"/all_chats/{self.user_id}")
     #     self.assertEqual(response.status_code, 200)
     #     response_json = json.load(response)
