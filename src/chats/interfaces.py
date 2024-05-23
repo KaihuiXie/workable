@@ -27,6 +27,7 @@ class Language(Enum):
     GERMAN = "DE"
     CHINESE = "ZH"
     JAPANESE = "JA"
+    RUSSIAN = "RU"
 
     @staticmethod
     def from_string(s):
