@@ -720,7 +720,7 @@ class Supabase:
         try:
             response = (
                 self.supabase.table("referee_list")
-                .select("referrer_id, guest_email, join_date, bonus")
+                .select("*")
                 .eq("referrer_id", user_id)
                 .execute()
             )
@@ -784,3 +784,22 @@ class Supabase:
             return True, user_id
         except Exception as e:
             return False, ""
+
+    def update_notification(self, user_id, email):
+        try:
+            response = (
+                self.supabase.table("referee_list")
+                .update(
+                    {
+                        "isNotify": True
+                    }
+                )
+                .eq("referrer_id", user_id)
+                .eq("guest_email", email)
+                .execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during updating notification for user {user_id} and guest email {email}: {e}"
+            )

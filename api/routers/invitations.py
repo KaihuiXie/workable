@@ -3,6 +3,7 @@ import logging
 from fastapi import APIRouter, HTTPException
 
 from common.objects import invitations
+from src.invitations.interfaces import UpdateInvitationNotificationRequest
 
 router = APIRouter(
     # prefix="/invitations",
@@ -46,6 +47,22 @@ async def get_invitation_by_token(invitation_token: str, user_id: str):
 async def get_referee_list(user_id: str):
     try:
         return invitations.get_referee_list(user_id)
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/invitation/is_notified/{user_id}")
+async def get_referee_list(user_id: str):
+    try:
+        return invitations.get_notification_list(user_id)
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.put("/invitation/is_notified")
+async def update_isNotified(request:UpdateInvitationNotificationRequest):
+    try:
+        return invitations.update_notification(request.user_id, request.guest_email)
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))

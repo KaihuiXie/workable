@@ -36,3 +36,16 @@ class Invitations(Supabase):
 
     def get_referee_list(self, user_id: str):
         return self.supabase.get_referee_list(user_id)
+
+    def get_notification_list(self, user_id: str):
+        referee_list = self.get_referee_list(user_id)
+        response_list = []
+        for referee in referee_list.data:
+            if not referee['isNotify']:
+                response_list.append(referee['guest_email'])
+        return response_list
+    
+    def update_notification(self, user_id: str, guest_email: list):
+        for email in guest_email:
+            self.supabase.update_notification(user_id,email)
+        return True
