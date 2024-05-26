@@ -705,7 +705,7 @@ class Supabase:
             token_date = data[1][0]["created_at"]
             if is_rewarded:
                 return False, user_email
-            if token_date < created_at:
+            if token_date > created_at:
                 return False, user_email
             self.supabase.table("user_profile").update({"is_rewarded": True}).eq(
                 "user_id", user_id
