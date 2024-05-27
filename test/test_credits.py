@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 
 from api.main import app
+from src.credits.supabase import CreditsSupabase
 from src.math_agent.supabase import Supabase
 
 
@@ -30,7 +31,9 @@ class CreditsTest(unittest.TestCase):
     @classmethod
     def __init_supabase(cls):
         load_dotenv()
-        cls.supabase = Supabase(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+        cls.supabase = CreditsSupabase(
+            Supabase(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+        )
 
     def setUp(self):
         ...

@@ -1,14 +1,14 @@
 import logging
 
 from src.credits.interfaces import DecrementCreditRequest, UpdateCreditRequest
-from src.math_agent.supabase import Supabase
+from src.credits.supabase import CreditsSupabase
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
 
 class Credit:
-    def __init__(self, supabase: Supabase):
+    def __init__(self, supabase: CreditsSupabase):
         self.supabase = supabase
 
     def create_credit(self, user_id: str):

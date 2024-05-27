@@ -88,13 +88,3 @@ async def get_examples():
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/session")
-async def get_session():
-    try:
-        session = supabase.get_session()
-        return {"session": session}
-    except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))

@@ -10,6 +10,7 @@ from fastapi.testclient import TestClient
 
 from api.main import app
 from common.constants import ROOT_DIR
+from src.chats.supabase import ChatsSupabase
 from src.math_agent.math_agent import MathAgent
 from src.math_agent.supabase import Supabase
 
@@ -36,7 +37,9 @@ class ChatsTest(unittest.TestCase):
     @classmethod
     def __init_supabase(cls):
         load_dotenv()
-        cls.supabase = Supabase(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+        cls.supabase = ChatsSupabase(
+            Supabase(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+        )
 
     @classmethod
     def __init_math_agent(cls):

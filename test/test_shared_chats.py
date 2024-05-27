@@ -12,6 +12,7 @@ from fastapi.testclient import TestClient
 from api.main import app
 from common.constants import SHARED_CHAT_EXPIRE_TIME
 from src.math_agent.supabase import Supabase
+from src.shared_chats.supabase import SharedChatsSupabase
 
 
 class SharedChatsTest(unittest.TestCase):
@@ -33,7 +34,9 @@ class SharedChatsTest(unittest.TestCase):
     @classmethod
     def __init_supabase(cls):
         load_dotenv()
-        cls.supabase = Supabase(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+        cls.supabase = SharedChatsSupabase(
+            Supabase(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+        )
 
     @classmethod
     def __create_chat(cls):

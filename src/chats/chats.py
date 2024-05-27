@@ -8,8 +8,8 @@ from fastapi import Depends, HTTPException
 from starlette.responses import StreamingResponse
 
 from src.chats.interfaces import ChatRequest, Mode, UploadQuestionRequest
+from src.chats.supabase import ChatsSupabase
 from src.math_agent.math_agent import MathAgent
-from src.math_agent.supabase import Supabase
 from src.utils import check_message_size, preprocess_image
 
 # Configure logging
@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 class Chat:
-    def __init__(self, supabase: Supabase, math_agent: MathAgent):
+    def __init__(self, supabase: ChatsSupabase, math_agent: MathAgent):
         self.supabase = supabase
         self.math_agent = math_agent
 

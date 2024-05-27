@@ -60,3 +60,13 @@ async def oauth_login(request: OAuthSignInRequest):
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/session")
+async def get_session():
+    try:
+        session = await users.get_session()
+        return {"session": session}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))

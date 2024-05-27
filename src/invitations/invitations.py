@@ -1,13 +1,13 @@
 import logging
 
-from src.math_agent.supabase import Supabase
+from src.invitations.supabase import InvitationsSupabase
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
 
-class Invitations(Supabase):
-    def __init__(self, supabase: Supabase):
+class Invitations(InvitationsSupabase):
+    def __init__(self, supabase: InvitationsSupabase):
         self.supabase = supabase
 
     def get_referrer(self, invitation_token: str):

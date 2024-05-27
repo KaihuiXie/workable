@@ -6,7 +6,6 @@ from common.objects import credits
 from src.credits.interfaces import DecrementCreditRequest, UpdateCreditRequest
 
 router = APIRouter(
-    # prefix="/credits",
     tags=["credits"],
     responses={404: {"description": "Not found"}},
 )

@@ -3,10 +3,12 @@ import logging
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
+from src.users.supabase import UsersSupabase
 
-class User:
-    def __init__(self, supabase_client):
-        self.supabase = supabase_client
+
+class User(UsersSupabase):
+    def __init__(self, supabase: UsersSupabase):
+        self.supabase = supabase
 
     async def signup(self, email, phone, password):
         return self.supabase.sign_up(email, phone, password)
@@ -23,3 +25,6 @@ class User:
 
     async def oauth_login(self, provider):
         return self.supabase.sign_in_with_oauth(provider)
+
+    async def get_session(self):
+        return self.supabase.get_session()
