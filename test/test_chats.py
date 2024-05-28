@@ -11,8 +11,8 @@ from fastapi.testclient import TestClient
 from api.main import app
 from common.constants import EVERY_DAY_CREDIT_INCREMENT, ROOT_DIR
 from common.objects import credits
-from src.interfaces import UpdateCreditRequest
 from src.chats.supabase import ChatsSupabase
+from src.credits.interfaces import UpdateCreditRequest
 from src.math_agent.math_agent import MathAgent
 from src.math_agent.supabase import Supabase
 
@@ -51,13 +51,26 @@ class ChatsTest(unittest.TestCase):
         )
 
     def setUp(self):
-        ...
+        # make sure test user has enough credits
+        credits.update_temp_credit(
+            UpdateCreditRequest(user_id=self.user_id, credit=EVERY_DAY_CREDIT_INCREMENT)
+        )
+        credits.update_perm_credit(
+            UpdateCreditRequest(user_id=self.user_id, credit=EVERY_DAY_CREDIT_INCREMENT)
+        )
 
     def tearDown(self):
-        ...
+        credits.update_temp_credit(
+            UpdateCreditRequest(user_id=self.user_id, credit=EVERY_DAY_CREDIT_INCREMENT)
+        )
+        credits.update_perm_credit(
+            UpdateCreditRequest(user_id=self.user_id, credit=EVERY_DAY_CREDIT_INCREMENT)
+        )
 
-    def __create_chat(self):
+    def __create_chat(self, question=None):
         chat_id = self.supabase.create_empty_chat(self.user_id)
+        if question:
+            self.supabase.update_question(chat_id, question=question)
         return chat_id
 
     def __delete_chat(self, chat_id):
@@ -67,13 +80,6 @@ class ChatsTest(unittest.TestCase):
         data = {
             "user_id": self.user_id,
         }
-        # make sure test user has enough credits
-        credits.update_temp_credit(
-            UpdateCreditRequest(user_id=self.user_id, credit=EVERY_DAY_CREDIT_INCREMENT)
-        )
-        credits.update_perm_credit(
-            UpdateCreditRequest(user_id=self.user_id, credit=EVERY_DAY_CREDIT_INCREMENT)
-        )
         response = self.test_client.post("/new_chat_id", json=data)
         self.assertEqual(response.status_code, 200)
         response_json = json.load(response)
@@ -85,12 +91,6 @@ class ChatsTest(unittest.TestCase):
         credits.update_perm_credit(UpdateCreditRequest(user_id=self.user_id, credit=0))
         response = self.test_client.post("/new_chat_id", json=data)
         self.assertEqual(response.status_code, 405)
-        credits.update_temp_credit(
-            UpdateCreditRequest(user_id=self.user_id, credit=EVERY_DAY_CREDIT_INCREMENT)
-        )
-        credits.update_perm_credit(
-            UpdateCreditRequest(user_id=self.user_id, credit=EVERY_DAY_CREDIT_INCREMENT)
-        )
 
     def test_question_photo_learner_no_photo(self):
         data = {
@@ -129,17 +129,18 @@ class ChatsTest(unittest.TestCase):
         self.assertEqual(response_json["chat_again"], False)
         self.__delete_chat(chat_id)
 
-    # def test_all_chats(self):
-    #     chat_id_1 = self.__create_chat()
-    #     chat_id_2 = self.__create_chat()
+    def test_all_chats(self):
+        question = "1+1"
+        chat_id_1 = self.__create_chat(question=question)
+        chat_id_2 = self.__create_chat(question=question)
 
-    #     response = self.test_client.get(f"/all_chats/{self.user_id}")
-    #     self.assertEqual(response.status_code, 200)
-    #     response_json = json.load(response)
-    #     ids = [item["id"] for item in response_json["data"]]
-    #     self.assertEqual(set(ids), set({chat_id_1, chat_id_2}))
-    #     self.__delete_chat(chat_id_1)
-    #     self.__delete_chat(chat_id_2)
+        response = self.test_client.get(f"/all_chats/{self.user_id}")
+        self.assertEqual(response.status_code, 200)
+        response_json = json.load(response)
+        ids = [item["id"] for item in response_json["data"]]
+        self.assertEqual(set(ids), set({chat_id_1, chat_id_2}))
+        self.__delete_chat(chat_id_1)
+        self.__delete_chat(chat_id_2)
 
     def test_question_photo_learner_no_prompt(self):
         chat_id = self.__create_chat()
