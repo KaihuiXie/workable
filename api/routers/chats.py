@@ -2,7 +2,7 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from common.objects import chats
+from common.objects import chats, credits
 from src.chats.interfaces import ChatRequest, NewChatRequest, UploadQuestionRequest
 
 router = APIRouter(
@@ -17,8 +17,16 @@ logging.basicConfig(level=logging.INFO)
 @router.post("/new_chat_id")
 async def get_new_chat_id(request: NewChatRequest):
     try:
+        temp_credit, perm_credit = credits.get_credit(request.user_id)
+        if temp_credit + perm_credit <= 0:
+            raise ValueError("Not enough credits")
         chat_id = chats.get_new_chat_id(request.user_id)
         return {"chat_id": chat_id}
+    except ValueError:
+        raise HTTPException(
+            status_code=405,
+            detail=f"User: {request.user_id} doesn't have enough credits to create a new chat",
+        )
     except Exception as e:
         raise HTTPException(
             status_code=500,

@@ -9,7 +9,9 @@ from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 
 from api.main import app
-from common.constants import ROOT_DIR
+from common.constants import EVERY_DAY_CREDIT_INCREMENT, ROOT_DIR
+from common.objects import credits
+from src.interfaces import UpdateCreditRequest
 from src.chats.supabase import ChatsSupabase
 from src.math_agent.math_agent import MathAgent
 from src.math_agent.supabase import Supabase
@@ -65,11 +67,30 @@ class ChatsTest(unittest.TestCase):
         data = {
             "user_id": self.user_id,
         }
+        # make sure test user has enough credits
+        credits.update_temp_credit(
+            UpdateCreditRequest(user_id=self.user_id, credit=EVERY_DAY_CREDIT_INCREMENT)
+        )
+        credits.update_perm_credit(
+            UpdateCreditRequest(user_id=self.user_id, credit=EVERY_DAY_CREDIT_INCREMENT)
+        )
         response = self.test_client.post("/new_chat_id", json=data)
         self.assertEqual(response.status_code, 200)
         response_json = json.load(response)
         chat_id = response_json["chat_id"]
         self.__delete_chat(chat_id)
+
+        # failure case
+        credits.update_temp_credit(UpdateCreditRequest(user_id=self.user_id, credit=0))
+        credits.update_perm_credit(UpdateCreditRequest(user_id=self.user_id, credit=0))
+        response = self.test_client.post("/new_chat_id", json=data)
+        self.assertEqual(response.status_code, 405)
+        credits.update_temp_credit(
+            UpdateCreditRequest(user_id=self.user_id, credit=EVERY_DAY_CREDIT_INCREMENT)
+        )
+        credits.update_perm_credit(
+            UpdateCreditRequest(user_id=self.user_id, credit=EVERY_DAY_CREDIT_INCREMENT)
+        )
 
     def test_question_photo_learner_no_photo(self):
         data = {
