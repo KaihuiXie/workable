@@ -1,4 +1,13 @@
+from datetime import datetime, timezone
+
+import dateutil.parser
 from supabase import Client, ClientOptions, create_client
+
+from common.constants import EVERY_DAY_CREDIT_INCREMENT
+
+
+def is_same_day(date: datetime):
+    return date.date() == datetime.utcnow().date()
 
 
 class Supabase:
@@ -110,4 +119,73 @@ class Supabase:
         except Exception as e:
             raise Exception(
                 f"An error occurred during getting perm credit by user {user_id}: {e}"
+            )
+
+    # for everyday login & refresh every Sunday
+    def update_temp_credit_by_user_id(self, user_id, amount):
+        try:
+            if amount < 0:
+                raise ValueError(f"User {user_id}: credit can't be negative.")
+            response = (
+                self.supabase.table("credits")
+                .update({"temp_credit": amount})
+                .eq("user_id", user_id)
+                .execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during updating temp credit for user {user_id}: {e}"
+            )
+
+    # 1. Check if user is eligible for login award
+    # 1.1 get last_award_time
+    # 1.2 compare with today
+    # 2. if 1 is yes
+    # 2.1 get_prev_temp_credit
+    # 2.2 update_temp_credit
+    # 2.3 update last_award_time
+    def grant_login_award(self, user_id):
+        last_award_time = self.get_last_award_time_by_user_id(user_id)
+        is_eligible = not is_same_day(dateutil.parser.parse(last_award_time))
+        if not is_eligible:
+            return
+        prev_temp_credit = self.get_temp_credit_by_user_id(user_id)
+        self.update_temp_credit_by_user_id(
+            user_id, prev_temp_credit + EVERY_DAY_CREDIT_INCREMENT
+        )
+        self.update_last_award_time_by_user_id(user_id)
+
+    def get_last_award_time_by_user_id(self, user_id):
+        try:
+            data, count = (
+                self.supabase.from_("credits")
+                .select("last_award_time")
+                .eq("user_id", user_id)
+                .execute()
+            )
+            return data[1][0]["last_award_time"]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting last login by user email {user_id}: {e}"
+            )
+
+    def update_last_award_time_by_user_id(self, user_id):
+        try:
+            response = (
+                self.supabase.table("credits")
+                .update(
+                    {
+                        "last_award_time": datetime.now(timezone.utc).strftime(
+                            "%Y-%m-%dT%H:%M:%S%z"
+                        )
+                    }
+                )
+                .eq("user_id", user_id)
+                .execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during updating perm credit for user {user_id}: {e}"
             )

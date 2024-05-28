@@ -131,7 +131,21 @@ class ChatsSupabase(Supabase):
             return response
         except Exception as e:
             raise Exception(
-                f"An error occurred during upserting payload for chat {chat_id}: {e}"
+                f"An error occurred during updating payload for chat {chat_id}: {e}"
+            )
+
+    def update_question(self, chat_id, question):
+        try:
+            response = (
+                self.supabase.table("chats")
+                .update({"question": question})
+                .eq("id", chat_id)
+                .execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during updating question for chat {chat_id}: {e}"
             )
 
     def get_user_id_by_chat_id(self, chat_id):
