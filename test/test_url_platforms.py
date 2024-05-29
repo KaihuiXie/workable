@@ -43,7 +43,7 @@ class UrlPlatformssTest(unittest.TestCase):
 
     def __create_platform(self):
         new_platform = "red"
-        platform_id = self.supabase.get_platform_id(new_platform)
+        platform_id = self.supabase.add_new_platform(new_platform)
         return platform_id
 
     def __delete_platform(self, platform_id):

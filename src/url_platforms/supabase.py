@@ -1,44 +1,48 @@
 from src.math_agent.supabase import Supabase
-
+import uuid
 
 def clean_platform_text(platform: str) -> str:
     return platform.strip().upper()
 
+def generate_hex_uuid():
+    # 生成一个随机的UUID
+    full_uuid = uuid.uuid4()
+    # 将UUID转换为十六进制字符串，并取前四位
+    hex_uuid = full_uuid.hex[:4]
+    return hex_uuid
 
 class UrlPlatformsSupabase(Supabase):
     def __init__(self, supabase: Supabase):
         self.supabase = supabase.client()
         self.table = "url_platforms"
-
-    def get_platform_id(self, platform: str) -> any:
+    
+    def check_uuid_exist(self, uuid: str) -> bool:
         try:
-            platform_cleaned = clean_platform_text(platform)
             data, count = (
                 self.supabase.from_(self.table)
                 .select("*")
-                .eq("platform", platform_cleaned)
+                .eq("platform_id", uuid)
                 .execute()
             )
-            # Check if exactly one record was inserted
-            if len(data[1]) == 1:
-                return data[1][0]["id"]
-            else:
-                return None
+            return len(data[1]) >= 1
         except Exception as e:
             raise Exception(
-                f"An error occurred during getting url platform({platform}) : {e}"
+                f"An error occurred during checking if the uuid {uuid} exist: {e}"
             )
-
     def add_new_platform(self, platform: str) -> str:
         try:
             platform_cleaned = clean_platform_text(platform)
+            uuid = generate_hex_uuid()
+            while(self.check_uuid_exist(uuid)):
+                uuid = generate_hex_uuid()
             row_dict = {
+                "platform_id":uuid,
                 "platform": platform_cleaned,
             }
             data, count = self.supabase.table(self.table).insert(row_dict).execute()
             # Check if exactly one record was inserted
             if len(data[1]) == 1:
-                return data[1][0]["id"]
+                return data[1][0]["platform_id"]
             else:
                 raise ValueError(
                     f"Unexpected number of records inserted: {len(data)}. Expected 1."
@@ -62,7 +66,7 @@ class UrlPlatformsSupabase(Supabase):
             )
             # Check if exactly one record was inserted
             if len(data[1]) == 1:
-                return data[1][0]["id"]
+                return data[1][0]["platform_id"]
             else:
                 return self.add_new_platform(platform)
         except Exception as e:
@@ -73,7 +77,7 @@ class UrlPlatformsSupabase(Supabase):
     def delete_platform_by_id(self, platform_id: str) -> any:
         try:
             response = (
-                self.supabase.table(self.table).delete().eq("id", platform_id).execute()
+                self.supabase.table(self.table).delete().eq("platform_id", platform_id).execute()
             )
             return response
         except Exception as e:
@@ -86,7 +90,7 @@ class UrlPlatformsSupabase(Supabase):
             data, count = (
                 self.supabase.from_(self.table)
                 .update({"clicks": value})
-                .eq("id", platform_id)
+                .eq("platform_id", platform_id)
                 .execute()
             )
             return data[1][0]["clicks"]
@@ -100,7 +104,7 @@ class UrlPlatformsSupabase(Supabase):
             data, count = (
                 self.supabase.from_(self.table)
                 .select("clicks")
-                .eq("id", platform_id)
+                .eq("platform_id", platform_id)
                 .execute()
             )
             return data[1][0]["clicks"]
