@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from fastapi import Depends, HTTPException
 from starlette.responses import StreamingResponse
 
+from common.decorators import TimerLogLevel, timer
 from src.chats.interfaces import ChatRequest, Mode, UploadQuestionRequest
 from src.chats.supabase import ChatsSupabase
 from src.math_agent.math_agent import MathAgent
@@ -26,39 +27,19 @@ class Chat:
             user_id=user_id,
         )
 
-    async def upload_question_photo(
+    @timer(log_level=TimerLogLevel.BASIC)
+    async def parse_question(
         self,
         request: UploadQuestionRequest = Depends(
             UploadQuestionRequest.parse_question_request
         ),
     ):
-        ## TO_BE_DELETED
-        start_time = time.time()
-        ## TO_BE_DELETED
-
         image_string = ""
         thumbnail_string = ""
         if request.image_file:
             image_bytes = await request.image_file.read()
             image_string, thumbnail_string = preprocess_image(image_bytes)
-
-            ## TO_BE_DELETED
-            start_time1 = time.time()
-            print(
-                f"Chat({request.chat_id}) Preprocessing image took:",
-                start_time1 - start_time,
-            )
-            ## TO_BE_DELETED
-
-            question = self.math_agent.query_vision(image_string, request.prompt)
-
-            ## TO_BE_DELETED
-            print(
-                f"Chat({request.chat_id}) query_vision image took:",
-                time.time() - start_time1,
-            )
-            ## TO_BE_DELETED
-
+            question = self.math_agent.parse_question(image_string, request.prompt)
         elif request.prompt:
             question = request.prompt
         else:
@@ -76,55 +57,22 @@ class Chat:
         )
         return response
 
+    @timer(log_level=TimerLogLevel.VERBOSE)
     async def solve(self, request: ChatRequest):
-        ## TO_BE_DELETED
-        start_time = time.time()  # Record the start time
-        print(
-            "Solve request received:",
-            time.asctime(time.localtime(start_time)),
-        )
-        ## TO_BE_DELETED
-
-        chat_info = self.supabase.get_chat_by_id(request.chat_id)
-        question = chat_info["question"]
         payload = {"messages": []}
-        language = None
-        if request.language:
-            language = request.language.name
-        if chat_info["learner_mode"]:
-            response = self.math_agent.learner(question, payload["messages"], language)
-        else:
-            response = self.math_agent.helper(question, payload["messages"], language)
-
-        ## TO_BE_DELETED
-        print(
-            f"Chat({request.chat_id}) Time taken before first reponse received:",
-            time.time() - start_time,
-        )
-        ## TO_BE_DELETED
+        chat = self.supabase.get_chat_by_id(request.chat_id)
+        language = request.language.name if request.language else None
+        response = self.math_agent.solve(chat, payload["messages"], language)
         return StreamingResponse(
             self.__event_generator(response, payload, request.chat_id),
             media_type="text/event-stream",
         )
 
+    @timer(log_level=TimerLogLevel.BASIC)
     async def chat(self, request: ChatRequest):
-        # Query db to get messages
-        ## TO_BE_DELETED
-        start_time = time.time()  # Record the start time
-        ## TO_BE_DELETED
-
         payload = self.supabase.get_chat_payload_by_id(request.chat_id)
         payload["messages"].append({"role": "user", "content": request.query})
-
         response = self.math_agent.query(payload["messages"])
-
-        ## TO_BE_DELETED
-        print(
-            f"Chat {request.chat_id} before first reponse received:",
-            time.time() - start_time,
-        )
-        ## TO_BE_DELETED
-
         return StreamingResponse(
             self.__event_generator(response, payload, request.chat_id),
             media_type="text/event-stream",

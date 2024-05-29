@@ -1,20 +1,20 @@
 import logging
+import re
 import time
 
 import requests
 from openai import OpenAI
 
+from common.decorators import TimerLogLevel, timer
 from src.math_agent.prompts import (
-    HELPER_PROMPT,
     IMAGE_READING_PROMPT,
-    LANGUGAE_PROMPT,
+    LANGUAGE_PROMPT,
     LATEX_PROMPT,
-    LEARNING_PROMPT,
     QUESTION_CONTEXT_PROMPT,
     SYSTEM_PROMPT,
-    WOLFRAM_ALPHA_PROMPT,
     WOLFRAM_ALPHA_SUMMARIZE_SYSTEM_PROMPT,
     WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE,
+    get_user_prompt_for_solve,
 )
 from src.math_agent.utils import replace_wolfram_image
 
@@ -26,6 +26,7 @@ class MathAgent:
     def __init__(self, openai_api_keys: str, wolf_api_key):
         self.open_ai_keys = [s.strip() for s in openai_api_keys.split(",")]
         self.wolf_api_key = wolf_api_key
+        self.wolfram_url = "http://api.wolframalpha.com/v2/query"
 
     def _get_openai_key(self):
         # Remove and get the first element
@@ -46,7 +47,8 @@ class MathAgent:
             },
         ]
 
-    def query_vision(self, image_base64_str, additional_prompt):
+    @timer(log_level=TimerLogLevel.BASIC)
+    def parse_question(self, image_base64_str, additional_prompt):
         session = self._cur_openai_client()
         Question_Context = QUESTION_CONTEXT_PROMPT.format(context=additional_prompt)
         content = self._compose_image_content(
@@ -63,8 +65,8 @@ class MathAgent:
         )
         return response.choices[0].message.content
 
+    @timer(log_level=TimerLogLevel.BASIC)
     def query(self, messages):
-        start_time = time.time()  # Record the start time
         session = self._cur_openai_client()
         stream = session.chat.completions.create(
             model="gpt-4o",
@@ -73,63 +75,42 @@ class MathAgent:
             stop=["###SYSTEM_PROMPT"],
             stream=True,
         )
-        end_time = time.time()  # Record the end time
-        time_taken = end_time - start_time  # Calculate the time taken
-        # Log or store the time taken
-        print("OpenAI Query before first reponse received:", time_taken)
-
         return stream
 
-    def helper(self, question, messages, language):
-        return self._solve(question, HELPER_PROMPT, messages, language)
-
-    def learner(self, question, messages, language):
-        return self._solve(question, LEARNING_PROMPT, messages, language)
-
-    def _generate_wolfram_query(self, question):
-        start_time = time.time()  # Record the start time
-        session = self._cur_openai_client()
-        response = session.chat.completions.create(
-            model="gpt-4o",
-            temperature=0.1,
-            messages=[
-                {"role": "user", "content": WOLFRAM_ALPHA_PROMPT.format(question)}
-            ],
-        )
-        end_time = time.time()
-        print("generate wolfram query took:", end_time - start_time)
-        response_str = response.choices[0].message.content
-        return response_str
-
-    def _solve(self, question, mode_prompt, messages, language=None):
+    def solve(self, chat, messages, language=None):
+        question = chat["question"]
+        learner_mode = chat["learner_mode"]
+        image_str = chat["image_str"]
         try:
-            wolfram_alpha_response = self._query_wolfram_alpha(question)
-
-            start_time = time.time()
-
-            extracted_response = ""
-            if wolfram_alpha_response:
-                extracted_response = self._extract_wolfram_alpha_response(
-                    wolfram_alpha_response, question
-                )
-                extracted_response = replace_wolfram_image(extracted_response)
-                print(extracted_response)
-
-            end_time1 = time.time()
-            print("extract wolfram took:", end_time1 - start_time)
-
-            text_prompt = (mode_prompt).format(
-                context=question, reference=extracted_response
+            match = re.search(
+                r"<wolfram_query>(.*?)</wolfram_query>", question, re.DOTALL
             )
-
+            extracted_response = ""
+            if match:
+                wolfram_query = match.group(1)
+                wolfram_alpha_response = self._query_wolfram_alpha(wolfram_query)
+                extracted_response = ""
+                if wolfram_alpha_response:
+                    extracted_response = self._extract_wolfram_alpha_response(
+                        wolfram_alpha_response, question
+                    )
+                    extracted_response = replace_wolfram_image(extracted_response)
+            image = "<image>data:image/jpeg;base64," + image_str + "</image>\n"
+            question = re.sub(
+                r"<wolfram_query>((.|[\r\n])*)</wolfram_query>", image, question
+            )
+            user_prompt = get_user_prompt_for_solve(
+                question, extracted_response, learner_mode
+            )
+            print(user_prompt)
             system_prompt = SYSTEM_PROMPT
             if language:
-                system_prompt += LANGUGAE_PROMPT.format(language=language)
+                system_prompt += LANGUAGE_PROMPT.format(language=language)
 
             messages.extend(
                 [
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": text_prompt},
+                    {"role": "user", "content": user_prompt},
                 ]
             )
             return self.query(messages)
@@ -137,22 +118,16 @@ class MathAgent:
             print(e)
             raise Exception(e)
 
-    def _query_wolfram_alpha(self, query):
-        url = "http://api.wolframalpha.com/v2/query"
-        generated_wolfram = self._generate_wolfram_query(query)
+    @timer(log_level=TimerLogLevel.STANDARD)
+    def _query_wolfram_alpha(self, wolfram_query):
         params = {
-            "input": generated_wolfram,
+            "input": wolfram_query,
             "appid": self.wolf_api_key,
             "output": "JSON",
         }
-        print(generated_wolfram)
-        print("==========================")
-        start_time = time.time()  # Record the start time
         try:
-            response = requests.get(url, params=params)
+            response = requests.get(self.wolfram_url, params=params)
             response_data = response.json()
-            end_time = time.time()
-            print("query wolfram took:", end_time - start_time)
             query_result = response_data["queryresult"]
             if (
                 query_result.get("success")
@@ -170,6 +145,7 @@ class MathAgent:
             logging.error(e)
             return None
 
+    @timer(log_level=TimerLogLevel.BASIC)
     def _extract_wolfram_alpha_response(self, wa_response, question):
         session = self._cur_openai_client()
         response = session.chat.completions.create(

@@ -7,6 +7,7 @@ from PIL import Image
 from pillow_heif import register_heif_opener
 
 from common.constants import MAX_MESSAGE_SIZE
+from common.decorators import TimerLogLevel, timer
 
 register_heif_opener()
 # Configure logging
@@ -53,6 +54,7 @@ def base64_to_bytes(base64_str):
     return original_bytes
 
 
+@timer(log_level=TimerLogLevel.BASIC)
 def preprocess_image(image_bytes, shrink_ratio=1.0):
     try:
         jpeg_bytes = convert_to_jpeg(image_bytes, shrink_ratio)

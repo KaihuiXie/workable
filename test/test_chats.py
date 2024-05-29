@@ -189,12 +189,18 @@ class ChatsTest(unittest.TestCase):
             }
             response = self.test_client.post("/question_photo", data=data, files=files)
             self.assertEqual(response.status_code, 200)
+        payload = {
+            "chat_id": chat_id,
+        }
+        response = self.test_client.post("/solve", json=payload)
+        self.assertEqual(response.status_code, 200)
         self.__delete_chat(chat_id)
 
-    def test_question_photo_helper_prompt(self):
+    def test_GRE_math_question_photo_helper_prompt(self):
         chat_id = self.__create_chat()
 
-        image_file_path = self.image_path
+        # image_file_path = self.image_path
+        image_file_path = ROOT_DIR + "/test/resources/GREMath.png"
         with open(image_file_path, "rb") as image_file:
             data = {
                 "chat_id": chat_id,
@@ -206,6 +212,11 @@ class ChatsTest(unittest.TestCase):
             }
             response = self.test_client.post("/question_photo", data=data, files=files)
             self.assertEqual(response.status_code, 200)
+        payload = {
+            "chat_id": chat_id,
+        }
+        response = self.test_client.post("/solve", json=payload)
+        self.assertEqual(response.status_code, 200)
         self.__delete_chat(chat_id)
 
     def test_question_photo_helper_no_image(self):

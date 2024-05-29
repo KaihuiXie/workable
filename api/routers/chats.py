@@ -41,7 +41,7 @@ async def upload_question_photo(
     ),
 ):
     try:
-        return await chats.upload_question_photo(request)
+        return await chats.parse_question(request)
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"An error occurred during reading image: {str(e)}"
