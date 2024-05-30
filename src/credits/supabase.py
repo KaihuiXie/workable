@@ -107,7 +107,3 @@ class CreditsSupabase(Supabase):
             raise Exception(
                 f"An error occurred during getting last login by user email {user_id}: {e}"
             )
-
-    def get_bonus(self, user_id):
-        prev_perm_credit = self.get_perm_credit_by_user_id(user_id)
-        self.update_perm_credit_by_user_id(user_id, prev_perm_credit + INVITATION_BONUS)

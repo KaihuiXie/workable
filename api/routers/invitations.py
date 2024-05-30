@@ -3,7 +3,10 @@ import logging
 from fastapi import APIRouter, HTTPException
 
 from common.objects import invitations
-from src.invitations.interfaces import UpdateInvitationNotificationRequest
+from src.invitations.interfaces import (
+    UpdateInvitationNotificationRequest,
+    VerifyUserIsEligibleForBonus
+)
 
 router = APIRouter(
     # prefix="/invitations",
@@ -34,10 +37,10 @@ async def get_invitation_by_user_id(user_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/invitation/verify_user/{invitation_token}/{user_id}")
-async def get_invitation_by_token(invitation_token: str, user_id: str):
+@router.post("/invitation/verify_user")
+async def get_invitation_by_token(request: VerifyUserIsEligibleForBonus):
     try:
-        return invitations.get_invitation_by_token(invitation_token, user_id)
+        return invitations.get_invitation_by_token(request.invitation_token, request.user_id)
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))

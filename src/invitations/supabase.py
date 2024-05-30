@@ -187,3 +187,37 @@ class InvitationsSupabase(Supabase):
             raise Exception(
                 f"An error occurred during updating notification for user {user_id} and guest email {email}: {e}"
             )
+
+    def get_bonus(self, user_id):
+        prev_perm_credit = self.get_perm_credit_by_user_id(user_id)
+        self.update_perm_credit_by_user_id(user_id, prev_perm_credit + INVITATION_BONUS)
+    
+    def get_perm_credit_by_user_id(self, user_id):
+        try:
+            data, count = (
+                self.supabase.from_("credits")
+                .select("perm_credit")
+                .eq("user_id", user_id)
+                .execute()
+            )
+            return data[1][0]["perm_credit"]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting perm credit by user {user_id}: {e}"
+            )
+        
+    def update_perm_credit_by_user_id(self, user_id, amount):
+        try:
+            if amount < 0:
+                raise ValueError(f"User {user_id}: credit can't be negative.")
+            response = (
+                self.supabase.table("credits")
+                .update({"perm_credit": amount})
+                .eq("user_id", user_id)
+                .execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during updating perm credit for user {user_id}: {e}"
+            )
