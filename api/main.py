@@ -27,7 +27,7 @@ tags_metadata = [
     },
     {
         "name": "credits",
-        "description": "TODO",  # TODO: add description
+        "description": "CRUD operations of users' temp & perm credits",
     },
     {
         "name": "invitations",
