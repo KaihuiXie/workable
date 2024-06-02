@@ -191,7 +191,7 @@ class InvitationsSupabase(Supabase):
     def get_bonus(self, user_id):
         prev_perm_credit = self.get_perm_credit_by_user_id(user_id)
         self.update_perm_credit_by_user_id(user_id, prev_perm_credit + INVITATION_BONUS)
-    
+
     def get_perm_credit_by_user_id(self, user_id):
         try:
             data, count = (
@@ -205,7 +205,7 @@ class InvitationsSupabase(Supabase):
             raise Exception(
                 f"An error occurred during getting perm credit by user {user_id}: {e}"
             )
-        
+
     def update_perm_credit_by_user_id(self, user_id, amount):
         try:
             if amount < 0:

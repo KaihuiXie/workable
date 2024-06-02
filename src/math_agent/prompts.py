@@ -110,13 +110,13 @@ Requirements:
     b. If the answer is not in the choices, just give your answer and do not select any choices.
 5. Only extract 'img' urls whose title and alt contain 'plot', 'Visual Representation', '3D plot', 'Contour plot' and 'Plot Image', etc. Remember to give a breif introduction: Example: ![Line plot](https://example.com/path/to/line.jpg).
 6. If the extracted image urls are about result, functions, discard the urls.
-7. If there are no relevant image URL, just regardless this session.
+7. If there are no relevant image URL, just discard this session.
 The output format show follow below:
 **Question**: the question
 **Final Result**: the answer of the question
-**Relevant Image URL**: (if there are no plot and images in this session, regardless it)
+**Relevant Image URL**: (if there are no plot and images in this session, discard it)
    - ![Plot]( the url of the plot )
-**Choice**: the correct choice of the question if there are choice
+**Choice**: the correct choice of the question if there are choices
 """
 
 WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE = f"""
@@ -128,38 +128,47 @@ def get_user_prompt_for_solve(question, answer, learner_mode):
     has_answer = answer != ""
     system_prompt = (
         "###SYSTEM_PROMPT###\n"
-        + "You will be given a question that includes up to " + ("five" if has_answer else "four") + " parts, some of which may be empty:\n"
+        + "You will be given a question that includes up to "
+        + ("five" if has_answer else "four")
+        + " parts, some of which may be empty:\n"
         + "1. The description of the question, delimited by <question>.\n"
         + "2. Some text prompt, delimited by <text_prompt>. This may also include the description of the question or some extra instructions on how to solve it.\n"
-        + "3. An image URL, delimited by <image>. The image contains content related with this question.\n"
-        + "4. Some description of the image, delimited by <image_content>. This includes some description of the image.\n"
-        + ("5. A reference answer, delimited by <reference>. This provides the final authoritative answer to the question.\n" if has_answer else "")
-        + "Your task is to understand the question by examining all the information, and then guide me to find the final answer" + (" in <reference>.\n" if has_answer else ".\n")
+        + "3. Some description of the image, delimited by <image_content>. This includes some description of the image.\n"
+        + (
+            "4. A reference answer, delimited by <reference>. This provides the final authoritative answer to the question.\n"
+            if has_answer
+            else ""
+        )
+        + "Your task is to understand the question by examining all the information, and then guide me to find the final answer"
+        + (" in <reference>.\n" if has_answer else ".\n")
     )
-    requirements = (
-        "Requirements:\n"
-        "1. Do NOT include the image within <image></image> in your answer.\n"
-    )
+    requirements = ""
     if has_answer:
         requirements += (
-            "2. Don't change the reference answer! Don't evaluate the reference answer! Don't correct the calculation of the reference answer. JUST guide me to the steps to get the reference answer.\n"
-            "3. You don't have any standard answer, the only correct answer is in the <reference>. Don't judge, conclude and evaluate that answer.For example, the answer in <reference> is '4', you think the answer is '2', just regardless your answer '2' and never mention it!\n"
-            "4. NEVER mention the existence of the reference answer in your response.\n"
-            "5. If there are image urls available within <reference></reference>, include them in the answer in a markdown format with brief introduction.Example: ![Cute Puppy](https://example.com/path/to/puppy.jpg)\n"
+            "Requirements:\n"
+            "1. Don't change the reference answer! Don't evaluate the reference answer! Don't correct the calculation of the reference answer. JUST guide me to the steps to get the reference answer.\n"
+            "2. You don't have any standard answer, the only correct answer is in the <reference>. Don't judge, conclude and evaluate that answer.For example, the answer in <reference> is '4', you think the answer is '2', just regardless your answer '2' and never mention it!\n"
+            "3. NEVER mention the existence of the reference answer in your response.\n"
+            "4. If there are image urls available within <reference></reference>, include them in the answer in a markdown format with brief introduction.Example: ![Cute Puppy](https://example.com/path/to/puppy.jpg)\n"
         )
     mode_prompt = "Now follow the following steps:\n"
     if learner_mode:
-        mode_prompt += (
-            "1. First, based on the problem, please provide 2-3 knowledge points using concise language with the bold subtitle 'Knowledge Points'. Avoid considering 'Simplify the expression' and 'Combining terms' as standalone knowledge points.\n"
-            "2. Then, having another bold subtitle 'Now, let's work through the problem together with a few step-by-step guiding questions.' guide me with asking one concise, guiding question in the format of multiple choice (4 different choices AND each in a new line) toward the correct solution.\n"
-            "3. Once I answered each guiding question, please let me know the correctness. If it's correct, please proceed to the next guiding question. If it's wrong or the user says 'I don't know', provide more hints instead of directly telling me the correct answer.\n"
-        )
+        mode_prompt += r"""
+            1. First, based on the problem, please provide no more than two knowledge points using concise language with the bold subtitle 'Knowledge Points'. Avoid considering 'Simplify the expression' and 'Combining terms' as standalone knowledge points.
+            2. Then, having another bold subtitle 'Now, let's work through the problem together with a few step-by-step guiding questions.<br>' guide me with asking one concise, guiding question in the format of multiple choices toward the correct solution.
+            Use explicit line break <br> before each choice. Example: 'What is 1+1? <br>A) 1 <br>B) 2 <br>...'
+            3. Once I answered each guiding question, please let me know the correctness. If it's correct, please proceed to the next guiding question. If it's wrong or the user says 'I don't know', provide more hints instead of directly telling me the correct answer.
+            """
     else:
         mode_prompt += (
-            "1. Return two required sections. 'Result' and 'Step-by-Step Explanation', and an optional 'Figure' section if there is a related figure.\n"
-            "2. First, show the final answer" + (" in <reference>" if has_answer else "") + " within a rectangular box, including the answer and choice if possible. Example: '$$ \\boxed{{ 1 }} $$' means the answer is 1 within a box, '$$ \\boxed{{ A }} $$' means we select A for the answer of multiple choices question.\n"
-            "3. Only show essential calculation process without too much explanation.\n"
-            "4. The conclusion part should be aligned with the final answer" + (" provided in <reference>" if has_answer else "") + ", if there are multiple choices provided in <image_content>, tell me what is the question in <question> and show me all the choices.\n"
+            "1. Return two required sections. 'Step-by-Step Explanation' and 'Result', and an optional 'Figure' section if there is a related figure.\n"
+            "2. 'Step-by-Step Explanation': Only show essential calculation process without too much explanation.\n"
+            "3. 'Result': show the final answer"
+            + (" in <reference>" if has_answer else "")
+            + " within a rectangular box, including the answer and choice if possible. Example: '$$ \\boxed{{ 1 }} $$' means the answer is 1 within a box, '$$ \\boxed{{ A }} $$' means we select A for the answer of multiple choices question.\n"
+            "4. The conclusion part should be aligned with the final answer"
+            + (" provided in <reference>" if has_answer else "")
+            + ", if there are multiple choices provided in <image_content>, tell me what is the question in <question> and show me all the choices.\n"
             "5. If there is a related plot with URL, show that in 'Figure' section with minimal description.\n"
         )
     return (

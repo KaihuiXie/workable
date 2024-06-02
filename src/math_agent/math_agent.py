@@ -69,8 +69,8 @@ class MathAgent:
     def query(self, messages):
         session = self._cur_openai_client()
         stream = session.chat.completions.create(
-            model="gpt-4o",
-            temperature=0.1,
+            model="gpt-3.5-turbo-0125",
+            # temperature=0.1,
             messages=[{"role": m["role"], "content": m["content"]} for m in messages],
             stop=["###SYSTEM_PROMPT"],
             stream=True,
@@ -95,14 +95,13 @@ class MathAgent:
                         wolfram_alpha_response, question
                     )
                     extracted_response = replace_wolfram_image(extracted_response)
-            image = "<image>data:image/jpeg;base64," + image_str + "</image>\n"
             question = re.sub(
-                r"<wolfram_query>((.|[\r\n])*)</wolfram_query>", image, question
+                r"<wolfram_query>.*?</wolfram_query>", "", question, flags=re.DOTALL
             )
+
             user_prompt = get_user_prompt_for_solve(
                 question, extracted_response, learner_mode
             )
-            print(user_prompt)
             system_prompt = SYSTEM_PROMPT
             if language:
                 system_prompt += LANGUAGE_PROMPT.format(language=language)

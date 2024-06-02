@@ -1,8 +1,11 @@
-from src.math_agent.supabase import Supabase
 import uuid
+
+from src.math_agent.supabase import Supabase
+
 
 def clean_platform_text(platform: str) -> str:
     return platform.strip().upper()
+
 
 def generate_hex_uuid():
     # 生成一个随机的UUID
@@ -11,11 +14,12 @@ def generate_hex_uuid():
     hex_uuid = full_uuid.hex[:4]
     return hex_uuid
 
+
 class UrlPlatformsSupabase(Supabase):
     def __init__(self, supabase: Supabase):
         self.supabase = supabase.client()
         self.table = "url_platforms"
-    
+
     def check_uuid_exist(self, uuid: str) -> bool:
         try:
             data, count = (
@@ -29,14 +33,15 @@ class UrlPlatformsSupabase(Supabase):
             raise Exception(
                 f"An error occurred during checking if the uuid {uuid} exist: {e}"
             )
+
     def add_new_platform(self, platform: str) -> str:
         try:
             platform_cleaned = clean_platform_text(platform)
             uuid = generate_hex_uuid()
-            while(self.check_uuid_exist(uuid)):
+            while self.check_uuid_exist(uuid):
                 uuid = generate_hex_uuid()
             row_dict = {
-                "platform_id":uuid,
+                "platform_id": uuid,
                 "platform": platform_cleaned,
             }
             data, count = self.supabase.table(self.table).insert(row_dict).execute()
@@ -77,7 +82,10 @@ class UrlPlatformsSupabase(Supabase):
     def delete_platform_by_id(self, platform_id: str) -> any:
         try:
             response = (
-                self.supabase.table(self.table).delete().eq("platform_id", platform_id).execute()
+                self.supabase.table(self.table)
+                .delete()
+                .eq("platform_id", platform_id)
+                .execute()
             )
             return response
         except Exception as e:
