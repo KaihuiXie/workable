@@ -7,6 +7,21 @@ class ChatsSupabase(Supabase):
         self.supabase = supabase.client()
         self.table = "chats"
 
+    def user_has_access(self, chat_id, user_id) -> bool:
+        try:
+            data, count = (
+                self.supabase.from_(self.table)
+                .select("id")
+                .eq("id", chat_id)
+                .eq("user_id", user_id)
+                .execute()
+            )
+            return len(data[1]) > 0
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting chat by chat_id {chat_id} and user_id {user_id}: {e}"
+            )
+
     def get_chat_payload_by_id(self, chat_id):
         try:
             data, count = (

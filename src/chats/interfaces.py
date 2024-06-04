@@ -5,6 +5,13 @@ from fastapi import File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, ValidationError, model_validator
 
 
+class ChatOwnershipError(Exception):
+    """Custom exception for chat ownership errors."""
+
+    def __init__(self, message):
+        super().__init__(message)
+
+
 # Define the Mode enumeration
 class Mode(Enum):
     LEARNER = "learner"

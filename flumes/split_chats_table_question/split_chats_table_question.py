@@ -3,7 +3,9 @@ import re
 
 from dotenv import load_dotenv
 
-from flumes.split_chats_table_question.split_chats_table_question_supabase import SplitChatsTableQuestionSupabase
+from flumes.split_chats_table_question.split_chats_table_question_supabase import (
+    SplitChatsTableQuestionSupabase,
+)
 
 
 def search(question, tag):
@@ -18,7 +20,9 @@ def search(question, tag):
 
 def split_rows_created_after(created_timestamp):
     load_dotenv()
-    supabase = SplitChatsTableQuestionSupabase(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+    supabase = SplitChatsTableQuestionSupabase(
+        os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY")
+    )
     all_chats = supabase.get_all_chats_created_after(created_timestamp)
     count = len(all_chats)
     for i in range(count):
@@ -35,7 +39,9 @@ def split_rows_created_after(created_timestamp):
         if new_question is None:
             new_question = old_question
 
-        supabase.back_fill_new_columns(chat_id, new_question, text_prompt, image_content)
+        supabase.back_fill_new_columns(
+            chat_id, new_question, text_prompt, image_content
+        )
 
 
 if __name__ == "__main__":

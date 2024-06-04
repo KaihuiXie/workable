@@ -8,7 +8,12 @@ from fastapi import Depends, HTTPException
 from starlette.responses import StreamingResponse
 
 from common.decorators import TimerLogLevel, timer
-from src.chats.interfaces import ChatRequest, Mode, UploadQuestionRequest
+from src.chats.interfaces import (
+    ChatOwnershipError,
+    ChatRequest,
+    Mode,
+    UploadQuestionRequest,
+)
 from src.chats.supabase import ChatsSupabase
 from src.math_agent.math_agent import MathAgent
 from src.utils import check_message_size, preprocess_image
@@ -90,7 +95,11 @@ class Chat:
         response.data = [record for record in response.data if record["question"] != ""]
         return response
 
-    def get_chat(self, chat_id: str):
+    def get_chat(self, chat_id: str, user_id: str):
+        if not self.supabase.user_has_access(chat_id=chat_id, user_id=user_id):
+            raise ChatOwnershipError(
+                f"User {user_id} does not have access to chat {chat_id}!"
+            )
         payload = self.supabase.get_chat_payload_by_id(chat_id)
         question = self.supabase.get_chat_question_by_id(chat_id)
         image_str = self.supabase.get_chat_image_by_id(chat_id)

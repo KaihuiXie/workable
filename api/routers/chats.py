@@ -3,7 +3,12 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException
 
 from common.objects import chats, credits
-from src.chats.interfaces import ChatRequest, NewChatRequest, UploadQuestionRequest
+from src.chats.interfaces import (
+    ChatOwnershipError,
+    ChatRequest,
+    NewChatRequest,
+    UploadQuestionRequest,
+)
 
 router = APIRouter(
     # prefix="/chats",
@@ -76,9 +81,12 @@ async def all_chats(user_id: str):
 
 
 @router.get("/chat/{chat_id}")
-async def get_chat(chat_id: str):
+async def get_chat(chat_id: str, user_id: str):
     try:
-        return chats.get_chat(chat_id)
+        return chats.get_chat(chat_id=chat_id, user_id=user_id)
+    except ChatOwnershipError as e:
+        logging.error(e)
+        raise HTTPException(status_code=405, detail=str(e))
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))

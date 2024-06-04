@@ -48,10 +48,10 @@ async def get_credit(user_id: str):
 @router.get("/credit/temp/{user_id}")
 async def get_temp_credit(user_id: str):
     """
-   Get the temp credit from a specific user.
+    Get the temp credit from a specific user.
 
-    - param request: `user_id` type of string. The unique uuid of the user,\n
-    - return: `credit`, the temp credit of the user.\n
+     - param request: `user_id` type of string. The unique uuid of the user,\n
+     - return: `credit`, the temp credit of the user.\n
     """
     try:
         temp_credit = credits.get_temp_credit(user_id)
@@ -64,10 +64,10 @@ async def get_temp_credit(user_id: str):
 @router.get("/credit/perm/{user_id}")
 async def get_perm_credit(user_id: str):
     """
-   Get the perm credit from a specific user.
+    Get the perm credit from a specific user.
 
-    - param request: `user_id` type of string. The unique uuid of the user,\n
-    - return: `credit`, the perm credit of the user.\n
+     - param request: `user_id` type of string. The unique uuid of the user,\n
+     - return: `credit`, the perm credit of the user.\n
     """
     try:
         perm_credit = credits.get_perm_credit(user_id)

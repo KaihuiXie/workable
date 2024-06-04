@@ -2,7 +2,6 @@ from supabase import Client, ClientOptions, create_client
 
 
 class SplitChatsTableQuestionSupabase:
-
     def __init__(self, url, key):
         self.supabase: Client = create_client(
             url, key, options=ClientOptions(flow_type="pkce")
@@ -21,9 +20,7 @@ class SplitChatsTableQuestionSupabase:
             )
             return response.data
         except Exception as e:
-            raise Exception(
-                f"An error occurred getting all chats: {e}"
-            )
+            raise Exception(f"An error occurred getting all chats: {e}")
 
     def get_all_chats_created_after(self, created_timestamp):
         try:
