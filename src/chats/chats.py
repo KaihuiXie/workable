@@ -66,9 +66,8 @@ class Chat:
             image_content = search(parse_result, "image_content")
             if image_content:
                 columns[ChatColumn.IMAGE_CONTENT] = image_content
-            text_prompt = search(parse_result, "text_prompt")
-            if text_prompt:
-                columns[ChatColumn.TEXT_PROMPT] = text_prompt
+
+            columns[ChatColumn.TEXT_PROMPT] = request.prompt
             wolfram_query = search(parse_result, "wolfram_query")
             if wolfram_query:
                 columns[ChatColumn.WOLFRAM_QUERY] = wolfram_query
