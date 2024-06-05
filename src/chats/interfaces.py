@@ -13,7 +13,7 @@ class ChatOwnershipError(Exception):
 
 
 # Define the Mode enumeration
-class Mode(Enum):
+class Mode(str, Enum):
     LEARNER = "learner"
     HELPER = "helper"
 
@@ -27,7 +27,7 @@ class Mode(Enum):
             raise ValueError(f"{s} is not a valid Mode")
 
 
-class Language(Enum):
+class Language(str, Enum):
     ENGLISH = "EN"
     SPANISH = "ES"
     FRENCH = "FR"
@@ -44,6 +44,23 @@ class Language(Enum):
             return Language[s.upper()]
         except KeyError:
             raise ValueError(f"{s} is not a valid Language")
+
+
+class ChatColumn(str, Enum):
+    ID = "id"
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"
+    PAYLOAD = "payload"
+    IMAGE_STR = "image_str"
+    LEARNER_MODE = "learner_mode"
+    USER_ID = "user_id"
+    THUMBNAIL_STR = "thumbnail_str"
+    QUESTION = "question"
+    TEXT_PROMPT = "text_prompt"
+    IMAGE_CONTENT = "image_content"
+    WOLFRAM_QUERY = "wolfram_query"
+    WOLFRAM_ANSWER = "wolfram_answer"
+    WOLFRAM_IMAGE = "wolfram_image"
 
 
 class UploadQuestionRequest(BaseModel):

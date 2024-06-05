@@ -6,6 +6,7 @@ import requests
 from openai import OpenAI
 
 from common.decorators import TimerLogLevel, timer
+from src.chats.interfaces import ChatColumn
 from src.math_agent.prompts import (
     IMAGE_READING_PROMPT,
     LANGUAGE_PROMPT,
@@ -16,6 +17,7 @@ from src.math_agent.prompts import (
     WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE,
     get_user_prompt_for_solve,
 )
+from src.math_agent.supabase import Supabase
 from src.math_agent.utils import replace_wolfram_image
 
 # Configure logging
@@ -23,10 +25,11 @@ logging.basicConfig(level=logging.INFO)
 
 
 class MathAgent:
-    def __init__(self, openai_api_keys: str, wolf_api_key):
+    def __init__(self, openai_api_keys: str, wolf_api_key, supabase: Supabase):
         self.open_ai_keys = [s.strip() for s in openai_api_keys.split(",")]
         self.wolf_api_key = wolf_api_key
         self.wolfram_url = "http://api.wolframalpha.com/v2/query"
+        self.supabase = supabase
 
     def _get_openai_key(self):
         # Remove and get the first element
@@ -78,16 +81,13 @@ class MathAgent:
         return stream
 
     def solve(self, chat, messages, language=None):
-        question = chat["question"]
-        learner_mode = chat["learner_mode"]
-        image_str = chat["image_str"]
+        question = chat[ChatColumn.QUESTION]
+        learner_mode = chat[ChatColumn.LEARNER_MODE]
+        wolfram_query = chat[ChatColumn.WOLFRAM_QUERY]
+        chat_id = chat["id"]
         try:
-            match = re.search(
-                r"<wolfram_query>(.*?)</wolfram_query>", question, re.DOTALL
-            )
             extracted_response = ""
-            if match:
-                wolfram_query = match.group(1)
+            if wolfram_query:
                 wolfram_alpha_response = self._query_wolfram_alpha(wolfram_query)
                 extracted_response = ""
                 if wolfram_alpha_response:
@@ -95,12 +95,17 @@ class MathAgent:
                         wolfram_alpha_response, question
                     )
                     extracted_response = replace_wolfram_image(extracted_response)
-            question = re.sub(
-                r"<wolfram_query>.*?</wolfram_query>", "", question, flags=re.DOTALL
-            )
-
+                    column = {ChatColumn.WOLFRAM_ANSWER: extracted_response}
+                    self.supabase.update_columns_by_primary_id(
+                        table="chats", primary_id=chat_id, columns=column
+                    )
+            question_context = f"""
+            <question>{question}</question>
+            <text_prompt>{chat[ChatColumn.TEXT_PROMPT]}</text_prompt>
+            <image_content>{chat[ChatColumn.IMAGE_CONTENT]}</image_content>
+            """
             user_prompt = get_user_prompt_for_solve(
-                question, extracted_response, learner_mode
+                question_context, extracted_response, learner_mode
             )
             system_prompt = SYSTEM_PROMPT
             if language:

@@ -19,8 +19,10 @@ from src.users.users import User
 
 # Initalization
 load_dotenv()
-math_agent = MathAgent(os.getenv("OPENAI_API_KEYS"), os.getenv("WOLFRAM_ALPHA_APP_ID"))
 supabase = Supabase(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+math_agent = MathAgent(
+    os.getenv("OPENAI_API_KEYS"), os.getenv("WOLFRAM_ALPHA_APP_ID"), supabase
+)
 
 shared_chats = SharedChat(SharedChatsSupabase(supabase))
 chats = Chat(ChatsSupabase(supabase), math_agent=math_agent)

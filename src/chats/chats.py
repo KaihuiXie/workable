@@ -9,6 +9,7 @@ from starlette.responses import StreamingResponse
 
 from common.decorators import TimerLogLevel, timer
 from src.chats.interfaces import (
+    ChatColumn,
     ChatOwnershipError,
     ChatRequest,
     Mode,
@@ -20,6 +21,14 @@ from src.utils import check_message_size, preprocess_image
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
+
+
+def search(content: str, tag: str):
+    pattern = rf"<{tag}>((.|[\r\n])*?)</{tag}>"
+    match = re.search(pattern, content, re.DOTALL)
+    if match and match.group(1) != "None":
+        return match.group(1)
+    return None
 
 
 class Chat:
@@ -39,27 +48,39 @@ class Chat:
             UploadQuestionRequest.parse_question_request
         ),
     ):
-        image_string = ""
-        thumbnail_string = ""
+        columns = dict()
+
         if request.image_file:
             image_bytes = await request.image_file.read()
-            image_string, thumbnail_string = preprocess_image(image_bytes)
-            question = self.math_agent.parse_question(image_string, request.prompt)
+            (
+                columns[ChatColumn.IMAGE_STR],
+                columns[ChatColumn.THUMBNAIL_STR],
+            ) = preprocess_image(image_bytes)
+            parse_result = self.math_agent.parse_question(
+                columns[ChatColumn.IMAGE_STR], request.prompt
+            )
+            columns[ChatColumn.PAYLOAD] = {
+                "messages": [{"role": "assistant", "content": parse_result}]
+            }
+            columns[ChatColumn.QUESTION] = search(parse_result, "question")
+            image_content = search(parse_result, "image_content")
+            if image_content:
+                columns[ChatColumn.IMAGE_CONTENT] = image_content
+            text_prompt = search(parse_result, "text_prompt")
+            if text_prompt:
+                columns[ChatColumn.TEXT_PROMPT] = text_prompt
+            wolfram_query = search(parse_result, "wolfram_query")
+            if wolfram_query:
+                columns[ChatColumn.WOLFRAM_QUERY] = wolfram_query
         elif request.prompt:
-            question = request.prompt
+            columns[ChatColumn.QUESTION] = request.prompt
         else:
             raise HTTPException(
                 status_code=500,
                 detail=f"At least one of `image_file` or `prompt` are required!",
             )
-
-        response = self.supabase.fulfill_empty_chat(
-            chat_id=request.chat_id,
-            image_str=image_string,
-            thumbnail_str=thumbnail_string,
-            question=question,
-            is_learner_mode=(request.mode == Mode.LEARNER),
-        )
+        columns[ChatColumn.LEARNER_MODE] = request.mode == Mode.LEARNER
+        response = self.supabase.update_chat_columns_by_id(request.chat_id, columns)
         return response
 
     @timer(log_level=TimerLogLevel.VERBOSE)
@@ -75,7 +96,9 @@ class Chat:
 
     @timer(log_level=TimerLogLevel.BASIC)
     async def chat(self, request: ChatRequest):
-        payload = self.supabase.get_chat_payload_by_id(request.chat_id)
+        payload = self.supabase.get_chat_column_by_id(
+            request.chat_id, ChatColumn.PAYLOAD
+        )
         payload["messages"].append({"role": "user", "content": request.query})
         response = self.math_agent.query(payload["messages"])
         return StreamingResponse(
@@ -84,34 +107,33 @@ class Chat:
         )
 
     def get_all_chats(self, user_id: str):
-        response = self.supabase.get_all_chats(user_id)
-        for record in response.data:
-            question = record["question"]
-            match = re.search(r"<question>(.*?)</question>", question, re.DOTALL)
-            if match:
-                question = match.group(1)
-            record["question"] = question
+        columns = [
+            ChatColumn.ID,
+            ChatColumn.THUMBNAIL_STR,
+            ChatColumn.QUESTION,
+            ChatColumn.LEARNER_MODE,
+            ChatColumn.CREATED_AT,
+            ChatColumn.TEXT_PROMPT,
+        ]
+        all_chats = self.supabase.get_all_chats_columns_by_user_id(user_id, columns)
         # if record["question"] == "", we filter the record out
-        response.data = [record for record in response.data if record["question"] != ""]
-        return response
+        all_chats.data = [chat for chat in all_chats.data if chat["question"] != ""]
+        return all_chats
 
     def get_chat(self, chat_id: str, user_id: str):
         if not self.supabase.user_has_access(chat_id=chat_id, user_id=user_id):
             raise ChatOwnershipError(
                 f"User {user_id} does not have access to chat {chat_id}!"
             )
-        payload = self.supabase.get_chat_payload_by_id(chat_id)
-        question = self.supabase.get_chat_question_by_id(chat_id)
-        image_str = self.supabase.get_chat_image_by_id(chat_id)
-        chat_again = ("messages" not in payload) or check_message_size(
-            payload["messages"]
+        chat = self.supabase.get_chat_by_id(chat_id)
+        payload = chat["payload"]
+        chat_again = (
+            not payload
+            or ("messages" not in payload)
+            or check_message_size(payload["messages"])
         )
-        return {
-            "payload": payload,
-            "question": question,
-            "image_str": image_str,
-            "chat_again": chat_again,
-        }
+        chat["chat_again"] = chat_again
+        return chat
 
     def delete_chat(self, chat_id: str):
         self.supabase.delete_chat_by_id(chat_id)

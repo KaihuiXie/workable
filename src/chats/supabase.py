@@ -1,3 +1,4 @@
+from src.chats.interfaces import ChatColumn
 from src.math_agent.supabase import Supabase
 from src.utils import generate_thumbnail_string_from_image_string
 
@@ -22,90 +23,65 @@ class ChatsSupabase(Supabase):
                 f"An error occurred during getting chat by chat_id {chat_id} and user_id {user_id}: {e}"
             )
 
-    def get_chat_payload_by_id(self, chat_id):
+    def get_chat_columns_by_id(self, chat_id: str, columns: list[ChatColumn]):
+        try:
+            columns = ", ".join(columns)
+            data, count = (
+                self.supabase.from_(self.table)
+                .select(columns, count="exact")
+                .eq("id", chat_id)
+                .execute()
+            )
+            return data[1][0]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting {columns} by chat_id {chat_id}: {e}"
+            )
+
+    def get_chat_column_by_id(self, chat_id: str, column: ChatColumn):
         try:
             data, count = (
                 self.supabase.from_(self.table)
-                .select("payload")
+                .select(column)
                 .eq("id", chat_id)
                 .execute()
             )
-            return data[1][0]["payload"]
+            return data[1][0][column]
         except Exception as e:
             raise Exception(
-                f"An error occurred during getting chat payload by chat_id {chat_id}: {e}"
+                f"An error occurred during getting {column} by chat_id {chat_id}: {e}"
             )
 
-    def get_chat_image_by_id(self, chat_id):
+    def get_all_chats_columns_by_user_id(self, user_id: str, columns: list[ChatColumn]):
         try:
-            data, count = (
-                self.supabase.from_(self.table)
-                .select("image_str")
-                .eq("id", chat_id)
-                .execute()
-            )
-            return data[1][0]["image_str"]
-        except Exception as e:
-            raise Exception(
-                f"An error occurred during getting question image by chat_id {chat_id}: {e}"
-            )
-
-    def get_chat_question_by_id(self, chat_id):
-        try:
-            data, count = (
-                self.supabase.from_(self.table)
-                .select("question")
-                .eq("id", chat_id)
-                .execute()
-            )
-            return data[1][0]["question"]
-        except Exception as e:
-            raise Exception(
-                f"An error occurred during getting chat question by chat_id {chat_id}: {e}"
-            )
-
-    def fulfill_empty_chat(
-        self, chat_id, image_str, thumbnail_str, question, is_learner_mode
-    ):
-        try:
-            payload = self.question_to_payload(question)
-            response = (
-                self.supabase.table("chats")
-                .update(
-                    {
-                        "image_str": image_str,
-                        "thumbnail_str": thumbnail_str,
-                        "payload": payload,
-                        "question": question,
-                        "learner_mode": is_learner_mode,
-                    }
-                )
-                .eq("id", chat_id)
-                .execute()
-            )
-            return response
-        except Exception as e:
-            raise Exception(
-                f"An error occurred during fulfill fields for chat {chat_id}: {e}"
-            )
-
-    def get_all_chats(self, user_id):
-        try:
+            columns = ", ".join(columns)
             response = (
                 self.supabase.from_("chats")
-                .select(
-                    "id, thumbnail_str, question, learner_mode, created_at",
-                    count="exact",
-                )
+                .select(columns, count="exact")
                 .eq("user_id", user_id)
                 .order("created_at", desc=True)
                 .execute()
             )
+            # TODO: move grant award logic out
             self.grant_login_award(user_id)
             return response
         except Exception as e:
             raise Exception(
                 f"An error occurred getting all chats for user {user_id}: {e}"
+            )
+
+    def update_chat_columns_by_id(self, chat_id: str, columns: dict[ChatColumn:str]):
+        try:
+            response = (
+                self.supabase.table(self.table)
+                .update(columns)
+                .eq("id", chat_id)
+                .execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during updating {list(columns.keys())} for chat {chat_id}: {e}"
             )
 
     def backfill_thumbnail_str(self, chat_ids):
@@ -161,18 +137,4 @@ class ChatsSupabase(Supabase):
         except Exception as e:
             raise Exception(
                 f"An error occurred during updating question for chat {chat_id}: {e}"
-            )
-
-    def get_user_id_by_chat_id(self, chat_id):
-        try:
-            data, count = (
-                self.supabase.from_("chats")
-                .select("user_id")
-                .eq("id", chat_id)
-                .execute()
-            )
-            return data[1][0]["user_id"]
-        except Exception as e:
-            raise Exception(
-                f"An error occurred during getting user_id by chat {chat_id}: {e}"
             )

@@ -35,12 +35,7 @@ class Supabase:
     def create_empty_chat(self, user_id):
         try:
             row_dict = {
-                "image_str": "",
-                "thumbnail_str": "",
                 "user_id": user_id,
-                "question": "",
-                "payload": "",
-                "learner_mode": False,
             }
             data, count = self.supabase.table("chats").insert(row_dict).execute()
             # Check if exactly one record was inserted
@@ -188,4 +183,20 @@ class Supabase:
         except Exception as e:
             raise Exception(
                 f"An error occurred during updating perm credit for user {user_id}: {e}"
+            )
+
+    def update_columns_by_primary_id(
+        self, table: str, primary_id: str, columns: dict[str, str]
+    ):
+        try:
+            response = (
+                self.supabase.table(table)
+                .update(columns)
+                .eq("id", primary_id)
+                .execute()
+            )
+            return response
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during updating {list(columns.keys())} for {table} {primary_id}: {e}"
             )

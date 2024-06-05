@@ -47,7 +47,9 @@ class ChatsTest(unittest.TestCase):
     def __init_math_agent(cls):
         load_dotenv()
         cls.math_agent = MathAgent(
-            os.getenv("OPENAI_API_KEYS"), os.getenv("WOLFRAM_ALPHA_APP_ID")
+            os.getenv("OPENAI_API_KEYS"),
+            os.getenv("WOLFRAM_ALPHA_APP_ID"),
+            cls.supabase,
         )
 
     def setUp(self):
@@ -110,9 +112,9 @@ class ChatsTest(unittest.TestCase):
         response = self.test_client.get(f"/chat/{chat_id}?user_id={self.user_id}")
         self.assertEqual(response.status_code, 200)
         response_json = json.load(response)
-        self.assertEqual(response_json["payload"], "")
-        self.assertEqual(response_json["question"], "")
-        self.assertEqual(response_json["image_str"], "")
+        self.assertEqual(response_json["payload"], None)
+        self.assertEqual(response_json["question"], None)
+        self.assertEqual(response_json["image_str"], None)
         self.assertEqual(response_json["chat_again"], True)
         self.__delete_chat(chat_id)
 
@@ -133,8 +135,8 @@ class ChatsTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         response_json = json.load(response)
         self.assertEqual(response_json["payload"], payload)
-        self.assertEqual(response_json["question"], "")
-        self.assertEqual(response_json["image_str"], "")
+        self.assertEqual(response_json["question"], None)
+        self.assertEqual(response_json["image_str"], None)
         self.assertEqual(response_json["chat_again"], False)
         self.__delete_chat(chat_id)
 

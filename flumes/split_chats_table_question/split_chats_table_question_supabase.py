@@ -43,7 +43,7 @@ class SplitChatsTableQuestionSupabase:
                 self.supabase.table("chats")
                 .update(
                     {
-                        "new_question": new_question,
+                        "question": new_question,
                         "text_prompt": text_prompt,
                         "image_content": image_content,
                     }

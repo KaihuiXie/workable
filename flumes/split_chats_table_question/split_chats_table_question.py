@@ -45,5 +45,5 @@ def split_rows_created_after(created_timestamp):
 
 
 if __name__ == "__main__":
-    split_after = "2024-06-02 07:22:04.774631+00"  # created_at of the last splitted row
+    split_after = "2024-06-03 00:57:40.261984+00"  # created_at of the last splitted row
     split_rows_created_after(split_after)
