@@ -31,13 +31,15 @@ def split_rows_created_after(created_timestamp):
         chat_id = chat["id"]
         print(f"Processing {i}/{count}, chat_id: {chat_id}")
 
+        if old_question is None:
+            continue
         new_question = search(old_question, "question")
+        if new_question is None:
+            continue
         image_content = search(old_question, "image_content")
         text_prompt = search(old_question, "question_context")
         if text_prompt is None:
             text_prompt = search(old_question, "text_prompt")
-        if new_question is None:
-            new_question = old_question
 
         supabase.back_fill_new_columns(
             chat_id, new_question, text_prompt, image_content
@@ -45,5 +47,5 @@ def split_rows_created_after(created_timestamp):
 
 
 if __name__ == "__main__":
-    split_after = "2024-06-03 00:57:40.261984+00"  # created_at of the last splitted row
+    split_after = "2024-06-05 07:30:34.8224+00"  # created_at of the last splitted row
     split_rows_created_after(split_after)
