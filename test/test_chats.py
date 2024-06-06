@@ -140,51 +140,50 @@ class ChatsTest(unittest.TestCase):
         self.assertEqual(response_json["chat_again"], False)
         self.__delete_chat(chat_id)
 
+    #     def test_all_chats(self):
+    #         question = "1+1"
+    #         chat_id_1 = self.__create_chat(question=question)
+    #         chat_id_2 = self.__create_chat(question=question)
 
-#     def test_all_chats(self):
-#         question = "1+1"
-#         chat_id_1 = self.__create_chat(question=question)
-#         chat_id_2 = self.__create_chat(question=question)
+    #         response = self.test_client.get(f"/all_chats/{self.user_id}")
+    #         self.assertEqual(response.status_code, 200)
+    #         response_json = json.load(response)
+    #         ids = [item["id"] for item in response_json["data"]]
+    #         self.assertEqual(set(ids), set({chat_id_1, chat_id_2}))
+    #         self.__delete_chat(chat_id_1)
+    #         self.__delete_chat(chat_id_2)
 
-#         response = self.test_client.get(f"/all_chats/{self.user_id}")
-#         self.assertEqual(response.status_code, 200)
-#         response_json = json.load(response)
-#         ids = [item["id"] for item in response_json["data"]]
-#         self.assertEqual(set(ids), set({chat_id_1, chat_id_2}))
-#         self.__delete_chat(chat_id_1)
-#         self.__delete_chat(chat_id_2)
+    #     def test_question_photo_learner_no_prompt(self):
+    #         chat_id = self.__create_chat()
 
-#     def test_question_photo_learner_no_prompt(self):
-#         chat_id = self.__create_chat()
+    #         image_file_path = self.image_path
+    #         with open(image_file_path, "rb") as image_file:
+    #             data = {
+    #                 "chat_id": chat_id,
+    #                 "mode": "learner",
+    #             }
+    #             files = {
+    #                 "image_file": image_file,
+    #             }
+    #             response = self.test_client.post("/question_photo", data=data, files=files)
+    #             self.assertEqual(response.status_code, 200)
+    #         self.__delete_chat(chat_id)
 
-#         image_file_path = self.image_path
-#         with open(image_file_path, "rb") as image_file:
-#             data = {
-#                 "chat_id": chat_id,
-#                 "mode": "learner",
-#             }
-#             files = {
-#                 "image_file": image_file,
-#             }
-#             response = self.test_client.post("/question_photo", data=data, files=files)
-#             self.assertEqual(response.status_code, 200)
-#         self.__delete_chat(chat_id)
+    #     def test_question_photo_helper_no_prompt(self):
+    #         chat_id = self.__create_chat()
 
-#     def test_question_photo_helper_no_prompt(self):
-#         chat_id = self.__create_chat()
-
-#         image_file_path = self.image_path
-#         with open(image_file_path, "rb") as image_file:
-#             data = {
-#                 "chat_id": chat_id,
-#                 "mode": "helper",
-#             }
-#             files = {
-#                 "image_file": image_file,
-#             }
-#             response = self.test_client.post("/question_photo", data=data, files=files)
-#             self.assertEqual(response.status_code, 200)
-#         self.__delete_chat(chat_id)
+    #         image_file_path = self.image_path
+    #         with open(image_file_path, "rb") as image_file:
+    #             data = {
+    #                 "chat_id": chat_id,
+    #                 "mode": "helper",
+    #             }
+    #             files = {
+    #                 "image_file": image_file,
+    #             }
+    #             response = self.test_client.post("/question_photo", data=data, files=files)
+    #             self.assertEqual(response.status_code, 200)
+    #         self.__delete_chat(chat_id)
 
     # def test_question_photo_learner_prompt(self):
     #     chat_id = self.__create_chat()
@@ -208,28 +207,29 @@ class ChatsTest(unittest.TestCase):
     #     self.assertEqual(response.status_code, 200)
     #     self.__delete_chat(chat_id)
 
-#     def test_GRE_math_question_photo_helper_prompt(self):
-#         chat_id = self.__create_chat()
+    def test_GRE_math_question_photo_helper_prompt(self):
+        chat_id = self.__create_chat()
 
-#         # image_file_path = self.image_path
-#         image_file_path = ROOT_DIR + "/test/resources/GREMath.png"
-#         with open(image_file_path, "rb") as image_file:
-#             data = {
-#                 "chat_id": chat_id,
-#                 "mode": "helper",
-#                 "prompt": "reply in Chinese",
-#             }
-#             files = {
-#                 "image_file": image_file,
-#             }
-#             response = self.test_client.post("/question_photo", data=data, files=files)
-#             self.assertEqual(response.status_code, 200)
-#         payload = {
-#             "chat_id": chat_id,
-#         }
-#         response = self.test_client.post("/solve", json=payload)
-#         self.assertEqual(response.status_code, 200)
-#         self.__delete_chat(chat_id)
+        image_file_path = self.image_path
+        # image_file_path = ROOT_DIR + "/test/resources/GREMath.png"
+        with open(image_file_path, "rb") as image_file:
+            data = {
+                "chat_id": chat_id,
+                "mode": "helper",
+                "prompt": "reply in Chinese",
+            }
+            files = {
+                "image_file": image_file,
+            }
+            response = self.test_client.post("/question_photo", data=data, files=files)
+            self.assertEqual(response.status_code, 200)
+        payload = {
+            "chat_id": chat_id,
+        }
+        response = self.test_client.post("/solve", json=payload)
+        self.assertEqual(response.status_code, 200)
+        self.__delete_chat(chat_id)
+
 
 #     def test_question_photo_helper_no_image(self):
 #         chat_id = self.__create_chat()
