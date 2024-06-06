@@ -6,6 +6,7 @@ from common.objects import chats, credits
 from src.chats.interfaces import (
     ChatOwnershipError,
     ChatRequest,
+    NewChatIDRequest,
     NewChatRequest,
     UploadQuestionRequest,
 )
@@ -20,7 +21,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 @router.post("/new_chat_id")
-async def get_new_chat_id(request: NewChatRequest):
+async def get_new_chat_id(request: NewChatIDRequest):
     try:
         temp_credit, perm_credit = credits.get_credit(request.user_id)
         if temp_credit + perm_credit <= 0:
@@ -37,6 +38,24 @@ async def get_new_chat_id(request: NewChatRequest):
             status_code=500,
             detail=f"An error occurred during creating new chat id: {str(e)}",
         )
+
+
+@router.post("/new_chat")
+async def new_chat(
+    request: NewChatRequest = Depends(NewChatRequest.parse_new_chat_request),
+):
+    try:
+        temp_credit, perm_credit = credits.get_credit(request.user_id)
+        if temp_credit + perm_credit <= 0:
+            raise ValueError("Not enough credits")
+        return await chats.new_chat(request)
+    except ValueError:
+        raise HTTPException(
+            status_code=405,
+            detail=f"User: {request.user_id} doesn't have enough credits to create a new chat",
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/question_photo")

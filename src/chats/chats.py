@@ -12,7 +12,9 @@ from src.chats.interfaces import (
     ChatColumn,
     ChatOwnershipError,
     ChatRequest,
+    Language,
     Mode,
+    NewChatRequest,
     UploadQuestionRequest,
 )
 from src.chats.supabase import ChatsSupabase
@@ -36,18 +38,14 @@ class Chat:
         self.supabase = supabase
         self.math_agent = math_agent
 
+    # TO_BE_DELETED
     def get_new_chat_id(self, user_id: str):
         return self.supabase.create_empty_chat(
             user_id=user_id,
         )
 
     @timer(log_level=TimerLogLevel.BASIC)
-    async def parse_question(
-        self,
-        request: UploadQuestionRequest = Depends(
-            UploadQuestionRequest.parse_question_request
-        ),
-    ):
+    async def parse_question(self, request: UploadQuestionRequest):
         columns = dict()
 
         if request.image_file:
@@ -92,6 +90,8 @@ class Chat:
             self.__event_generator(response, payload, request.chat_id),
             media_type="text/event-stream",
         )
+
+    # TO_BE_DELETED
 
     @timer(log_level=TimerLogLevel.BASIC)
     async def chat(self, request: ChatRequest):
@@ -166,3 +166,57 @@ class Chat:
                         callback()
                 except Exception as db_error:
                     logging.error("Error updating payload to database: %s", db_error)
+
+    async def __new_chat_event_generator(
+        self, response, payload, chat_id, callback=None
+    ):
+        yield f"event: chat_id\ndata: {json.dumps(chat_id)}\n\n"
+        full_response = ""
+        chat_again = check_message_size(payload["messages"])
+        yield f"event: chat_again\ndata: {json.dumps(chat_again)}\n\n"
+        try:
+            for event in response:
+                event_text = event.choices[0].delta.content
+                if event_text is not None:
+                    full_response += event_text
+                    event_data = {"text": event_text}
+                    yield f"event: answer\ndata: {json.dumps(event_data)}\n\n"
+        except Exception as e:
+            # Handle exceptions or end of stream
+            self.delete_chat(chat_id)
+            logging.error(e)
+            yield
+        finally:
+            if full_response:
+                try:
+                    payload["messages"].append(
+                        {"role": "assistant", "content": full_response}
+                    )
+                    self.supabase.update_payload(chat_id, payload)
+                    if callback:
+                        callback()
+                except Exception as db_error:
+                    self.delete_chat(chat_id)
+                    logging.error("Error updating payload to database: %s", db_error)
+
+    async def __parse_question(self, request: NewChatRequest, chat_id: str):
+        upload_question_request = request.to_UploadQuestionRequest(chat_id)
+        await self.parse_question(upload_question_request)
+
+    @timer(log_level=TimerLogLevel.VERBOSE)
+    async def __solve(self, chat_id: str, language: Language):
+        payload = {"messages": []}
+        chat = self.supabase.get_chat_by_id(chat_id)
+        language = language.name if language else None
+        response = self.math_agent.solve(chat, payload["messages"], language)
+        return StreamingResponse(
+            self.__new_chat_event_generator(response, payload, chat_id),
+            media_type="text/event-stream",
+        )
+
+    async def new_chat(self, request: NewChatRequest):
+        chat_id = self.supabase.create_empty_chat(
+            user_id=request.user_id,
+        )
+        await self.__parse_question(request, chat_id)
+        return await self.__solve(chat_id, request.language)

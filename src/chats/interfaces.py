@@ -94,11 +94,58 @@ class UploadQuestionRequest(BaseModel):
         #     raise HTTPException(status_code=400, detail="Invalid request data")
 
 
+## TO_BE_DELETED
+
+
+class NewChatRequest(BaseModel):
+    user_id: str
+    mode: Mode
+    language: Optional[Language] = None
+    prompt: Optional[str] = None
+    image_file: Optional[UploadFile] = None
+
+    @model_validator(mode="before")
+    def check_image_str_and_prompt(cls, values):
+        image_file, prompt = values.get("image_file"), values.get("prompt")
+        if not image_file and not prompt:
+            raise ValueError("If image_file is empty, then prompt must exist.")
+        return values
+
+    @staticmethod
+    # Dependency to parse QuestionRequest model from form data
+    async def parse_new_chat_request(
+        user_id: str = Form(...),
+        mode: Mode = Form(...),
+        language: Optional[Language] = Form(None),
+        prompt: Optional[str] = Form(None),
+        image_file: Optional[UploadFile] = File(None),
+    ) -> "NewChatRequest":
+        # Construct the NewChatRequest object
+        return NewChatRequest(
+            user_id=user_id,
+            mode=mode,
+            language=language,
+            prompt=prompt,
+            image_file=image_file,
+        )
+        # except ValidationError as e:
+        #     # Handle validation errors, e.g., by raising an HTTP exception
+        #     raise HTTPException(status_code=400, detail="Invalid request data")
+
+    def to_UploadQuestionRequest(self, chat_id: str):
+        return UploadQuestionRequest(
+            chat_id=chat_id,
+            mode=self.mode,
+            prompt=self.prompt,
+            image_file=self.image_file,
+        )
+
+
 class ChatRequest(BaseModel):
     query: Optional[str] = None
     chat_id: str
     language: Optional[Language] = None
 
 
-class NewChatRequest(BaseModel):
+class NewChatIDRequest(BaseModel):
     user_id: str

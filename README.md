@@ -3,7 +3,7 @@
 ### Installation
 
 ```bash
-git clone git@github.com:Cherolfu/asian_math_pro.git
+git clone git@github.com:MathSolverTop/asian_math_pro.git
 cd asian_math_pro
 pip install -r requirements.txt
 ```
