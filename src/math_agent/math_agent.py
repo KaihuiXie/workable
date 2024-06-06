@@ -1,9 +1,6 @@
-import base64
 import logging
-import re
 
 import requests
-from PIL import Image
 from openai import OpenAI
 
 from common.decorators import TimerLogLevel, timer
@@ -20,7 +17,6 @@ from src.math_agent.prompts import (
 )
 from src.supabase.supabase import Supabase
 from src.math_agent.utils import replace_wolfram_image
-from src.utils import bytes_to_base64
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -82,16 +78,6 @@ class MathAgent:
         )
         return stream
 
-    def _extract_wolfram_image(self, wolfram_response):
-        pattern = r'!\[.*?\]\((.*?)\)'
-        match = re.search(pattern, wolfram_response)
-        if match:
-            url = match.group(1)
-            image = base64.b64encode(requests.get(url).content).decode("utf-8")
-            return "data:image/jpeg;base64," + image
-        else:
-            return None
-
     def solve(self, chat, messages, language=None):
         question = chat[ChatColumn.QUESTION]
         learner_mode = chat[ChatColumn.LEARNER_MODE]
@@ -107,8 +93,7 @@ class MathAgent:
                         wolfram_alpha_response, question
                     )
                     extracted_response = replace_wolfram_image(extracted_response)
-                    column = {ChatColumn.WOLFRAM_ANSWER: extracted_response,
-                              ChatColumn.WOLFRAM_IMAGE: self._extract_wolfram_image(extracted_response)}
+                    column = {ChatColumn.WOLFRAM_ANSWER: extracted_response}
                     self.supabase.update_columns_by_primary_id(
                         table="chats", primary_id=chat_id, columns=column
                     )
