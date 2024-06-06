@@ -1,4 +1,4 @@
-from src.supabase.supabase import Supabase
+from src.math_agent.supabase import Supabase
 
 
 class UsersSupabase(Supabase):

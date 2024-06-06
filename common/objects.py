@@ -9,7 +9,7 @@ from src.credits.supabase import CreditsSupabase
 from src.invitations.invitations import Invitations
 from src.invitations.supabase import InvitationsSupabase
 from src.math_agent.math_agent import MathAgent
-from src.supabase.supabase import Supabase
+from src.math_agent.supabase import Supabase
 from src.shared_chats.shared_chats import SharedChat
 from src.shared_chats.supabase import SharedChatsSupabase
 from src.url_platforms.supabase import UrlPlatformsSupabase

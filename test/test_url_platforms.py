@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import sys
@@ -8,7 +9,7 @@ from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 
 from api.main import app
-from src.supabase.supabase import Supabase
+from src.math_agent.supabase import Supabase
 from src.url_platforms.supabase import UrlPlatformsSupabase
 
 

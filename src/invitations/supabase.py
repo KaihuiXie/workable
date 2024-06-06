@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 import dateutil.parser
 
 from common.constants import INVITATION_BONUS, INVITATION_TOKEN_EXPIRATION
-from src.supabase.supabase import Supabase
+from src.math_agent.supabase import Supabase
 
 
 def is_invitation_expired(timestamp):

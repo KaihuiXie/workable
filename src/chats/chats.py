@@ -9,12 +9,12 @@ from starlette.responses import StreamingResponse
 
 from common.decorators import TimerLogLevel, timer
 from src.chats.interfaces import (
+    ChatColumn,
     ChatOwnershipError,
     ChatRequest,
     Mode,
     UploadQuestionRequest,
 )
-from src.supabase.interfaces import ChatColumn
 from src.chats.supabase import ChatsSupabase
 from src.math_agent.math_agent import MathAgent
 from src.utils import check_message_size, preprocess_image
@@ -66,7 +66,7 @@ class Chat:
             image_content = search(parse_result, "image_content")
             if image_content:
                 columns[ChatColumn.IMAGE_CONTENT] = image_content
-            print(f"Prompt of chat {request.chat_id}: {request.prompt}\n\n")
+
             columns[ChatColumn.TEXT_PROMPT] = request.prompt
             wolfram_query = search(parse_result, "wolfram_query")
             if wolfram_query:

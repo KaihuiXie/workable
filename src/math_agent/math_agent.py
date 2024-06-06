@@ -1,10 +1,12 @@
 import logging
+import re
+import time
 
 import requests
 from openai import OpenAI
 
 from common.decorators import TimerLogLevel, timer
-from src.supabase.interfaces import ChatColumn
+from src.chats.interfaces import ChatColumn
 from src.math_agent.prompts import (
     IMAGE_READING_PROMPT,
     LANGUAGE_PROMPT,
@@ -15,7 +17,7 @@ from src.math_agent.prompts import (
     WOLFRAM_ALPHA_SUMMARIZE_TEMPLATE,
     get_user_prompt_for_solve,
 )
-from src.supabase.supabase import Supabase
+from src.math_agent.supabase import Supabase
 from src.math_agent.utils import replace_wolfram_image
 
 # Configure logging

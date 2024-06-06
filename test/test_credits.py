@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 
 from api.main import app
 from src.credits.supabase import CreditsSupabase
-from src.supabase.supabase import Supabase
+from src.math_agent.supabase import Supabase
 
 
 class CreditsTest(unittest.TestCase):

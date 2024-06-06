@@ -3,8 +3,10 @@ from datetime import datetime, timezone
 from common.constants import (
     COST_PER_QUESTION,
     DEFAULT_CREDIT,
+    EVERY_DAY_CREDIT_INCREMENT,
+    INVITATION_BONUS,
 )
-from src.supabase.supabase import Supabase
+from src.math_agent.supabase import Supabase
 
 
 class CreditsSupabase(Supabase):

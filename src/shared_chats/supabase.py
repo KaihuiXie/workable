@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from common.constants import TIME_FORMAT
-from src.supabase.supabase import Supabase
+from src.math_agent.supabase import Supabase
 
 
 class SharedChatsSupabase(Supabase):

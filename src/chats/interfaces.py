@@ -1,8 +1,8 @@
 from enum import Enum
 from typing import Optional
 
-from fastapi import File, Form, UploadFile
-from pydantic import BaseModel, model_validator
+from fastapi import File, Form, HTTPException, UploadFile
+from pydantic import BaseModel, ValidationError, model_validator
 
 
 class ChatOwnershipError(Exception):
@@ -44,6 +44,23 @@ class Language(str, Enum):
             return Language[s.upper()]
         except KeyError:
             raise ValueError(f"{s} is not a valid Language")
+
+
+class ChatColumn(str, Enum):
+    ID = "id"
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"
+    PAYLOAD = "payload"
+    IMAGE_STR = "image_str"
+    LEARNER_MODE = "learner_mode"
+    USER_ID = "user_id"
+    THUMBNAIL_STR = "thumbnail_str"
+    QUESTION = "question"
+    TEXT_PROMPT = "text_prompt"
+    IMAGE_CONTENT = "image_content"
+    WOLFRAM_QUERY = "wolfram_query"
+    WOLFRAM_ANSWER = "wolfram_answer"
+    WOLFRAM_IMAGE = "wolfram_image"
 
 
 class UploadQuestionRequest(BaseModel):

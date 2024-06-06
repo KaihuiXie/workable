@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 
 from api.main import app
-from src.supabase.supabase import Supabase
+from src.math_agent.supabase import Supabase
 
 
 class UsersTest(unittest.TestCase):
