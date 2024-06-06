@@ -200,3 +200,5 @@ class Supabase:
             raise Exception(
                 f"An error occurred during updating {list(columns.keys())} for {table} {primary_id}: {e}"
             )
+
+

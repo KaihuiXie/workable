@@ -1,5 +1,5 @@
-from src.chats.interfaces import ChatColumn
-from src.math_agent.supabase import Supabase
+from src.supabase.interfaces import ChatColumn
+from src.supabase.supabase import Supabase
 from src.utils import generate_thumbnail_string_from_image_string
 
 

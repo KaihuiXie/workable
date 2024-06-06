@@ -1,6 +1,6 @@
 import uuid
 
-from src.math_agent.supabase import Supabase
+from src.supabase.supabase import Supabase
 
 
 def clean_platform_text(platform: str) -> str:
