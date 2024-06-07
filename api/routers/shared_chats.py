@@ -37,7 +37,7 @@ async def get_shared_chat(shared_chat_id: str):
     Get a shared chat by `shared_chat_id`.\n
 
     - param `shared_chat_id`: Shared chat id\n
-    - return: a json object containing all fields for the shared chat, if the requested shared chat exists and doesn't expire yet. Otherwise return `null`.\n
+    - return: a chat object containing all fields for the shared chat snapshot, if the requested shared chat exists and doesn't expire yet. Otherwise return `null`.\n
     """
     try:
         return shared_chats.get_shared_chat(shared_chat_id)

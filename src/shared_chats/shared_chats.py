@@ -3,6 +3,7 @@ import logging
 from datetime import datetime, timezone
 
 from common.constants import SHARED_CHAT_EXPIRE_TIME, TIME_FORMAT
+from src.chats.chats import replace_wolfram_url
 from src.shared_chats.interfaces import CreateSharedChatRequest
 from src.shared_chats.supabase import SharedChatsSupabase
 
@@ -24,14 +25,9 @@ class SharedChat:
             return shared_chat_id
         else:
             return self.supabase.create_shared_chat(
-                chat["user_id"],
                 request.chat_id,
                 chat["updated_at"],
                 chat["payload"],
-                chat["image_str"],
-                chat["question"],
-                chat["thumbnail_str"],
-                chat["learner_mode"],
                 request.is_permanent,
             )
 
@@ -39,7 +35,11 @@ class SharedChat:
         shared_chat = self.supabase.get_shared_chat_by_shared_chat_id(shared_chat_id)
         if self.__is_expired(shared_chat):
             return None
-        return shared_chat
+        chat = self.supabase.get_chat_by_id(shared_chat["chat_id"])
+        chat["payload"] = shared_chat["payload"]
+        chat["updated_at"] = shared_chat["updated_at"]
+        replace_wolfram_url(chat)
+        return chat
 
     def delete_shared_chat_by_chat_id(self, shared_chat_id: str):
         self.supabase.delete_shared_chat_by_chat_id(shared_chat_id)

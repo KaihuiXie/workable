@@ -33,9 +33,14 @@ def search(content: str, tag: str):
     return None
 
 
-def replace_wolfram_image(chat):
+def replace_wolfram_url(chat):
     payload = chat["payload"]
-    if not chat["learner_mode"] and chat["wolfram_image"] and payload and "messages" in payload:
+    if (
+        not chat["learner_mode"]
+        and chat["wolfram_image"]
+        and payload
+        and "messages" in payload
+    ):
         image = chat["wolfram_image"]["image"]
         url = chat["wolfram_image"]["url"]
         for message in payload["messages"]:
@@ -137,7 +142,7 @@ class Chat:
             )
         chat = self.supabase.get_chat_by_id(chat_id)
         payload = chat["payload"]
-        replace_wolfram_image(chat)
+        replace_wolfram_url(chat)
         chat_again = (
             not payload
             or ("messages" not in payload)

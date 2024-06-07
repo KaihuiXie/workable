@@ -11,26 +11,16 @@ class SharedChatsSupabase(Supabase):
 
     def create_shared_chat(
         self,
-        user_id,
         chat_id,
         updated_at,
         payload,
-        image_str,
-        question,
-        thumbnail_str,
-        learner_mode,
         is_permanent=False,
     ):
         try:
             row_dict = {
-                "user_id": user_id,
                 "chat_id": chat_id,
                 "updated_at": updated_at,
                 "payload": payload,
-                "image_str": image_str,
-                "question": question,
-                "thumbnail_str": thumbnail_str,
-                "leaner_mode": learner_mode,
                 "is_permanent": is_permanent,
             }
             data, count = self.supabase.table("shared_chats").insert(row_dict).execute()
