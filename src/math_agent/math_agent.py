@@ -1,3 +1,4 @@
+import base64
 import logging
 import re
 import time
@@ -80,6 +81,23 @@ class MathAgent:
         )
         return stream
 
+    def _extract_wolfram_image(self, wolfram_response):
+        try:
+            pattern = r"!\[.*?\]\((.*?)\)"
+            match = re.search(pattern, wolfram_response)
+            if match:
+                url = match.group(1)
+                image = base64.b64encode(requests.get(url).content).decode("utf-8")
+                return {
+                    "url": url,
+                    "image": "data:image/jpeg;base64," + image,
+                }
+            else:
+                return None
+        except Exception as e:
+            logging.error(e)
+            return None
+
     def solve(self, chat, messages, language=None):
         question = chat[ChatColumn.QUESTION]
         learner_mode = chat[ChatColumn.LEARNER_MODE]
@@ -95,7 +113,12 @@ class MathAgent:
                         wolfram_alpha_response, question
                     )
                     extracted_response = replace_wolfram_image(extracted_response)
-                    column = {ChatColumn.WOLFRAM_ANSWER: extracted_response}
+                    column = {
+                        ChatColumn.WOLFRAM_ANSWER: extracted_response,
+                        ChatColumn.WOLFRAM_IMAGE: self._extract_wolfram_image(
+                            extracted_response
+                        ),
+                    }
                     self.supabase.update_columns_by_primary_id(
                         table="chats", primary_id=chat_id, columns=column
                     )
