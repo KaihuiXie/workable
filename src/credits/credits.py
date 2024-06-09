@@ -35,5 +35,5 @@ class Credit:
             request.user_id, request.credit
         )
 
-    def decrement_credit(self, request: DecrementCreditRequest):
-        return self.supabase.decrement_credit(request.user_id)
+    def decrement_credit(self, user_id):
+        return self.supabase.decrement_credit(user_id)

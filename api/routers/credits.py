@@ -124,7 +124,7 @@ async def decrement_credit(request: DecrementCreditRequest):
       - Will throw error when user doesn't have enough credit\n
     """
     try:
-        credits.decrement_credit(request)
+        credits.decrement_credit(request.user_id)
         return {"decremental": True}
     except Exception as e:
         logging.error(e)

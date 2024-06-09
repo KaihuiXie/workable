@@ -87,6 +87,7 @@ class Chat:
                 columns[ChatColumn.WOLFRAM_QUERY] = wolfram_query
         elif request.prompt:
             columns[ChatColumn.QUESTION] = request.prompt
+            columns[ChatColumn.TEXT_PROMPT] = request.prompt
         else:
             raise HTTPException(
                 status_code=500,
@@ -231,7 +232,8 @@ class Chat:
             media_type="text/event-stream",
         )
 
-    async def new_chat(self, request: NewChatRequest):
+    async def new_chat(self, request: NewChatRequest, creditService):
+        creditService.decrement_credit(request.user_id)
         chat_id = self.supabase.create_empty_chat(
             user_id=request.user_id,
         )

@@ -48,7 +48,7 @@ async def new_chat(
         temp_credit, perm_credit = credits.get_credit(request.user_id)
         if temp_credit + perm_credit <= 0:
             raise ValueError("Not enough credits")
-        return await chats.new_chat(request)
+        return await chats.new_chat(request, credits)
     except ValueError:
         raise HTTPException(
             status_code=405,
