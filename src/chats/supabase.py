@@ -67,6 +67,22 @@ class ChatsSupabase(Supabase):
             return response
         except Exception as e:
             raise Exception(
+                f"An error occurred getting all chats by columns {columns} for user {user_id}: {e}"
+            )
+
+    def get_all_chats(self, user_id: str):
+        try:
+            columns = [
+                ChatColumn.ID,
+                ChatColumn.THUMBNAIL_STR,
+                ChatColumn.QUESTION,
+                ChatColumn.LEARNER_MODE,
+                ChatColumn.CREATED_AT,
+                ChatColumn.TEXT_PROMPT,
+            ]
+            return self.get_all_chats_columns_by_user_id(user_id, columns)
+        except Exception as e:
+            raise Exception(
                 f"An error occurred getting all chats for user {user_id}: {e}"
             )
 

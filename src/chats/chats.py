@@ -12,6 +12,7 @@ from src.chats.interfaces import (
     ChatColumn,
     ChatOwnershipError,
     ChatRequest,
+    GetChatResponse,
     Language,
     Mode,
     NewChatRequest,
@@ -63,7 +64,6 @@ class Chat:
     @timer(log_level=TimerLogLevel.BASIC)
     async def parse_question(self, request: UploadQuestionRequest):
         columns = dict()
-
         if request.image_file:
             image_bytes = await request.image_file.read()
             (
@@ -94,8 +94,8 @@ class Chat:
                 detail=f"At least one of `image_file` or `prompt` are required!",
             )
         columns[ChatColumn.LEARNER_MODE] = request.mode == Mode.LEARNER
-        response = self.supabase.update_chat_columns_by_id(request.chat_id, columns)
-        return response
+        data, count = self.supabase.update_chat_columns_by_id(request.chat_id, columns)
+        return data[1][0]["id"]
 
     @timer(log_level=TimerLogLevel.VERBOSE)
     async def solve(self, request: ChatRequest):
@@ -123,20 +123,16 @@ class Chat:
         )
 
     def get_all_chats(self, user_id: str):
-        columns = [
-            ChatColumn.ID,
-            ChatColumn.THUMBNAIL_STR,
-            ChatColumn.QUESTION,
-            ChatColumn.LEARNER_MODE,
-            ChatColumn.CREATED_AT,
-            ChatColumn.TEXT_PROMPT,
-        ]
-        all_chats = self.supabase.get_all_chats_columns_by_user_id(user_id, columns)
-        # if record["question"] == "", we filter the record out
-        all_chats.data = [chat for chat in all_chats.data if chat["question"] != ""]
-        return all_chats
+        try:
+            all_chats = self.supabase.get_all_chats(user_id)
+            # if record["question"] == "", we filter the record out
+            all_chats.data = [chat for chat in all_chats.data if chat["question"] != ""]
+            return all_chats
+        except Exception as e:
+            print(e)
+            logging.error(e)
 
-    def get_chat(self, chat_id: str, user_id: str):
+    def get_chat(self, chat_id: str, user_id: str) -> GetChatResponse:
         if not self.supabase.user_has_access(chat_id=chat_id, user_id=user_id):
             raise ChatOwnershipError(
                 f"User {user_id} does not have access to chat {chat_id}!"
@@ -149,8 +145,15 @@ class Chat:
             or ("messages" not in payload)
             or check_message_size(payload["messages"])
         )
-        chat["chat_again"] = chat_again
-        return chat
+        response = GetChatResponse(
+            payload=payload,
+            question=chat["question"],
+            image_str=chat["image_str"],
+            chat_again=chat_again,
+            text_prompt=chat["text_prompt"],
+            image_content=chat["image_content"],
+        )
+        return response
 
     def delete_chat(self, chat_id: str):
         self.supabase.delete_chat_by_id(chat_id)

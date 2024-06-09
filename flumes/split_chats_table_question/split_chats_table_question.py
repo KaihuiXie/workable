@@ -12,9 +12,7 @@ def search(question, tag):
     pattern = rf"<{tag}>((.|[\r\n])*?)</{tag}>"
     match = re.search(pattern, question, re.DOTALL)
     if match and match.group(1) != "None":
-        print(f"{tag}: {match.group(1)}")
         return match.group(1)
-    print(f"{tag}: None")
     return None
 
 
