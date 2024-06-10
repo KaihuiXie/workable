@@ -91,16 +91,18 @@ class CreditsTest(unittest.TestCase):
         }
         response = self.test_client.put("/credit/temp", json=payload)
         logging.error(response.json())
+        assert response.json()["credit"] == credit_amount
         assert response.status_code == 200
 
     def test_update_perm_credit(self):
-        credit_amount = 100
+        credit_amount = 101
         payload = {
             "user_id": self.user_id,
             "credit": credit_amount,
         }
         response = self.test_client.put("/credit/perm", json=payload)
         logging.error(response.json())
+        assert response.json()["credit"] == credit_amount
         assert response.status_code == 200
 
 

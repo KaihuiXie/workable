@@ -3,7 +3,15 @@ import logging
 from fastapi import APIRouter, HTTPException
 
 from common.objects import credits
-from src.credits.interfaces import DecrementCreditRequest, UpdateCreditRequest
+from src.credits.interfaces import (
+    CreditResponse,
+    DecrementCreditRequest,
+    DeleteCreditResponse,
+    NewCreditResponse,
+    PermCreditResponse,
+    TempCreditResponse,
+    UpdateCreditRequest,
+)
 
 router = APIRouter(
     tags=["credits"],
@@ -13,8 +21,8 @@ router = APIRouter(
 logging.basicConfig(level=logging.INFO)
 
 
-@router.post("/credit/{user_id}")
-async def create_credit(user_id: str):
+@router.post("/credit/{user_id}", response_model=NewCreditResponse)
+async def create_credit(user_id: str) -> NewCreditResponse:
     """
     Create a credit record for a given user in DB.
 
@@ -22,15 +30,15 @@ async def create_credit(user_id: str):
     - return: `id` type of uuid. The credit record's unique id, \n
     """
     try:
-        id = credits.create_credit(user_id)
-        return {"id": id}
+        credit_id = credits.create_credit(user_id)
+        return NewCreditResponse(id=credit_id)
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/credit/{user_id}")
-async def get_credit(user_id: str):
+@router.get("/credit/{user_id}", response_model=CreditResponse)
+async def get_credit(user_id: str) -> CreditResponse:
     """
     Get the temp and perm credits from a specific user.
 
@@ -39,14 +47,14 @@ async def get_credit(user_id: str):
     """
     try:
         temp_credit, perm_credit = credits.get_credit(user_id)
-        return {"temp_credit": temp_credit, "perm_credit": perm_credit}
+        return CreditResponse(temp_credit=temp_credit, perm_credit=perm_credit)
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/credit/temp/{user_id}")
-async def get_temp_credit(user_id: str):
+@router.get("/credit/temp/{user_id}", response_model=TempCreditResponse)
+async def get_temp_credit(user_id: str) -> TempCreditResponse:
     """
     Get the temp credit from a specific user.
 
@@ -55,14 +63,14 @@ async def get_temp_credit(user_id: str):
     """
     try:
         temp_credit = credits.get_temp_credit(user_id)
-        return {"credit": temp_credit}
+        return TempCreditResponse(credit=temp_credit)
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/credit/perm/{user_id}")
-async def get_perm_credit(user_id: str):
+@router.get("/credit/perm/{user_id}", response_model=PermCreditResponse)
+async def get_perm_credit(user_id: str) -> PermCreditResponse:
     """
     Get the perm credit from a specific user.
 
@@ -71,14 +79,14 @@ async def get_perm_credit(user_id: str):
     """
     try:
         perm_credit = credits.get_perm_credit(user_id)
-        return {"credit": perm_credit}
+        return PermCreditResponse(credit=perm_credit)
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.put("/credit/temp")
-async def update_temp_credit(request: UpdateCreditRequest):
+@router.put("/credit/temp", response_model=TempCreditResponse)
+async def update_temp_credit(request: UpdateCreditRequest) -> TempCreditResponse:
     """
     Update the temp credit for a user.
 
@@ -89,14 +97,14 @@ async def update_temp_credit(request: UpdateCreditRequest):
     """
     try:
         response = credits.update_temp_credit(request)
-        return {"credit": response}
+        return TempCreditResponse(credit=response.data[0]["temp_credit"])
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.put("/credit/perm")
-async def update_perm_credit(request: UpdateCreditRequest):
+@router.put("/credit/perm", response_model=PermCreditResponse)
+async def update_perm_credit(request: UpdateCreditRequest) -> PermCreditResponse:
     """
     Update the perm credit for a user.
 
@@ -107,14 +115,14 @@ async def update_perm_credit(request: UpdateCreditRequest):
     """
     try:
         response = credits.update_perm_credit(request)
-        return {"credit": response}
+        return PermCreditResponse(credit=response.data[0]["perm_credit"])
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.put("/credit")
-async def decrement_credit(request: DecrementCreditRequest):
+@router.put("/credit", response_model=DeleteCreditResponse)
+async def decrement_credit(request: DecrementCreditRequest) -> DeleteCreditResponse:
     """
     Decrement a user's credit according to COST_PER_QUESTION constant.
 
@@ -124,8 +132,13 @@ async def decrement_credit(request: DecrementCreditRequest):
       - Will throw error when user doesn't have enough credit\n
     """
     try:
-        credits.decrement_credit(request.user_id)
-        return {"decremental": True}
+        credits.decrement_credit(request)
+        return DeleteCreditResponse(success=True)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=405,
+            detail=f"User: {request.user_id} doesn't have enough credits to create a new chat",
+        )
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))

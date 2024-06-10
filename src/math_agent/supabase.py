@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
 
 import dateutil.parser
+from supabase import Client, ClientOptions, create_client
 
 from common.constants import EVERY_DAY_CREDIT_INCREMENT
-from supabase import Client, ClientOptions, create_client
 
 
 def is_same_day(date: datetime):
