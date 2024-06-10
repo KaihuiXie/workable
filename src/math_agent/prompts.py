@@ -161,7 +161,7 @@ def get_user_prompt_for_solve(question, answer, learner_mode):
             """
     else:
         mode_prompt += (
-            "1. Return two required sections. 'Step-by-Step Explanation' and 'Result', and an optional 'Figure' section if there is a related figure.\n"
+            "1. Return two required sections. 'Step-by-Step Explanation' and 'Result', and an optional 'Figure' section if there is a related figure. Use BOLD section names.\n"
             "2. 'Step-by-Step Explanation': Only show essential calculation process without too much explanation.\n"
             "3. 'Result': show the final answer"
             + (" in <reference>" if has_answer else "")

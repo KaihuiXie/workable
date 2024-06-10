@@ -70,11 +70,11 @@ class MathAgent:
         return response.choices[0].message.content
 
     @timer(log_level=TimerLogLevel.BASIC)
-    def query(self, messages):
+    def query(self, messages, model="gpt-3.5-turbo-0125", temperature=0.5):
         session = self._cur_openai_client()
         stream = session.chat.completions.create(
-            model="gpt-3.5-turbo-0125",
-            # temperature=0.1,
+            model=model,
+            temperature=temperature,
             messages=[{"role": m["role"], "content": m["content"]} for m in messages],
             stop=["###SYSTEM_PROMPT"],
             stream=True,
@@ -140,7 +140,7 @@ class MathAgent:
                     {"role": "user", "content": user_prompt},
                 ]
             )
-            return self.query(messages)
+            return self.query(messages, model="gpt-4o", temperature=0.1)
         except Exception as e:
             print(e)
             raise Exception(e)
