@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 from common.constants import SHARED_CHAT_EXPIRE_TIME, TIME_FORMAT
 from src.chats.chats import replace_wolfram_url
-from src.shared_chats.interfaces import CreateSharedChatRequest
+from src.shared_chats.interfaces import NewSharedChatRequest
 from src.shared_chats.supabase import SharedChatsSupabase
 
 # Configure logging
@@ -16,7 +16,7 @@ class SharedChat:
         self.supabase = supabase
         self.expire_time = SHARED_CHAT_EXPIRE_TIME
 
-    def create_shared_chat(self, request: CreateSharedChatRequest):
+    def create_shared_chat(self, request: NewSharedChatRequest):
         chat = self.supabase.get_chat_by_id(request.chat_id)
         shared_chat_id = self.__get_existing_shared_chat_id(
             request.chat_id, chat["updated_at"]
@@ -42,10 +42,10 @@ class SharedChat:
         return chat
 
     def delete_shared_chat_by_chat_id(self, shared_chat_id: str):
-        self.supabase.delete_shared_chat_by_chat_id(shared_chat_id)
+        return self.supabase.delete_shared_chat_by_chat_id(shared_chat_id)
 
     def delete_shared_chat_by_shared_chat_id(self, shared_chat_id: str):
-        self.supabase.delete_shared_chat_by_shared_chat_id(shared_chat_id)
+        return self.supabase.delete_shared_chat_by_shared_chat_id(shared_chat_id)
 
     def __get_existing_shared_chat_id(self, chat_id: str, updated_at: str):
         """

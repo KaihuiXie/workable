@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import sys
@@ -101,7 +102,8 @@ class SharedChatsTest(unittest.TestCase):
             "is_permanent": True,
         }
         response = self.test_client.post(f"/shared_chat/create", json=request)
-        shared_chat_id = response.text.strip('"')
+        response_json = json.load(response)
+        shared_chat_id = response_json["shared_chat_id"]
         response = self.test_client.get(f"/shared_chat/{shared_chat_id}")
         self.assertEqual(response.status_code, 200)
 
@@ -112,7 +114,8 @@ class SharedChatsTest(unittest.TestCase):
         }
         response = self.test_client.post(f"/shared_chat/create", json=request)
         self.assertEqual(self.__get_shared_chat_count(), 1)
-        shared_chat_id = response.text.strip('"')
+        response_json = json.load(response)
+        shared_chat_id = response_json["shared_chat_id"]
         response = self.test_client.delete(
             f"/shared_chat/by_shared_chat_id/{shared_chat_id}"
         )
@@ -141,13 +144,13 @@ class SharedChatsTest(unittest.TestCase):
             "is_permanent": True,
         }
         response = self.test_client.post(f"/shared_chat/create", json=request)
-        shared_chat_id_1 = response.text.strip('"')
+        shared_chat_id_1 = json.load(response)["shared_chat_id"]
         response = self.__get_shared_chat(shared_chat_id_1)
         created_at_1 = response["created_at"]
 
         time.sleep(1)
         response = self.test_client.post(f"/shared_chat/create", json=request)
-        shared_chat_id_2 = response.text.strip('"')
+        shared_chat_id_2 = json.load(response)["shared_chat_id"]
         response = self.__get_shared_chat(shared_chat_id_2)
         created_at_2 = response["created_at"]
 
@@ -160,14 +163,14 @@ class SharedChatsTest(unittest.TestCase):
             "is_permanent": False,
         }
         response = self.test_client.post(f"/shared_chat/create", json=request)
-        self.__update_shared_chat_create_time(response.text.strip('"'))
+        shared_chat_id = json.load(response)["shared_chat_id"]
+        self.__update_shared_chat_create_time(shared_chat_id)
         self.assertEqual(self.__get_shared_chat_count(), 1)
 
         time.sleep(1)
-        shared_chat_id = response.text.strip('"')
+        shared_chat_id = json.load(response)["shared_chat_id"]
         response = self.test_client.get(f"/shared_chat/{shared_chat_id}")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.text.strip('"'), "null")
+        self.assertEqual(response.status_code, 404)
         self.assertEqual(self.__get_shared_chat_count(), 0)
 
     def test_permanent_shared_chat_expired(self):
@@ -176,9 +179,10 @@ class SharedChatsTest(unittest.TestCase):
             "is_permanent": True,
         }
         response = self.test_client.post(f"/shared_chat/create", json=request)
-        self.__update_shared_chat_create_time(response.text.strip('"'))
+        shared_chat_id = json.load(response)["shared_chat_id"]
+        self.__update_shared_chat_create_time(shared_chat_id)
         time.sleep(1)
-        shared_chat_id = response.text.strip('"')
+        shared_chat_id = json.load(response)["shared_chat_id"]
         response = self.test_client.get(f"/shared_chat/{shared_chat_id}")
         self.assertEqual(response.status_code, 200)
         self.assertNotEqual(response.text.strip('"'), "null")
