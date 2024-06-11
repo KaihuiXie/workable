@@ -160,12 +160,11 @@ class Chat:
 
     async def __event_generator(self, response, payload, chat_id, callback=None):
         full_response = ""
-        chat_again = check_message_size(payload["messages"])
-        yield f"event: type\n\n"
-        yield f"data: {json.dumps({'chat_again': chat_again})}\n\n"
-
-        yield f"event: answer\n\n"
         try:
+            chat_again = check_message_size(payload["messages"])
+            yield f"event: type\n\n"
+            yield f"data: {json.dumps({'chat_again': chat_again})}\n\n"
+            yield f"event: answer\n\n"
             for event in response:
                 event_text = event.choices[0].delta.content
                 if event_text is not None:
@@ -177,25 +176,28 @@ class Chat:
             logging.error(e)
             yield
         finally:
-            if full_response:
-                try:
-                    payload["messages"].append(
-                        {"role": "assistant", "content": full_response}
-                    )
-                    self.supabase.update_payload(chat_id, payload)
-                    if callback:
-                        callback()
-                except Exception as db_error:
-                    logging.error("Error updating payload to database: %s", db_error)
+            for event in response:
+                event_text = event.choices[0].delta.content
+                if event_text is not None:
+                    full_response += event_text
+            try:
+                payload["messages"].append(
+                    {"role": "assistant", "content": full_response}
+                )
+                self.supabase.update_payload(chat_id, payload)
+                if callback:
+                    callback()
+            except Exception as db_error:
+                logging.error("Error updating payload to database: %s", db_error)
 
     async def __new_chat_event_generator(
         self, response, payload, chat_id, callback=None
     ):
-        yield f"event: chat_id\ndata: {json.dumps(chat_id)}\n\n"
         full_response = ""
-        chat_again = check_message_size(payload["messages"])
-        yield f"event: chat_again\ndata: {json.dumps(chat_again)}\n\n"
         try:
+            yield f"event: chat_id\ndata: {json.dumps(chat_id)}\n\n"
+            chat_again = check_message_size(payload["messages"])
+            yield f"event: chat_again\ndata: {json.dumps(chat_again)}\n\n"
             for event in response:
                 event_text = event.choices[0].delta.content
                 if event_text is not None:
@@ -208,17 +210,20 @@ class Chat:
             logging.error(e)
             yield
         finally:
-            if full_response:
-                try:
-                    payload["messages"].append(
-                        {"role": "assistant", "content": full_response}
-                    )
-                    self.supabase.update_payload(chat_id, payload)
-                    if callback:
-                        callback()
-                except Exception as db_error:
-                    self.delete_chat(chat_id)
-                    logging.error("Error updating payload to database: %s", db_error)
+            for event in response:
+                event_text = event.choices[0].delta.content
+                if event_text is not None:
+                    full_response += event_text
+            try:
+                payload["messages"].append(
+                    {"role": "assistant", "content": full_response}
+                )
+                self.supabase.update_payload(chat_id, payload)
+                if callback:
+                    callback()
+            except Exception as db_error:
+                self.delete_chat(chat_id)
+                logging.error("Error updating payload to database: %s", db_error)
 
     async def __parse_question(self, request: NewChatRequest, chat_id: str):
         upload_question_request = request.to_UploadQuestionRequest(chat_id)

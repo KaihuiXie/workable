@@ -132,7 +132,7 @@ async def decrement_credit(request: DecrementCreditRequest) -> DeleteCreditRespo
       - Will throw error when user doesn't have enough credit\n
     """
     try:
-        credits.decrement_credit(request)
+        credits.decrement_credit(request.user_id)
         return DeleteCreditResponse(success=True)
     except ValueError as e:
         raise HTTPException(

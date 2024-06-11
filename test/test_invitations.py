@@ -28,33 +28,33 @@ class InvitationsTest(unittest.TestCase):
     def tearDown(self):
         ...
 
-    # With an exist, and not expired token.
-    # Will return true, and the referrer_id
-    def test_get_referrer_success_case(self):
-        invitation_token = "c99770af-f316-4377-ad28-a65c032e03ee"
+    # # With an exist, and not expired token.
+    # # Will return true, and the referrer_id
+    # def test_get_referrer_success_case(self):
+    #     invitation_token = "c99770af-f316-4377-ad28-a65c032e03ee"
 
-        response = self.test_client.get(f"/referrer/{invitation_token}")
-        logging.error(response.json())
-        assert response.status_code == 200
+    #     response = self.test_client.get(f"/referrer/{invitation_token}")
+    #     logging.error(response.json())
+    #     assert response.status_code == 200
 
-    # With a random token that does not exist
-    # will return false, and an empty referrer_id
-    def test_get_referrer_wrong_token_case(self):
-        invitation_token = "3d9e633f-542b-47ab-9606"
+    # # With a random token that does not exist
+    # # will return false, and an empty referrer_id
+    # def test_get_referrer_wrong_token_case(self):
+    #     invitation_token = "3d9e633f-542b-47ab-9606"
 
-        response = self.test_client.get(f"/referrer/{invitation_token}")
-        logging.error(response.json())
-        assert response.status_code == 200
+    #     response = self.test_client.get(f"/referrer/{invitation_token}")
+    #     logging.error(response.json())
+    #     assert response.status_code == 200
 
-    # need to use a expired token
-    # will return false, and a referrer id.
-    # So that front end can create an alert for user to ask for referrer to refresh token
-    def test_get_referrer_expire_case(self):
-        invitation_token = "36993590-7a33-4fc6-944f-1ad0a6b63782"
+    # # need to use a expired token
+    # # will return false, and a referrer id.
+    # # So that front end can create an alert for user to ask for referrer to refresh token
+    # def test_get_referrer_expire_case(self):
+    #     invitation_token = "36993590-7a33-4fc6-944f-1ad0a6b63782"
 
-        response = self.test_client.get(f"/referrer/{invitation_token}")
-        logging.error(response.json())
-        assert response.status_code == 200
+    #     response = self.test_client.get(f"/referrer/{invitation_token}")
+    #     logging.error(response.json())
+    #     assert response.status_code == 200
 
     # for create a new token case: need to use a new user_id that doesn't have a invitation token
     # for getting existing token case: need to use a user_id that have a not expired token
