@@ -62,8 +62,6 @@ class ChatsSupabase(Supabase):
                 .order("created_at", desc=True)
                 .execute()
             )
-            # TODO: move grant award logic out
-            self.grant_login_award(user_id)
             return response
         except Exception as e:
             raise Exception(

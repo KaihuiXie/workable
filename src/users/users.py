@@ -28,3 +28,6 @@ class User(UsersSupabase):
 
     async def get_session(self):
         return self.supabase.get_session()
+
+    async def get_daily_bonus(self, user_id):
+        return self.supabase.grant_login_award(user_id)

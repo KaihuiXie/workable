@@ -144,12 +144,13 @@ class Supabase:
         last_award_time = self.get_last_award_time_by_user_id(user_id)
         is_eligible = not is_same_day(dateutil.parser.parse(last_award_time))
         if not is_eligible:
-            return
+            return False
         prev_temp_credit = self.get_temp_credit_by_user_id(user_id)
         self.update_temp_credit_by_user_id(
             user_id, prev_temp_credit + EVERY_DAY_CREDIT_INCREMENT
         )
         self.update_last_award_time_by_user_id(user_id)
+        return True
 
     def get_last_award_time_by_user_id(self, user_id):
         try:
