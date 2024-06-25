@@ -1,8 +1,7 @@
 import logging
-
 from fastapi import APIRouter, Depends, HTTPException
-
 from common.objects import chats, credits
+from starlette.responses import StreamingResponse
 from src.chats.interfaces import (
     AllChatsResponse,
     ChatOwnershipError,
@@ -56,12 +55,9 @@ async def new_chat(
             raise ValueError("Not enough credits")
         return await chats.new_chat(request, credits)
     except ValueError:
-        raise HTTPException(
-            status_code=405,
-            detail=f"User: {request.user_id} doesn't have enough credits to create a new chat",
-        )
+        return await chats.sse_error('Balance is out of credits',405)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return await chats.sse_error('Internet error',500)
 
 
 @router.post("/question_photo", response_model=UploadQuestionResponse)

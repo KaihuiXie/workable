@@ -247,3 +247,9 @@ class Chat:
         )
         await self.__parse_question(request, chat_id)
         return await self.__solve(chat_id, request.language)
+
+    async def sse_error_generator(self, error, status_code):
+        yield f"event: error\ndata: {json.dumps({'error': error, 'status_code': status_code})}\n\n"
+
+    async def sse_error(self, error, status_code):
+        return StreamingResponse(self.sse_error_generator(error, status_code), media_type="text/event-stream")
