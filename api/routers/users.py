@@ -71,6 +71,7 @@ logging.basicConfig(level=logging.INFO)
 #         logging.error(e)
 #         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/daily_bonus/{user_id}")
 async def verify_daily_bonus(user_id):
     """

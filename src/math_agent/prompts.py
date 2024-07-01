@@ -50,7 +50,7 @@ REQUIREMENTS:
 LANGUAGE_PROMPT = f"""
 ==========
 Language Requirement:
-Must response in language {{language}}.
+Must response EVERYTHINg in language {{language}}, including section names "Step-by-Step Explanation", "Knowledge Points", and "Result". Neglect the original content language.
 """
 
 QUESTION_CONTEXT_PROMPT = f"""

@@ -4,10 +4,10 @@ from fastapi import APIRouter, HTTPException
 
 from common.objects import invitations
 from src.invitations.interfaces import (
+    InvitationTokenResponse,
+    RefereeListResponse,
     UpdateInvitationNotificationRequest,
     VerifyUserIsEligibleForBonus,
-    InvitationTokenResponse,
-    RefereeListResponse
 )
 
 router = APIRouter(
@@ -47,7 +47,7 @@ async def get_invitation_by_user_id(user_id: str) -> InvitationTokenResponse:
     """
     try:
         response = invitations.get_invitation_by_user_id(user_id)
-        return InvitationTokenResponse(token = response)
+        return InvitationTokenResponse(token=response)
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
@@ -90,7 +90,7 @@ async def get_referee_list(user_id: str) -> RefereeListResponse:
 # async def get_notified(user_id: str) -> bool:
 #     """
 #     will be deprecated
-#     see if the user is notified or not 
+#     see if the user is notified or not
 #     - input: \n
 #       - user_id : `uuid`, Unique uuid of the user.\n
 #     - return: `bool` \n
