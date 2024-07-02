@@ -1,11 +1,12 @@
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from starlette.responses import StreamingResponse
 
 from common.objects import chats, credits
 from src.chats.interfaces import (
     AllChatsResponse,
+    AuthorizationError,
     ChatOwnershipError,
     ChatRequest,
     DeleteChatResponse,
@@ -28,87 +29,148 @@ logging.basicConfig(level=logging.INFO)
 
 
 @router.post("/new_chat_id", response_model=NewChatResponse)
-async def get_new_chat_id(request: NewChatIDRequest) -> NewChatResponse:
+async def get_new_chat_id(
+    chat_request: NewChatIDRequest, request: Request
+) -> NewChatResponse:
     try:
-        temp_credit, perm_credit = credits.get_credit(request.user_id)
+        # get the authorization header
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            raise AuthorizationError("Authorization header missing")
+
+        temp_credit, perm_credit = credits.get_credit(chat_request.user_id)
         if temp_credit + perm_credit <= 0:
             raise ValueError("Not enough credits")
-        chat_id = chats.get_new_chat_id(request.user_id)
+
+        chat_id = chats.get_new_chat_id(
+            chat_request.user_id, authorization.replace("Bearer ", "")
+        )
         return NewChatResponse(chat_id=chat_id)
     except ValueError:
         raise HTTPException(
             status_code=405,
-            detail=f"User: {request.user_id} doesn't have enough credits to create a new chat",
+            detail=f"User: {chat_request.user_id} doesn't have enough credits to create a new chat",
         )
+    except AuthorizationError as e:
+        raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"An error occurred during creating new chat id: {str(e)}",
+            detail=str(e),
         )
 
 
 @router.post("/new_chat")
 async def new_chat(
-    request: NewChatRequest = Depends(NewChatRequest.parse_new_chat_request),
+    request: Request,
+    chat_request: NewChatRequest = Depends(NewChatRequest.parse_new_chat_request),
 ):
     try:
-        temp_credit, perm_credit = credits.get_credit(request.user_id)
+        # get the authorization header
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            raise AuthorizationError("Authorization header missing")
+        temp_credit, perm_credit = credits.get_credit(chat_request.user_id)
         if temp_credit + perm_credit <= 0:
             raise ValueError("Not enough credits")
-        return await chats.new_chat(request, credits)
+        return await chats.new_chat(
+            chat_request, credits, authorization.replace("Bearer ", "")
+        )
     except ValueError:
         return await chats.sse_error("Balance is out of credits", 405)
+    except AuthorizationError as e:
+        raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:
-        return await chats.sse_error("Internet error", 500)
+        return await chats.sse_error("Internet error", 500, str(e))
 
 
 @router.post("/question_photo", response_model=UploadQuestionResponse)
 async def upload_question_photo(
-    request: UploadQuestionRequest = Depends(
+    request: Request,
+    chat_request: UploadQuestionRequest = Depends(
         UploadQuestionRequest.parse_question_request
     ),
 ) -> UploadQuestionResponse:
     try:
-        chat_id = await chats.parse_question(request)
-        return UploadQuestionResponse(chat_id=chat_id)
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"An error occurred during reading image: {str(e)}"
+        # get the authorization header
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            raise AuthorizationError("Authorization header missing")
+
+        chat_id = await chats.parse_question(
+            chat_request, authorization.replace("Bearer ", "")
         )
+        return UploadQuestionResponse(chat_id=chat_id)
+    except AuthorizationError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/solve", response_model=SSEResponse)
-async def solve(request: ChatRequest):
+async def solve(chat_request: ChatRequest, request: Request):
     try:
-        return await chats.solve(request)
+        # get the authorization header
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            raise AuthorizationError("Authorization header missing")
+
+        return await chats.solve(chat_request, authorization.replace("Bearer ", ""))
+    except AuthorizationError as e:
+        raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/chat", response_model=SSEResponse)
-async def chat(request: ChatRequest):
+async def chat(chat_request: ChatRequest, request: Request):
     try:
-        return await chats.chat(request)
+        # get the authorization header
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            raise AuthorizationError("Authorization header missing")
+
+        return await chats.chat(chat_request, authorization.replace("Bearer ", ""))
+    except AuthorizationError as e:
+        raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/all_chats/{user_id}", response_model=AllChatsResponse)
-async def all_chats(user_id: str):
+async def all_chats(user_id: str, request: Request):
     try:
-        response = chats.get_all_chats(user_id)
+        # get the authorization header
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            raise AuthorizationError("Authorization header missing")
+
+        response = chats.get_all_chats(user_id, authorization.replace("Bearer ", ""))
         return AllChatsResponse(data=response.data, count=response.count)
+    except AuthorizationError as e:
+        raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/chat/{chat_id}", response_model=GetChatResponse)
-async def get_chat(chat_id: str, user_id: str):
+async def get_chat(chat_id: str, user_id: str, request: Request):
     try:
-        return chats.get_chat(chat_id=chat_id, user_id=user_id)
+        # get the authorization header
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            raise AuthorizationError("Authorization header missing")
+
+        return chats.get_chat(
+            chat_id=chat_id,
+            user_id=user_id,
+            auth_token=authorization.replace("Bearer ", ""),
+        )
+    except AuthorizationError as e:
+        raise HTTPException(status_code=401, detail=str(e))
     except ChatOwnershipError as e:
         logging.error(e)
         raise HTTPException(status_code=405, detail=str(e))
@@ -118,10 +180,17 @@ async def get_chat(chat_id: str, user_id: str):
 
 
 @router.delete("/chat/{chat_id}", response_model=DeleteChatResponse)
-async def delete_chat(chat_id: str):
+async def delete_chat(chat_id: str, request: Request):
     try:
-        chats.delete_chat(chat_id)
+        # get the authorization header
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            raise AuthorizationError("Authorization header missing")
+
+        chats.delete_chat(chat_id, authorization.replace("Bearer ", ""))
         return DeleteChatResponse(chat_id=chat_id)
+    except AuthorizationError as e:
+        raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))

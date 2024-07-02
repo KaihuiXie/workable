@@ -13,6 +13,13 @@ class ChatOwnershipError(Exception):
         super().__init__(message)
 
 
+class AuthorizationError(Exception):
+    """Custom exception for authorization errors. usually happens when frontend doesn't send authorization header"""
+
+    def __init__(self, message):
+        super().__init__(message)
+
+
 # Define the Mode enumeration
 class Mode(str, Enum):
     LEARNER = "learner"
@@ -89,7 +96,6 @@ class UploadQuestionRequest(BaseModel):
         prompt: Optional[str] = Form(None),
         image_file: Optional[UploadFile] = File(None),
     ) -> "UploadQuestionRequest":
-
         # Construct the QuestionRequest object
         return UploadQuestionRequest(
             chat_id=chat_id, mode=mode, prompt=prompt, image_file=image_file

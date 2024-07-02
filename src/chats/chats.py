@@ -56,13 +56,14 @@ class Chat:
         self.math_agent = math_agent
 
     # TO_BE_DELETED
-    def get_new_chat_id(self, user_id: str):
+    def get_new_chat_id(self, user_id: str, auth_token: str):
         return self.supabase.create_empty_chat(
             user_id=user_id,
+            auth_token=auth_token,
         )
 
     @timer(log_level=TimerLogLevel.BASIC)
-    async def parse_question(self, request: UploadQuestionRequest):
+    async def parse_question(self, request: UploadQuestionRequest, auth_token):
         columns = dict()
         if request.image_file:
             image_bytes = await request.image_file.read()
@@ -94,13 +95,15 @@ class Chat:
                 detail=f"At least one of `image_file` or `prompt` are required!",
             )
         columns[ChatColumn.LEARNER_MODE] = request.mode == Mode.LEARNER
-        data, count = self.supabase.update_chat_columns_by_id(request.chat_id, columns)
+        data, count = self.supabase.update_chat_columns_by_id(
+            request.chat_id, columns, auth_token
+        )
         return data[1][0]["id"]
 
     @timer(log_level=TimerLogLevel.VERBOSE)
-    async def solve(self, request: ChatRequest):
+    async def solve(self, request: ChatRequest, auth_token):
         payload = {"messages": []}
-        chat = self.supabase.get_chat_by_id(request.chat_id)
+        chat = self.supabase.get_chat_by_id(request.chat_id, auth_token)
         language = request.language.name if request.language else None
         response = self.math_agent.solve(chat, payload["messages"], language)
         return StreamingResponse(
@@ -111,9 +114,9 @@ class Chat:
     # TO_BE_DELETED
 
     @timer(log_level=TimerLogLevel.BASIC)
-    async def chat(self, request: ChatRequest):
+    async def chat(self, request: ChatRequest, auth_token):
         payload = self.supabase.get_chat_column_by_id(
-            request.chat_id, ChatColumn.PAYLOAD
+            request.chat_id, ChatColumn.PAYLOAD, auth_token
         )
         payload["messages"].append({"role": "user", "content": request.query})
         response = self.math_agent.query(payload["messages"])
@@ -122,9 +125,9 @@ class Chat:
             media_type="text/event-stream",
         )
 
-    def get_all_chats(self, user_id: str):
+    def get_all_chats(self, user_id: str, auth_token):
         try:
-            all_chats = self.supabase.get_all_chats(user_id)
+            all_chats = self.supabase.get_all_chats(user_id, auth_token)
             # if record["question"] == "", we filter the record out
             all_chats.data = [chat for chat in all_chats.data if chat["question"] != ""]
             return all_chats
@@ -132,12 +135,14 @@ class Chat:
             print(e)
             logging.error(e)
 
-    def get_chat(self, chat_id: str, user_id: str) -> GetChatResponse:
-        if not self.supabase.user_has_access(chat_id=chat_id, user_id=user_id):
+    def get_chat(self, chat_id: str, user_id: str, auth_token) -> GetChatResponse:
+        if not self.supabase.user_has_access(
+            chat_id=chat_id, user_id=user_id
+        ):  # TODO: maybe don't need this anymore
             raise ChatOwnershipError(
                 f"User {user_id} does not have access to chat {chat_id}!"
             )
-        chat = self.supabase.get_chat_by_id(chat_id)
+        chat = self.supabase.get_chat_by_id(chat_id, auth_token)
         payload = chat["payload"]
         replace_wolfram_url(chat)
         chat_again = (
@@ -155,8 +160,8 @@ class Chat:
         )
         return response
 
-    def delete_chat(self, chat_id: str):
-        self.supabase.delete_chat_by_id(chat_id)
+    def delete_chat(self, chat_id: str, auth_token):
+        self.supabase.delete_chat_by_id(chat_id, auth_token)
 
     async def __event_generator(self, response, payload, chat_id, callback=None):
         full_response = ""
@@ -225,14 +230,14 @@ class Chat:
                 self.delete_chat(chat_id)
                 logging.error("Error updating payload to database: %s", db_error)
 
-    async def __parse_question(self, request: NewChatRequest, chat_id: str):
+    async def __parse_question(self, request: NewChatRequest, chat_id: str, auth_token):
         upload_question_request = request.to_UploadQuestionRequest(chat_id)
-        await self.parse_question(upload_question_request)
+        await self.parse_question(upload_question_request, auth_token)
 
     @timer(log_level=TimerLogLevel.VERBOSE)
-    async def __solve(self, chat_id: str, language: Language):
+    async def __solve(self, chat_id: str, language: Language, auth_token):
         payload = {"messages": []}
-        chat = self.supabase.get_chat_by_id(chat_id)
+        chat = self.supabase.get_chat_by_id(chat_id, auth_token)
         language = language.name if language else None
         response = self.math_agent.solve(chat, payload["messages"], language)
         return StreamingResponse(
@@ -240,13 +245,14 @@ class Chat:
             media_type="text/event-stream",
         )
 
-    async def new_chat(self, request: NewChatRequest, creditService):
+    async def new_chat(self, request: NewChatRequest, creditService, auth_token):
         creditService.decrement_credit(request.user_id)
         chat_id = self.supabase.create_empty_chat(
             user_id=request.user_id,
+            auth_token=auth_token,
         )
-        await self.__parse_question(request, chat_id)
-        return await self.__solve(chat_id, request.language)
+        await self.__parse_question(request, chat_id, auth_token)
+        return await self.__solve(chat_id, request.language, auth_token)
 
     async def sse_error_generator(self, error, status_code):
         yield f"event: error\ndata: {json.dumps({'error': error, 'status_code': status_code})}\n\n"

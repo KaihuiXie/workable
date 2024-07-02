@@ -1,6 +1,19 @@
+import os
+
+from gotrue import SignInWithEmailAndPasswordCredentials, SignInWithPasswordCredentials
+from supabase import Client, ClientOptions, create_client
+
 from src.chats.interfaces import ChatColumn
 from src.math_agent.supabase import Supabase
 from src.utils import generate_thumbnail_string_from_image_string
+
+
+def create_supabase_client_by_auth_token(auth_token):
+    return create_client(
+        os.getenv("SUPABASE_URL"),
+        os.getenv("SUPABASE_KEY"),
+        ClientOptions(headers={"Authorization": f"Bearer {auth_token}"}),
+    )
 
 
 class ChatsSupabase(Supabase):
@@ -38,8 +51,9 @@ class ChatsSupabase(Supabase):
                 f"An error occurred during getting {columns} by chat_id {chat_id}: {e}"
             )
 
-    def get_chat_column_by_id(self, chat_id: str, column: ChatColumn):
+    def get_chat_column_by_id(self, chat_id: str, column: ChatColumn, auth_token):
         try:
+            self.supabase: Client = create_supabase_client_by_auth_token(auth_token)
             data, count = (
                 self.supabase.from_(self.table)
                 .select(column)
@@ -52,8 +66,11 @@ class ChatsSupabase(Supabase):
                 f"An error occurred during getting {column} by chat_id {chat_id}: {e}"
             )
 
-    def get_all_chats_columns_by_user_id(self, user_id: str, columns: list[ChatColumn]):
+    def get_all_chats_columns_by_user_id(
+        self, user_id: str, columns: list[ChatColumn], auth_token
+    ):
         try:
+            self.supabase: Client = create_supabase_client_by_auth_token(auth_token)
             columns = ", ".join(columns)
             response = (
                 self.supabase.from_("chats")
@@ -68,7 +85,7 @@ class ChatsSupabase(Supabase):
                 f"An error occurred getting all chats by columns {columns} for user {user_id}: {e}"
             )
 
-    def get_all_chats(self, user_id: str):
+    def get_all_chats(self, user_id: str, auth_token):
         try:
             columns = [
                 ChatColumn.ID,
@@ -78,14 +95,17 @@ class ChatsSupabase(Supabase):
                 ChatColumn.CREATED_AT,
                 ChatColumn.TEXT_PROMPT,
             ]
-            return self.get_all_chats_columns_by_user_id(user_id, columns)
+            return self.get_all_chats_columns_by_user_id(user_id, columns, auth_token)
         except Exception as e:
             raise Exception(
                 f"An error occurred getting all chats for user {user_id}: {e}"
             )
 
-    def update_chat_columns_by_id(self, chat_id: str, columns: dict[ChatColumn:str]):
+    def update_chat_columns_by_id(
+        self, chat_id: str, columns: dict[ChatColumn:str], auth_token
+    ):
         try:
+            self.supabase: Client = create_supabase_client_by_auth_token(auth_token)
             response = (
                 self.supabase.table(self.table)
                 .update(columns)
@@ -152,3 +172,19 @@ class ChatsSupabase(Supabase):
             raise Exception(
                 f"An error occurred during updating question for chat {chat_id}: {e}"
             )
+
+    def login(self, username, password):
+        try:
+            response = self.supabase.auth.sign_in_with_password(
+                {"email": username, "password": password}
+            )
+            return response
+        except Exception as e:
+            raise Exception(f"An error occurred during login for user {username}: {e}")
+
+    def get_auth_token(self):
+        try:
+            response = self.supabase.auth.get_session().access_token
+            return response
+        except Exception as e:
+            raise Exception(f"An error occurred during getting auth token: {e}")

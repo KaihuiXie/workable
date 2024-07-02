@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timezone
 
 import dateutil.parser
@@ -10,6 +11,14 @@ def is_same_day(date: datetime):
     return date.date() == datetime.utcnow().date()
 
 
+def create_supabase_client_by_auth_token(auth_token):
+    return create_client(
+        os.getenv("SUPABASE_URL"),
+        os.getenv("SUPABASE_KEY"),
+        ClientOptions(headers={"Authorization": f"Bearer {auth_token}"}),
+    )
+
+
 class Supabase:
     def __init__(self, url, key):
         self.supabase: Client = create_client(
@@ -20,8 +29,9 @@ class Supabase:
         return self.supabase
 
     ### Shared function
-    def get_chat_by_id(self, chat_id):
+    def get_chat_by_id(self, chat_id, auth_token):
         try:
+            self.supabase: Client = create_supabase_client_by_auth_token(auth_token)
             data, count = (
                 self.supabase.from_("chats").select("*").eq("id", chat_id).execute()
             )
@@ -32,8 +42,9 @@ class Supabase:
             )
 
     ### Shared function
-    def create_empty_chat(self, user_id):
+    def create_empty_chat(self, user_id, auth_token):
         try:
+            self.supabase: Client = create_supabase_client_by_auth_token(auth_token)
             row_dict = {
                 "user_id": user_id,
             }
@@ -79,8 +90,9 @@ class Supabase:
             )
 
     ### Shared function
-    def delete_chat_by_id(self, chat_id):
+    def delete_chat_by_id(self, chat_id, auth_token):
         try:
+            self.supabase: Client = create_supabase_client_by_auth_token(auth_token)
             response = self.supabase.table("chats").delete().eq("id", chat_id).execute()
             return response
         except Exception as e:
