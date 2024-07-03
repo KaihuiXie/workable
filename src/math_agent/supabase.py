@@ -28,7 +28,7 @@ class Supabase:
     def client(self):
         return self.supabase
 
-    ### Shared function
+    ### Get chat function
     def get_chat_by_id(self, chat_id, auth_token):
         try:
             self.supabase: Client = create_supabase_client_by_auth_token(auth_token)
@@ -41,6 +41,18 @@ class Supabase:
                 f"An error occurred during getting chat question by chat_id {chat_id}: {e}"
             )
 
+    ### Shared function
+    def get_shared_chat_by_id(self, chat_id):
+        try:
+            data, count = (
+                self.supabase.from_("chats").select("*").eq("id", chat_id).execute()
+            )
+            return data[1][0]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting chat question by chat_id {chat_id}: {e}"
+            )
+        
     ### Shared function
     def create_empty_chat(self, user_id, auth_token):
         try:

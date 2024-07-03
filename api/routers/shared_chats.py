@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 
 from common.objects import shared_chats
 from src.shared_chats.interfaces import (
@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 @router.post("/create", response_model=NewSharedChatResponse)
-async def create_shared_chat(request: NewSharedChatRequest) -> NewSharedChatResponse:
+async def create_shared_chat(request:Request, shared_chat_request: NewSharedChatRequest) -> NewSharedChatResponse:
     """
     Create a shared chat for the chat specified in the request.
 
@@ -31,7 +31,8 @@ async def create_shared_chat(request: NewSharedChatRequest) -> NewSharedChatResp
       - `shared_chat_id`, which will be used when users want to get the shared chat\n
     """
     try:
-        shared_chat_id = shared_chats.create_shared_chat(request)
+        authorization = request.headers.get("Authorization")
+        shared_chat_id = shared_chats.create_shared_chat(shared_chat_request, authorization)
         return NewSharedChatResponse(shared_chat_id=shared_chat_id)
     except Exception as e:
         logging.error(e)

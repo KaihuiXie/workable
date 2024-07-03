@@ -16,8 +16,8 @@ class SharedChat:
         self.supabase = supabase
         self.expire_time = SHARED_CHAT_EXPIRE_TIME
 
-    def create_shared_chat(self, request: NewSharedChatRequest):
-        chat = self.supabase.get_chat_by_id(request.chat_id)
+    def create_shared_chat(self, request: NewSharedChatRequest, auth_token):
+        chat = self.supabase.get_chat_by_id(request.chat_id, auth_token)
         shared_chat_id = self.__get_existing_shared_chat_id(
             request.chat_id, chat["updated_at"]
         )
@@ -35,7 +35,7 @@ class SharedChat:
         shared_chat = self.supabase.get_shared_chat_by_shared_chat_id(shared_chat_id)
         if self.__is_expired(shared_chat):
             return None
-        chat = self.supabase.get_chat_by_id(shared_chat["chat_id"])
+        chat = self.supabase.get_shared_chat_by_id(shared_chat["chat_id"])
         chat["payload"] = shared_chat["payload"]
         chat["updated_at"] = shared_chat["updated_at"]
         replace_wolfram_url(chat)
