@@ -5,7 +5,15 @@ import yaml
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routers import chats, credits, invitations, shared_chats, url_platforms, users
+from api.routers import (
+    admin,
+    chats,
+    credits,
+    invitations,
+    shared_chats,
+    url_platforms,
+    users,
+)
 from common.objects import supabase
 from src.middlewares import ExtendTimeoutMiddleware, TimerMiddleware
 
@@ -14,12 +22,16 @@ logging.basicConfig(level=logging.INFO)
 
 tags_metadata = [
     {
+        "name": "admin",
+        "description": "Admin operations. [DANGER ZONE]",
+    },
+    {
         "name": "users",
-        "description": "TODO",  # TODO: add description
+        "description": "User operations",
     },
     {
         "name": "chats",
-        "description": "TODO",  # TODO: add description
+        "description": "CRUD operations of chats.",
     },
     {
         "name": "shared_chat",
@@ -69,6 +81,7 @@ app.include_router(chats.router)
 app.include_router(invitations.router)
 app.include_router(credits.router)
 app.include_router(url_platforms.router)
+app.include_router(admin.router)
 
 
 @app.get("/health")

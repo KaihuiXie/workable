@@ -2,6 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
+from src.admin.admin import AdminSupabase
 from src.chats.chats import Chat
 from src.chats.supabase import ChatsSupabase
 from src.credits.credits import Credit
@@ -30,3 +31,4 @@ credits = Credit(CreditsSupabase(supabase))
 invitations = Invitations(InvitationsSupabase(supabase))
 users = User(UsersSupabase(supabase))
 url_platforms = UrlPlatforms(UrlPlatformsSupabase(supabase))
+admin = AdminSupabase(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_ROLE"))
