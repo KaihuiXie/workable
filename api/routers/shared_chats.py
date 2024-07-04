@@ -36,7 +36,7 @@ async def create_shared_chat(request: Request, shared_chat_request: NewSharedCha
         if not authorization:
             raise AuthorizationError("Authorization header missing")
         shared_chat_id = shared_chats.create_shared_chat(
-            shared_chat_request, authorization)
+            shared_chat_request, authorization.replace("Bearer ", ""))
         return NewSharedChatResponse(shared_chat_id=shared_chat_id)
     except AuthorizationError as e:
         raise HTTPException(status_code=401, detail=str(e))
