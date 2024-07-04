@@ -8,6 +8,7 @@ from src.shared_chats.interfaces import (
     GetSharedChatResponse,
     NewSharedChatRequest,
     NewSharedChatResponse,
+    AuthorizationError,
 )
 
 router = APIRouter(
@@ -20,7 +21,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 @router.post("/create", response_model=NewSharedChatResponse)
-async def create_shared_chat(request:Request, shared_chat_request: NewSharedChatRequest) -> NewSharedChatResponse:
+async def create_shared_chat(request: Request, shared_chat_request: NewSharedChatRequest) -> NewSharedChatResponse:
     """
     Create a shared chat for the chat specified in the request.
 
@@ -32,8 +33,13 @@ async def create_shared_chat(request:Request, shared_chat_request: NewSharedChat
     """
     try:
         authorization = request.headers.get("Authorization")
-        shared_chat_id = shared_chats.create_shared_chat(shared_chat_request, authorization)
+        if not authorization:
+            raise AuthorizationError("Authorization header missing")
+        shared_chat_id = shared_chats.create_shared_chat(
+            shared_chat_request, authorization)
         return NewSharedChatResponse(shared_chat_id=shared_chat_id)
+    except AuthorizationError as e:
+        raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
@@ -76,7 +82,8 @@ async def delete_shared_chat_by_shared_chat_id(
     - return: a list of the IDs of the deleted shared chat.\n
     """
     try:
-        response = shared_chats.delete_shared_chat_by_shared_chat_id(shared_chat_id)
+        response = shared_chats.delete_shared_chat_by_shared_chat_id(
+            shared_chat_id)
         return DeleteSharedChatResponse(
             shared_chat_id=[chat["id"] for chat in response.data]
         )
