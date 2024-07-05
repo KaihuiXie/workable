@@ -42,11 +42,11 @@ class SharedChatsTest(unittest.TestCase):
     @classmethod
     def __create_chat(cls):
         user_id = "88257e09-ce6f-4165-bc34-31bf0c873f29"  # lck2048@gmail.com
-        cls.chat_id = cls.supabase.create_empty_chat(user_id, 'auth_token')
+        cls.chat_id = cls.supabase.create_empty_chat(user_id, "auth_token")
 
     @classmethod
     def __delete_chat(cls):
-        cls.supabase.delete_chat_by_id(cls.chat_id, 'auth_token')
+        cls.supabase.delete_chat_by_id(cls.chat_id, "auth_token")
 
     def setUp(self):
         ...

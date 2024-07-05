@@ -52,7 +52,7 @@ class Supabase:
             raise Exception(
                 f"An error occurred during getting chat question by chat_id {chat_id}: {e}"
             )
-        
+
     ### Shared function
     def create_empty_chat(self, user_id, auth_token):
         try:

@@ -7,9 +7,11 @@ class AdminSupabase:
             url, key, options=ClientOptions(flow_type="pkce")
         )
 
-    def invite_user_by_email(self, email: str):
+    def invite_user_by_email(self, email: str, redirect_to_url: str):
         try:
-            response = self.supabase.auth.admin.invite_user_by_email(email)
+            response = self.supabase.auth.admin.invite_user_by_email(
+                email, options={"redirect_to": redirect_to_url}
+            )
             return response.user.id
         except Exception as e:
             raise Exception(

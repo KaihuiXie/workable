@@ -13,12 +13,14 @@ class NewSharedChatRequest(BaseModel):
         True, description="Whether this shared chat is permanent"
     )
 
+
 class AuthorizationError(Exception):
     """Custom exception for authorization errors. usually happens when frontend doesn't send authorization header"""
 
     def __init__(self, message):
         super().__init__(message)
-        
+
+
 class NewSharedChatResponse(BaseModel):
     shared_chat_id: str = Field(..., description="The ID of the shared chat")
 
