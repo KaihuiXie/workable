@@ -19,6 +19,5 @@ async def invite_user_by_email(request: InviteByEmailRequest) -> InviteByEmailRe
     try:
         user_id = admin.invite_user_by_email(request.email, request.redirect_to_url)
         return InviteByEmailResponse(user_id=user_id)
-    except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=str(e.detail))
