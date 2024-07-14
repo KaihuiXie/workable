@@ -57,12 +57,8 @@ app = FastAPI(openapi_tags=tags_metadata)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://react-learning-app-blush.vercel.app",
-        "http://react-learning-app-blush.vercel.app",
-        "https://react-learning-app-be-main.vercel.app",
-        "https://react-learning-app-rnpg.vercel.app",
-        "https://bedev.mathsolver.top",
-        "https://fedev.mathsolver.top",
+        "https://math-solver-frontend-five.vercel.app/",
+        "https://dev.mathsolver.top",
         "http://localhost:3000",
         "https://localhost:3000",
         "https://chat.mathsolver.top",
