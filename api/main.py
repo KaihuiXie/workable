@@ -59,8 +59,8 @@ app.add_middleware(
     allow_origins=[
         "https://math-solver-frontend-five.vercel.app",
         "http://math-solver-frontend-five.vercel.app",
-        "https://mathsolver-frontend-dev.vercel.app/",
-        "http://mathsolver-frontend-dev.vercel.app/",
+        "https://mathsolver-frontend-dev.vercel.app",
+        "http://mathsolver-frontend-dev.vercel.app",
         "https://dev.mathsolver.top",
         "http://localhost:3000",
         "https://localhost:3000",
