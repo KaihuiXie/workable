@@ -5,10 +5,11 @@ import time
 from datetime import datetime, timezone
 
 from fastapi import Depends, HTTPException
-from starlette.responses import StreamingResponse
+from fastapi.responses import StreamingResponse
 
 from common.decorators import TimerLogLevel, timer
 from src.chats.interfaces import (
+    AuthorizationError,
     ChatColumn,
     ChatOwnershipError,
     ChatRequest,
@@ -235,24 +236,31 @@ class Chat:
         await self.parse_question(upload_question_request, auth_token)
 
     @timer(log_level=TimerLogLevel.VERBOSE)
-    async def __solve(self, chat_id: str, language: Language, auth_token):
+    async def __solve(self, chat_id: str, language: Language, auth_token, callback=None):
         payload = {"messages": []}
-        chat = self.supabase.get_chat_by_id(chat_id, auth_token)
+        try:
+            chat = self.supabase.get_chat_by_id(chat_id, auth_token)
+        except Exception as e:
+            self.delete_chat(chat_id,auth_token)
+            raise AuthorizationError("Authorization header missing")
         language = language.name if language else None
         response = self.math_agent.solve(chat, payload["messages"], language)
         return StreamingResponse(
-            self.__new_chat_event_generator(response, payload, chat_id),
+            self.__new_chat_event_generator(response, payload, chat_id, callback=callback),
             media_type="text/event-stream",
         )
 
     async def new_chat(self, request: NewChatRequest, creditService, auth_token):
-        creditService.decrement_credit(request.user_id)
         chat_id = self.supabase.create_empty_chat(
             user_id=request.user_id,
             auth_token=auth_token,
         )
-        await self.__parse_question(request, chat_id, auth_token)
-        return await self.__solve(chat_id, request.language, auth_token)
+        try:
+            await self.__parse_question(request, chat_id, auth_token)
+        except Exception as e:
+            self.delete_chat(chat_id,auth_token)
+            raise AuthorizationError("Authorization header missing")
+        return await self.__solve(chat_id, request.language, auth_token,callback = creditService.decrement_credit(request.user_id))
 
     async def sse_error_generator(self, error, status_code):
         yield f"event: error\ndata: {json.dumps({'error': error, 'status_code': status_code})}\n\n"
