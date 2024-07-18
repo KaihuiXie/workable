@@ -79,9 +79,9 @@ async def new_chat(
     except ValueError:
         return await chats.sse_error("Balance is out of credits", 405)
     except AuthorizationError as e:
-        raise HTTPException(status_code=401, detail=str(e))
+        return await chats.sse_error(e, 401)
     except Exception as e:
-        return await chats.sse_error("Internet error", 500, str(e))
+        return await chats.sse_error(f"Internet error + {e}", 500)
 
 
 @router.post("/question_photo", response_model=UploadQuestionResponse)
