@@ -20,6 +20,13 @@ class AuthorizationError(Exception):
         super().__init__(message)
 
 
+class NewChatError(Exception):
+    """Custom exception for all errors related to new chat"""
+
+    def __init__(self, message):
+        super().__init__(message)
+
+
 # Define the Mode enumeration
 class Mode(str, Enum):
     LEARNER = "learner"

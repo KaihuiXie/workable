@@ -14,6 +14,7 @@ from src.chats.interfaces import (
     GetChatResponse,
     Language,
     Mode,
+    NewChatError,
     NewChatRequest,
     UploadQuestionRequest,
 )
@@ -234,17 +235,21 @@ class Chat:
         await self.parse_question(upload_question_request, auth_token)
 
     @timer(log_level=TimerLogLevel.VERBOSE)
-    async def __solve(self, chat_id: str, language: Language, auth_token, callback=None):
+    async def __solve(
+        self, chat_id: str, language: Language, auth_token, callback=None
+    ):
         payload = {"messages": []}
         try:
             chat = self.supabase.get_chat_by_id(chat_id, auth_token)
         except Exception as e:
-            self.delete_chat(chat_id,auth_token)
+            self.delete_chat(chat_id, auth_token)
             raise AuthorizationError("Authorization header missing")
         language = language.name if language else None
         response = self.math_agent.solve(chat, payload["messages"], language)
         return StreamingResponse(
-            self.__new_chat_event_generator(response, payload, chat_id, callback=callback),
+            self.__new_chat_event_generator(
+                response, payload, chat_id, callback=callback
+            ),
             media_type="text/event-stream",
         )
 
@@ -256,9 +261,15 @@ class Chat:
         try:
             await self.__parse_question(request, chat_id, auth_token)
         except Exception as e:
-            self.delete_chat(chat_id,auth_token)
-            raise AuthorizationError("Authorization header missing")
-        return await self.__solve(chat_id, request.language, auth_token,callback = creditService.decrement_credit(request.user_id))
+            # 只要有空chat这句话就铁报错。先comment掉了
+            # self.delete_chat(chat_id,auth_token)
+            raise NewChatError(f"An error occurred during creating an empty chat: {e}")
+        return await self.__solve(
+            chat_id,
+            request.language,
+            auth_token,
+            callback=creditService.decrement_credit(request.user_id),
+        )
 
     async def sse_error_generator(self, error, status_code):
         yield f"event: error\ndata: {json.dumps({'error': error, 'status_code': status_code})}\n\n"
