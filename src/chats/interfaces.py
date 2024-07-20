@@ -98,10 +98,10 @@ class UploadQuestionRequest(BaseModel):
     @staticmethod
     # Dependency to parse QuestionRequest model from form data
     async def parse_question_request(
-            chat_id: str = Form(...),
-            mode: Mode = Form(...),
-            prompt: Optional[str] = Form(None),
-            image_file: Optional[UploadFile] = File(None),
+        chat_id: str = Form(...),
+        mode: Mode = Form(...),
+        prompt: Optional[str] = Form(None),
+        image_file: Optional[UploadFile] = File(None),
     ) -> "UploadQuestionRequest":
         # Construct the QuestionRequest object
         return UploadQuestionRequest(
@@ -129,11 +129,11 @@ class NewChatRequest(BaseModel):
     @staticmethod
     # Dependency to parse QuestionRequest model from form data
     async def parse_new_chat_request(
-            user_id: str = Form(...),
-            mode: Mode = Form(...),
-            language: Optional[Language] = Form(None),
-            prompt: Optional[str] = Form(None),
-            image_file: Optional[UploadFile] = File(None),
+        user_id: str = Form(...),
+        mode: Mode = Form(...),
+        language: Optional[Language] = Form(None),
+        prompt: Optional[str] = Form(None),
+        image_file: Optional[UploadFile] = File(None),
     ) -> "NewChatRequest":
         # Construct the NewChatRequest object
         return NewChatRequest(
@@ -183,11 +183,11 @@ class NewChatRequest(BaseModel):
     @staticmethod
     # Dependency to parse QuestionRequest model from form data
     async def parse_new_chat_request(
-            user_id: str = Form(...),
-            mode: Mode = Form(...),
-            language: Optional[Language] = Form(None),
-            prompt: Optional[str] = Form(None),
-            image_file: Optional[UploadFile] = File(None),
+        user_id: str = Form(...),
+        mode: Mode = Form(...),
+        language: Optional[Language] = Form(None),
+        prompt: Optional[str] = Form(None),
+        image_file: Optional[UploadFile] = File(None),
     ) -> "NewChatRequest":
         # Construct the NewChatRequest object
         return NewChatRequest(

@@ -11,12 +11,13 @@ from src.chats.interfaces import (
     ChatRequest,
     DeleteChatResponse,
     GetChatResponse,
+    NewChatError,
     NewChatIDRequest,
     NewChatRequest,
     NewChatResponse,
     SSEResponse,
     UploadQuestionRequest,
-    UploadQuestionResponse, NewChatError,
+    UploadQuestionResponse,
 )
 
 router = APIRouter(
