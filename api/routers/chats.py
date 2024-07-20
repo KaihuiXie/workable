@@ -16,7 +16,7 @@ from src.chats.interfaces import (
     NewChatResponse,
     SSEResponse,
     UploadQuestionRequest,
-    UploadQuestionResponse,
+    UploadQuestionResponse, NewChatError,
 )
 
 router = APIRouter(
@@ -76,6 +76,8 @@ async def new_chat(
         return await chats.new_chat(
             chat_request, credits, authorization.replace("Bearer ", "")
         )
+    except NewChatError as e:
+        return await chats.sse_error(f"{e}", 441)
     except ValueError:
         return await chats.sse_error("Balance is out of credits", 405)
     except AuthorizationError as e:

@@ -15,7 +15,7 @@ from src.chats.interfaces import (
     Language,
     Mode,
     NewChatRequest,
-    UploadQuestionRequest,
+    UploadQuestionRequest, NewChatError,
 )
 from src.chats.supabase import ChatsSupabase
 from src.math_agent.math_agent import MathAgent
@@ -256,8 +256,9 @@ class Chat:
         try:
             await self.__parse_question(request, chat_id, auth_token)
         except Exception as e:
-            self.delete_chat(chat_id,auth_token)
-            raise AuthorizationError("Authorization header missing")
+            # 只要有空chat这句话就铁报错。先comment掉了
+            # self.delete_chat(chat_id,auth_token)
+            raise NewChatError(f"An error occurred during creating an empty chat: {e}")
         return await self.__solve(chat_id, request.language, auth_token,callback = creditService.decrement_credit(request.user_id))
 
     async def sse_error_generator(self, error, status_code):
