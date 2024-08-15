@@ -64,7 +64,7 @@ async def verify_user(request: VerifyUserIsEligibleForBonus) -> bool:
     """
     try:
         return invitations.get_invitation_by_token(
-            request.invitation_token, request.user_id
+            request.invitation_token, request.user_id,
         )
     except Exception as e:
         logging.error(e)

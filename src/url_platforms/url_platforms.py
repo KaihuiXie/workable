@@ -29,8 +29,9 @@ class UrlPlatforms(UrlPlatformsSupabase):
     def update_platform_id(
         self, request: UpdateUserProfilePlatformIdRequest
     ) -> UpdateUserProfilePlatformIdResponse:
-        platform_id = self.supabase.update_platform_id_in_user_profile(
-            request.user_id, request.platform_id
-        )
-        response: UpdateUserProfilePlatformIdResponse = {"platform_id": platform_id}
+        if request.platform_id:
+            platform_id = self.supabase.update_platform_id_in_user_profile(
+                request.user_id, request.platform_id
+            )
+        response: UpdateUserProfilePlatformIdResponse = {"platform_id": request.platform_id}
         return response

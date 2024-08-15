@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-
+from typing import Optional
 
 class UpdateInvitationNotificationRequest(BaseModel):
     user_id: str = Field(..., description="The ID of the user")
@@ -8,7 +8,7 @@ class UpdateInvitationNotificationRequest(BaseModel):
 
 class VerifyUserIsEligibleForBonus(BaseModel):
     user_id: str = Field(..., description="The ID of the user")
-    invitation_token: str = Field(..., description="The invitation token of the user")
+    invitation_token: Optional[str] = Field(..., description="The invitation token of the user")
 
 
 class InvitationTokenResponse(BaseModel):
