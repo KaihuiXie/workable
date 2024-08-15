@@ -141,13 +141,13 @@ class InvitationsSupabase(Supabase):
         
     def get_invitation_token_from_user_profile(self, user_id):
         try:
-            response = (
+            data, count = (
                 self.supabase.table("user_profile")
                 .select("invitation_token")
                 .eq("user_id", user_id)
                 .execute()
             )
-            return response["invitation_token"]
+            return data[1][0]["invitation_token"]
         except Exception as e:
             raise Exception(
                 f"An error occurred during getting invitation token for user {user_id}: {e}"
