@@ -138,7 +138,21 @@ class InvitationsSupabase(Supabase):
             raise Exception(
                 f"An error occurred during updateing referee list for user {user_id} and guest {guest_email}: {e}"
             )
-
+        
+    def get_invitation_token_from_user_profile(self, user_id):
+        try:
+            response = (
+                self.supabase.table("user_profile")
+                .select("invitation_token")
+                .eq("user_id", user_id)
+                .execute()
+            )
+            return response["invitation_token"]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting invitation token for user {user_id}: {e}"
+            )
+        
     def delete_invitation_by_user_id(self, user_id):
         try:
             response = (

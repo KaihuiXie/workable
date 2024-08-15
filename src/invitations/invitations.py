@@ -17,6 +17,10 @@ class Invitations(InvitationsSupabase):
         return self.supabase.get_invitation_by_user_id(user_id)
 
     def get_invitation_by_token(self, invitation_token: str, user_id: str):
+        if not invitation_token:
+            invitation_token = self.supabase.get_invitation_token_from_user_profile(user_id)
+        if not invitation_token:
+            return False
         is_invited, referrer_id = self.supabase.get_referrer_id_by_invitation_token(
             invitation_token
         )
