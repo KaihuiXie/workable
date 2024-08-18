@@ -2,7 +2,7 @@ import logging
 
 from fastapi import APIRouter, HTTPException
 
-from common.objects import invitations, io_thread_pool
+from common.objects import invitations
 from src.invitations.interfaces import (
     InvitationTokenResponse,
     RefereeListResponse,

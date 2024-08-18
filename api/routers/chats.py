@@ -2,7 +2,7 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from common.objects import chats, credits, io_thread_pool
+from common.objects import chats, credits
 from src.chats.interfaces import (
     AllChatsResponse,
     AuthorizationError,
