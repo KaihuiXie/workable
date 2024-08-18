@@ -17,7 +17,7 @@ from src.url_platforms.supabase import UrlPlatformsSupabase
 from src.url_platforms.url_platforms import UrlPlatforms
 from src.users.supabase import UsersSupabase
 from src.users.users import User
-
+import concurrent.futures
 # Initalization
 load_dotenv()
 supabase = Supabase(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
@@ -32,3 +32,7 @@ invitations = Invitations(InvitationsSupabase(supabase))
 users = User(UsersSupabase(supabase))
 url_platforms = UrlPlatforms(UrlPlatformsSupabase(supabase))
 admin = AdminSupabase(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_ROLE"))
+
+cpu_cores = os.cpu_count()
+thread_count = cpu_cores * 4
+io_thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=thread_count) 

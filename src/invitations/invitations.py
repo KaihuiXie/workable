@@ -7,8 +7,8 @@ logging.basicConfig(level=logging.INFO)
 
 
 class Invitations(InvitationsSupabase):
-    def __init__(self, supabase: InvitationsSupabase):
-        self.supabase = supabase
+    def __init__(self, supabase):
+        self.supabase: InvitationsSupabase = supabase
 
     def get_referrer(self, invitation_token: str):
         return self.supabase.get_referrer_id_by_invitation_token(invitation_token)

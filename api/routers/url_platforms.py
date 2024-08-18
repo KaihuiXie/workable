@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 @router.post("/increment", response_model=IncrementClicksResponse)
-async def increment_clicks(request: IncrementClicksRequest) -> IncrementClicksResponse:
+def increment_clicks(request: IncrementClicksRequest) -> IncrementClicksResponse:
     try:
         return url_platforms.increment_clicks(request)
     except Exception as e:
@@ -29,7 +29,7 @@ async def increment_clicks(request: IncrementClicksRequest) -> IncrementClicksRe
 
 
 @router.post("/update_user_profile", response_model=UpdateUserProfilePlatformIdResponse)
-async def update_platform_id(request: UpdateUserProfilePlatformIdRequest):
+def update_platform_id(request: UpdateUserProfilePlatformIdRequest):
     try:
         return url_platforms.update_platform_id(request)
     except Exception as e:

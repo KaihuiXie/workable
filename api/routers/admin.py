@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 @router.post("/invite_user_by_email", response_model=InviteByEmailResponse)
-async def invite_user_by_email(request: InviteByEmailRequest) -> InviteByEmailResponse:
+def invite_user_by_email(request: InviteByEmailRequest) -> InviteByEmailResponse:
     try:
         user_id = admin.invite_user_by_email(request.email, request.redirect_to_url,request.invitation_token, request.platform_token)
         return InviteByEmailResponse(user_id=user_id)
