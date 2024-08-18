@@ -140,7 +140,7 @@ class Chat:
 
     def sync_sse_error(self, error, status_code):
         return StreamingResponse(
-            self.sse_error_generator(error, status_code), media_type="text/event-stream"
+            self.sync_error_generator(error, status_code), media_type="text/event-stream"
         )
     
     def sync_event_generator(
