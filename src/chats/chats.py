@@ -178,7 +178,7 @@ class Chat:
                 self.delete_chat(chat_id)
                 logging.error("Error updating payload to database: %s", db_error)
 
-    def new_chat(self, request: NewChatRequest, creditService:CreditsSupabase, io_thread_pool, auth_token):
+    def new_chat(self, request: NewChatRequest, creditService:CreditsSupabase, auth_token):
 
         try:
             chat_id = self.supabase.create_empty_chat(

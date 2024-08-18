@@ -38,7 +38,7 @@ def new_chat(
         if temp_credit + perm_credit <= 0:
             raise ValueError("Not enough credits")
         return chats.new_chat(
-            chat_request, credits, io_thread_pool, authorization.replace("Bearer ", "")
+            chat_request, credits, authorization.replace("Bearer ", "")
         )
     except NewChatError as e:
         return chats.sync_sse_error(f"{e}", 441)
