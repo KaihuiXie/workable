@@ -97,7 +97,7 @@ class UploadQuestionRequest(BaseModel):
 
     @staticmethod
     # Dependency to parse QuestionRequest model from form data
-    async def parse_question_request(
+    def parse_question_request(
         chat_id: str = Form(...),
         mode: Mode = Form(...),
         prompt: Optional[str] = Form(None),
@@ -128,7 +128,7 @@ class NewChatRequest(BaseModel):
 
     @staticmethod
     # Dependency to parse QuestionRequest model from form data
-    async def parse_new_chat_request(
+    def parse_new_chat_request(
         user_id: str = Form(...),
         mode: Mode = Form(...),
         language: Optional[Language] = Form(None),
@@ -182,7 +182,7 @@ class NewChatRequest(BaseModel):
 
     @staticmethod
     # Dependency to parse QuestionRequest model from form data
-    async def parse_new_chat_request(
+    def parse_new_chat_request(
         user_id: str = Form(...),
         mode: Mode = Form(...),
         language: Optional[Language] = Form(None),

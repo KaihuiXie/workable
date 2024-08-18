@@ -13,8 +13,8 @@ logging.basicConfig(level=logging.INFO)
 
 
 class UrlPlatforms(UrlPlatformsSupabase):
-    def __init__(self, supabase: UrlPlatformsSupabase):
-        self.supabase = supabase
+    def __init__(self, supabase):
+        self.supabase:UrlPlatformsSupabase = supabase
 
     def get_platform_id(self, platform: str) -> str:
         return self.supabase.get_platform_id(platform)

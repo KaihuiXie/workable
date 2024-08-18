@@ -73,7 +73,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 @router.get("/daily_bonus/{user_id}")
-async def verify_daily_bonus(user_id):
+def verify_daily_bonus(user_id):
     """
     check if the user is eligible for daily_bonus
     - input: \n
@@ -81,7 +81,7 @@ async def verify_daily_bonus(user_id):
     - return: `bool` \n
     """
     try:
-        return await users.get_daily_bonus(user_id)
+        return users.get_daily_bonus(user_id)
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))

@@ -21,7 +21,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 @router.post("/create", response_model=NewSharedChatResponse)
-async def create_shared_chat(
+def create_shared_chat(
     request: Request, shared_chat_request: NewSharedChatRequest
 ) -> NewSharedChatResponse:
     """
@@ -49,7 +49,7 @@ async def create_shared_chat(
 
 
 @router.get("/{shared_chat_id}", response_model=GetSharedChatResponse)
-async def get_shared_chat(shared_chat_id: str) -> GetSharedChatResponse:
+def get_shared_chat(shared_chat_id: str) -> GetSharedChatResponse:
     """
     Get a shared chat by `shared_chat_id`.\n
 
@@ -75,7 +75,7 @@ async def get_shared_chat(shared_chat_id: str) -> GetSharedChatResponse:
 @router.delete(
     "/by_shared_chat_id/{shared_chat_id}", response_model=DeleteSharedChatResponse
 )
-async def delete_shared_chat_by_shared_chat_id(
+def delete_shared_chat_by_shared_chat_id(
     shared_chat_id: str,
 ) -> DeleteSharedChatResponse:
     """
@@ -95,7 +95,7 @@ async def delete_shared_chat_by_shared_chat_id(
 
 
 @router.delete("/by_chat_id/{chat_id}", response_model=DeleteSharedChatResponse)
-async def delete_shared_chat_by_chat_id(chat_id: str) -> DeleteSharedChatResponse:
+def delete_shared_chat_by_chat_id(chat_id: str) -> DeleteSharedChatResponse:
     """
     Delete *ALL* shared chats created from the chat specified by `chat_id`.\n
 

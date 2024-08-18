@@ -17,8 +17,8 @@ def create_supabase_client_by_auth_token(auth_token):
 
 
 class ChatsSupabase(Supabase):
-    def __init__(self, supabase: Supabase):
-        self.supabase = supabase.client()
+    def __init__(self, supabase):
+        self.supabase: Supabase = supabase.client()
         self.table = "chats"
 
     def user_has_access(self, chat_id, user_id) -> bool:

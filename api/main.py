@@ -84,7 +84,7 @@ app.include_router(admin.router)
 
 
 @app.get("/health")
-async def health_check():
+def health_check():
     try:
         return {"status": "up"}
     except Exception as e:
@@ -92,14 +92,15 @@ async def health_check():
         raise HTTPException(status_code=500, detail="Service unavailable")
 
 
-@app.get("/examples")
-async def get_examples():
-    try:
-        current_directory = os.path.dirname(os.path.realpath(__file__))
-        with open(f"{current_directory}/config/example_chat_ids.yaml", "r") as file:
-            example_chat_ids = yaml.safe_load(file)["chat_ids"]
-            response = supabase.get_chats_by_ids(example_chat_ids)
-            return {"data": response}
-    except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
+# TODO deprecate
+# @app.get("/examples")
+# async def get_examples():
+#     try:
+#         current_directory = os.path.dirname(os.path.realpath(__file__))
+#         with open(f"{current_directory}/config/example_chat_ids.yaml", "r") as file:
+#             example_chat_ids = yaml.safe_load(file)["chat_ids"]
+#             response = supabase.get_chats_by_ids(example_chat_ids)
+#             return {"data": response}
+#     except Exception as e:
+#         logging.error(e)
+#         raise HTTPException(status_code=500, detail=str(e))
