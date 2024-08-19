@@ -16,8 +16,8 @@ class AdminSupabase:
             data, count = (
                 self.supabase.from_("user_profile")
                 .update({
-                    "invitation_token": invitation_token,
-                    "platform_id": platform_token
+                    "invitation_token": invitation_token if invitation_token else None,
+                    "platform_id": platform_token if platform_token else None
                 })
                 .eq("user_id", response.user.id)
                 .execute()
