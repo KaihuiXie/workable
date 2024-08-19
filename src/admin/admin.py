@@ -34,3 +34,27 @@ class AdminSupabase:
                     detail=f"An error occurred during inviting user by email {email}: {e}",
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
+
+    def delete_user_by_email(self, email: str):
+        try:
+            data, count = (
+                self.supabase.from_("user_profile")
+                .select("user_id")
+                .eq("user_email", email)
+                .execute()
+            )
+            if not data[1]:
+                raise Exception("A user with this email address not exist")
+            self.supabase.auth.admin.delete_user(data[1][0]["user_id"])
+            return True
+        except Exception as e:
+            if str(e) == "A user with this email address not exist":
+                raise HTTPException(
+                    detail=f"An error occurred during deleting user by email {email}: {e}",
+                    status_code=status.HTTP_409_CONFLICT,
+                )
+            else:
+                raise HTTPException(
+                    detail=f"An error occurred during deleting user by email {email}: {e}",
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )

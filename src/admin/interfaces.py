@@ -10,3 +10,9 @@ class InviteByEmailRequest(BaseModel):
 
 class InviteByEmailResponse(BaseModel):
     user_id: str = Field(..., description="user_id created.")
+
+class DeleteByEmailRequest(BaseModel):
+    email: str = Field(..., description="User email")
+
+class DeleteByEmailResponse(BaseModel):
+    result: bool = Field(..., description="result")
