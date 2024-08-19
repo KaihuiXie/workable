@@ -1,10 +1,7 @@
 from datetime import datetime, timezone
-
 from common.constants import (
     COST_PER_QUESTION,
     DEFAULT_CREDIT,
-    EVERY_DAY_CREDIT_INCREMENT,
-    INVITATION_BONUS,
 )
 from src.math_agent.supabase import Supabase
 
@@ -43,20 +40,21 @@ class CreditsSupabase(Supabase):
 
     def decrement_credit(self, user_id):
         try:
-            temp_credit = self.get_temp_credit_by_user_id(user_id)
-            perm_credit = self.get_perm_credit_by_user_id(user_id)
-            if temp_credit >= COST_PER_QUESTION:
-                self.update_temp_credit_by_user_id(
-                    user_id, temp_credit - COST_PER_QUESTION
-                )
-            elif perm_credit >= COST_PER_QUESTION:
-                self.update_perm_credit_by_user_id(
-                    user_id, perm_credit - COST_PER_QUESTION
-                )
-            else:
-                raise ValueError(
-                    f"User {user_id}: {user_id} doesn't have enough credits."
-                )
+            result = self.supabase.rpc("deduct_credit", { "user_id": user_id, "credit_to_deduct": COST_PER_QUESTION }).execute()
+            # temp_credit = self.get_temp_credit_by_user_id(user_id)
+            # perm_credit = self.get_perm_credit_by_user_id(user_id)
+            # if temp_credit >= COST_PER_QUESTION:
+            #     self.update_temp_credit_by_user_id(
+            #         user_id, temp_credit - COST_PER_QUESTION
+            #     )
+            # elif perm_credit >= COST_PER_QUESTION:
+            #     self.update_perm_credit_by_user_id(
+            #         user_id, perm_credit - COST_PER_QUESTION
+            #     )
+            # else:
+            #     raise ValueError(
+            #         f"User {user_id}: {user_id} doesn't have enough credits."
+            #     )
         except Exception as e:
             raise Exception(
                 f"An error occurred during decrement credit from user {user_id}: {e}"
