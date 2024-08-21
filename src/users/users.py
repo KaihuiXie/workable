@@ -13,19 +13,19 @@ class User(UsersSupabase):
     def signup(self, email, phone, password):
         return self.supabase.sign_up(email, phone, password)
 
-    def login(self, email, phone, password):
-        auth_response = self.supabase.sign_in_with_password(email, phone, password)
-        user_id = auth_response.user.id
-        temp_credit = self.supabase.get_temp_credit_by_user_id(user_id)
-        perm_credit = self.supabase.get_perm_credit_by_user_id(user_id)
-        return auth_response, temp_credit, perm_credit
+    def login(self, email, password):
+        auth_response = self.supabase.sign_in_with_password(email, password)
+        return auth_response.session.access_token
 
-    def logout(self):
-        return self.supabase.sign_out()
+    def logout(self, jwt):
+        self.supabase.sign_out(jwt)
 
-    def oauth_login(self, provider):
-        return self.supabase.sign_in_with_oauth(provider)
+    def oauth_login(self, provider, token):
+        return self.supabase.sign_in_with_oauth(provider, token)
 
+    def exchange_code(self, auth_code):
+        return self.supabase.exchange_code_for_session(auth_code)
+    
     def get_session(self):
         return self.supabase.get_session()
 

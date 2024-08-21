@@ -7,7 +7,10 @@ class AdminSupabase:
         self.supabase: Client = create_client(
             url, key, options=ClientOptions(flow_type="pkce")
         )
-
+        
+    def client(self):
+        return self.supabase
+    
     def invite_user_by_email(self, email: str, redirect_to_url: str, invitation_token:str, platform_token:str):
         try:
             response = self.supabase.auth.admin.invite_user_by_email(

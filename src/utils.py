@@ -11,7 +11,7 @@ from common.decorators import TimerLogLevel, timer
 
 register_heif_opener()
 # Configure logging
-logging.basicConfig(level=logging.info)
+logging.basicConfig(level=logging.INFO)
 
 
 def convert_to_jpeg(image_bytes, scale_factor=1.0):

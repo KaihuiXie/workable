@@ -12,9 +12,10 @@ class SignUpRequest(BaseModel):
 
 class SignInRequest(BaseModel):
     email: str
-    phone: Optional[str] = None
     password: str
 
+class LoginResponse(BaseModel):
+    access_token: str
 
 class OAuthSignInRequest(BaseModel):
     provider: str

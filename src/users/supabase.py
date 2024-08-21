@@ -19,10 +19,10 @@ class UsersSupabase(Supabase):
                 f"An error occurred during signing up user with email {email}: {e}"
             )
 
-    def sign_in_with_password(self, email: str, phone: str, password: str):
+    def sign_in_with_password(self, email: str, password: str):
         try:
             res = self.supabase.auth.sign_in_with_password(
-                {"email": email, "phone": phone, "password": password}
+                {"email": email, "password": password}
             )
             return res
         except Exception as e:
@@ -30,11 +30,12 @@ class UsersSupabase(Supabase):
                 f"An error occurred during signing in user with email {email}: {e}"
             )
 
-    def sign_in_with_oauth(self, provider: str):
+    def sign_in_with_oauth(self, provider: str, token: str):
         try:
             res = self.supabase.auth.sign_in_with_oauth(
                 {
                     "provider": provider,
+                    "token":token
                 }
             )
             return res
@@ -43,10 +44,23 @@ class UsersSupabase(Supabase):
                 f"An error occurred during signing in user with oauth provider {provider}: {e}"
             )
 
-    def sign_out(self):
+    def exchange_code_for_session(self, auth_code: str):
         try:
-            res = self.supabase.auth.sign_out()
+            res = self.supabase.auth.exchange_code_for_session(
+                {
+                    "auth_code": auth_code,
+                    "code_verifier":" "
+                }
+            )
             return res
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during signing in user with oauth provider: {e}"
+            )
+
+    def sign_out(self, jwt):
+        try:
+            self.supabase.auth.admin.sign_out(jwt)
         except Exception as e:
             raise Exception(f"An error occurred during signing out: {e}")
 
