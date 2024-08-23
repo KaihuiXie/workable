@@ -6,7 +6,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.routers import (
-    admin,
     chats,
     credits,
     invitations,
@@ -21,10 +20,6 @@ from src.middlewares import ExtendTimeoutMiddleware, TimerMiddleware
 logging.basicConfig(level=logging.INFO)
 
 tags_metadata = [
-    {
-        "name": "admin",
-        "description": "Admin operations. [DANGER ZONE]",
-    },
     {
         "name": "users",
         "description": "User operations",
@@ -52,7 +47,10 @@ tags_metadata = [
 ]
 
 # FastAPI
-app = FastAPI(openapi_tags=tags_metadata)
+if os.getenv("ENVIRONMENT") == "developer":
+    app = FastAPI(openapi_tags=tags_metadata)
+else:
+    app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None, openapi_tags=tags_metadata)
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
@@ -80,7 +78,6 @@ app.include_router(chats.router)
 app.include_router(invitations.router)
 app.include_router(credits.router)
 app.include_router(url_platforms.router)
-app.include_router(admin.router)
 
 
 @app.get("/health")

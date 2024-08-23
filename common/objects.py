@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-from src.admin.admin import AdminSupabase
+from src.email.sendgrid import EmailService
 from src.chats.chats import Chat
 from src.chats.supabase import ChatsSupabase
 from src.credits.credits import Credit
@@ -28,6 +28,7 @@ shared_chats = SharedChat(SharedChatsSupabase(supabase))
 chats = Chat(ChatsSupabase(supabase), math_agent=math_agent)
 credits = Credit(CreditsSupabase(supabase))
 invitations = Invitations(InvitationsSupabase(supabase))
-users = User(UsersSupabase(supabase))
 url_platforms = UrlPlatforms(UrlPlatformsSupabase(supabase))
-admin = AdminSupabase(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_ROLE"))
+user_services = UsersSupabase(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_ROLE"))
+users = User(user_services)
+ems = EmailService(os.getenv("SENDGRID_API"), os.getenv("EMAIL_HEADER"))
