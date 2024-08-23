@@ -1,17 +1,17 @@
 {
-    "devCommand": "uvicorn api.main:app --host 0.0.0.0 --port 8080 --timeout-keep-alive 120",
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "api/main.py",
-        "headers": {
-          "Cache-Control": "no-store"
-        }
-      }
-    ],
-    "functions": {
-      "api/main.py": {
-        "maxDuration": 100
+  "devCommand": "uvicorn api.main:app --host 0.0.0.0 --port 8080 --timeout-keep-alive 120",
+  "builds": [{
+    "src": "api/main.py",
+    "use": "@vercel/python",
+    "config": { "maxLambdaSize": "15mb", "runtime": "python3.10" }
+  }],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "api/main.py",
+      "headers": {
+        "Cache-Control": "no-store"
       }
     }
-  }
+  ]
+}
