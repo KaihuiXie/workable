@@ -3,7 +3,7 @@ import urllib.parse
 
 from fastapi import APIRouter, HTTPException, Request, Form, Header, status
 from fastapi.responses import RedirectResponse
-from common.objects import users, ems
+from common.objects import users, ems, payment_service
 from src.users.interfaces import (
     SignInRequest, 
     LoginResponse,
@@ -16,6 +16,7 @@ from src.users.interfaces import (
 )
 import json
 import urllib
+
 router = APIRouter(
     # prefix="/users",
     tags=["users"],
@@ -94,7 +95,7 @@ def oauth_callback(code: str = Form(...), state: str = Form(...)):
     
 
 @router.get("/user_info", response_model=UserInfo)
-async def get_user_info(request: Request):
+def get_user_info(request: Request):
     try:
         authorization = request.headers.get('Authorization')
         response = users.get_user(authorization.replace("Bearer ", ""))
@@ -104,7 +105,7 @@ async def get_user_info(request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/reset_password")
-async def reset_password(request: ResetPasswordRequest):
+def reset_password(request: ResetPasswordRequest):
     try:
         response = users.reset_password_email(request.email, request.options.model_dump())
         return response
@@ -113,7 +114,7 @@ async def reset_password(request: ResetPasswordRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/update_password")
-async def reset_password(request: UpdatePasswordRequest, authorization:str = Header(None)):
+def reset_password(request: UpdatePasswordRequest, authorization:str = Header(None)):
     try:
         user = users.verify_jwt(authorization.replace("Bearer ", ""))
         if not user:
@@ -162,3 +163,17 @@ def verify_daily_bonus(user_id):
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/stripe_webhook")
+async def stripe_webhook(request: Request):
+    payload = await request.body()
+    sig_header = request.headers.get("stripe-signature")
+    await payment_service.process_event(payload, sig_header)
+    return {"status": "success"}
+
+@router.get("/user_subscription")
+def get_user_subscription(request: Request):
+    authorization = request.headers.get('Authorization')
+    user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
+    return {"result":users.get_subscription(user_id)}
+    

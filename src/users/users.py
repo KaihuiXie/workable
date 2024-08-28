@@ -138,6 +138,9 @@ class User(UsersSupabase):
     
     def verify_email(self,email):
         return self.supabase.verify_if_user_exist(email)
+    
+    def get_subscription(self, user_id):
+        return self.supabase.get_subscription(user_id)
     # def invite_user_by_email(self, email: str, redirect_to_url: str, invitation_token: str, platform_token: str):
     #     return super().invite_user_by_email(email, redirect_to_url, invitation_token, platform_token)
     

@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 
 from src.email.sendgrid import EmailService
+from src.stripe.stripe import Stripe
 from src.chats.chats import Chat
 from src.chats.supabase import ChatsSupabase
 from src.credits.credits import Credit
@@ -32,3 +33,4 @@ url_platforms = UrlPlatforms(UrlPlatformsSupabase(supabase))
 user_services = UsersSupabase(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_ROLE"))
 users = User(user_services)
 ems = EmailService(os.getenv("SENDGRID_API"), os.getenv("EMAIL_HEADER"))
+payment_service = Stripe(os.getenv("STRIPE_API"), os.getenv("STRIPE_ENDPOINT_KEY"), os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"), ems)
