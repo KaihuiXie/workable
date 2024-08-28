@@ -3,7 +3,7 @@ import urllib.parse
 
 from fastapi import APIRouter, HTTPException, Request, Form, Header, status
 from fastapi.responses import RedirectResponse
-from common.objects import users, ems
+from common.objects import users, ems, payment_service
 from src.users.interfaces import (
     SignInRequest, 
     LoginResponse,
@@ -16,6 +16,7 @@ from src.users.interfaces import (
 )
 import json
 import urllib
+
 router = APIRouter(
     # prefix="/users",
     tags=["users"],
@@ -162,3 +163,37 @@ def verify_daily_bonus(user_id):
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/stripe_webhook")
+async def stripe_webhook(request: Request):
+    payload = await request.body()
+    sig_header = request.headers.get("stripe-signature")
+    event = payment_service.construct_event(payload, sig_header)
+
+    # Process the event
+    if event["type"] == "checkout.session.completed":
+        session = event["data"]["object"]
+        print(session)
+        # Handle successful payment here
+
+    elif event["type"] == "customer.subscription.deleted":
+        subscription = event["data"]["object"]
+        print(f"Subscription canceled: {subscription['id']}")
+        # Handle subscription cancellation here
+        # You can notify the user, update the database, etc.
+
+    elif event["type"] == "invoice.payment_failed":
+        invoice = event["data"]["object"]
+        print(f"Payment failed for invoice: {invoice['id']}")
+        # Handle payment failure which might lead to subscription cancellation
+        # You can notify the user or take other actions
+
+    elif event["type"] == "charge.refunded":
+        charge = event["data"]["object"]
+        print(f"Charge refunded: {charge['id']}")
+
+    return {"status": "success"}
+
+@router.get("/user_subscription")
+def stripe_webhook(user_id, auth):
+    return True
