@@ -1,13 +1,13 @@
-import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from fastapi import HTTPException, status
-import smtplib
+import httpx
 import dns.resolver
 import re
 
 class EmailService:
     def __init__(self, api,email_header):
+        self.api = api
         self.client = SendGridAPIClient(api)
         self.from_email = email_header
 
@@ -46,3 +46,40 @@ class EmailService:
 
     def verify_email(self, email):
         return self.is_valid_domain(email) and self.is_valid_email_format(email)
+    
+    async def send_email_async(self, to_email, subject, content):
+        # Create the SendGrid Mail object
+        message = Mail(
+            from_email=self.from_email,
+            to_emails=to_email,
+            subject=subject,
+            html_content=content
+        )
+        # Prepare the payload
+        data = message.get()
+        # Send the email using httpx asynchronously
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                url="https://api.sendgrid.com/v3/mail/send",
+                json=data,
+                headers={
+                    "Authorization": f"Bearer {self.api}",
+                    "Content-Type": "application/json"
+                }
+            )
+            
+        return response
+    
+    async def send_subscription_email(self, to_email):
+        subject = "Thank you for your subscription"
+        content=f"""
+        <p>Thank you for subscribing our premium service</p>
+        """ 
+        return await self.send_email_async(to_email, subject, content)
+    
+    async def send_unsubscription_email(self, to_email):
+        subject = "Unsubscription notification"
+        content=f"""
+        <p>You have successfully unsubscribe our service</p>
+        """ 
+        return await self.send_email_async(to_email, subject, content)

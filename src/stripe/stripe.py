@@ -1,13 +1,14 @@
 import stripe
 from fastapi import HTTPException
 from src.supabase.async_supabase import AsyncSupabase
-
+from src.email.sendgrid import EmailService
 class Stripe:
-    def __init__(self, apikeys, endpoint_key, supabase_url, supabase_key):
+    def __init__(self, apikeys, endpoint_key, supabase_url, supabase_key, ems:EmailService):
         stripe.api_key = apikeys
         self.endpoint_key = endpoint_key
         self.supabase_url = supabase_url
         self.supabase_key = supabase_key
+        self.ems = ems
 
     async def process_event(self, payload, sig_header):
         try:
@@ -24,6 +25,7 @@ class Stripe:
                 customer_email = customer.get('email')
                 await self.update_premium(customer_email, True)
                 # Handle successful payment here
+                await self.ems.send_subscription_email(customer_email)
 
             elif event["type"] == "customer.subscription.deleted":
                 subscription = event["data"]["object"]
@@ -36,6 +38,7 @@ class Stripe:
                 await self.update_premium(customer_email, False)
                 # Handle subscription cancellation here
                 # You can notify the user, update the database, etc.
+                await self.ems.send_unsubscription_email(customer_email)
 
         except ValueError as e:
             # Invalid payload
