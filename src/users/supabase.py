@@ -164,3 +164,12 @@ class UsersSupabase:
         
     def grant_login_award(self, user_id):
         return self.supabase.rpc("daily_bonus", {"p_user_id":user_id, "p_bonus_amount": EVERY_DAY_CREDIT_INCREMENT}).execute().data
+
+    def get_subscription(self, user_id):
+        data, count = (
+            self.supabase.from_("user_profile")
+            .select("is_premium")
+            .eq("user_id", user_id)
+            .execute()
+        )
+        return data[1][0]["is_premium"]

@@ -95,7 +95,7 @@ def oauth_callback(code: str = Form(...), state: str = Form(...)):
     
 
 @router.get("/user_info", response_model=UserInfo)
-async def get_user_info(request: Request):
+def get_user_info(request: Request):
     try:
         authorization = request.headers.get('Authorization')
         response = users.get_user(authorization.replace("Bearer ", ""))
@@ -105,7 +105,7 @@ async def get_user_info(request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/reset_password")
-async def reset_password(request: ResetPasswordRequest):
+def reset_password(request: ResetPasswordRequest):
     try:
         response = users.reset_password_email(request.email, request.options.model_dump())
         return response
@@ -114,7 +114,7 @@ async def reset_password(request: ResetPasswordRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/update_password")
-async def reset_password(request: UpdatePasswordRequest, authorization:str = Header(None)):
+def reset_password(request: UpdatePasswordRequest, authorization:str = Header(None)):
     try:
         user = users.verify_jwt(authorization.replace("Bearer ", ""))
         if not user:
@@ -168,32 +168,12 @@ def verify_daily_bonus(user_id):
 async def stripe_webhook(request: Request):
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature")
-    event = payment_service.construct_event(payload, sig_header)
-
-    # Process the event
-    if event["type"] == "checkout.session.completed":
-        session = event["data"]["object"]
-        print(session)
-        # Handle successful payment here
-
-    elif event["type"] == "customer.subscription.deleted":
-        subscription = event["data"]["object"]
-        print(f"Subscription canceled: {subscription['id']}")
-        # Handle subscription cancellation here
-        # You can notify the user, update the database, etc.
-
-    elif event["type"] == "invoice.payment_failed":
-        invoice = event["data"]["object"]
-        print(f"Payment failed for invoice: {invoice['id']}")
-        # Handle payment failure which might lead to subscription cancellation
-        # You can notify the user or take other actions
-
-    elif event["type"] == "charge.refunded":
-        charge = event["data"]["object"]
-        print(f"Charge refunded: {charge['id']}")
-
+    await payment_service.process_event(payload, sig_header)
     return {"status": "success"}
 
 @router.get("/user_subscription")
-def stripe_webhook(user_id, auth):
-    return True
+def get_user_subscription(request: Request):
+    authorization = request.headers.get('Authorization')
+    user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
+    return {"result":users.get_subscription(user_id)}
+    
