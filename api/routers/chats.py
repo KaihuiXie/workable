@@ -57,7 +57,7 @@ def chat(chat_request: ChatRequest, request: Request):
         if not authorization:
             raise AuthorizationError("Authorization header missing")
 
-        return chats.chat(chat_request, authorization.replace("Bearer ", ""))
+        return chats.chat(chat_request, authorization.replace("Bearer ", ""), credits)
     except AuthorizationError as e:
         raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:

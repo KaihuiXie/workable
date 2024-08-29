@@ -36,8 +36,9 @@ class ChatsSupabase(Supabase):
                 f"An error occurred during getting chat by chat_id {chat_id} and user_id {user_id}: {e}"
             )
 
-    def get_chat_columns_by_id(self, chat_id: str, columns: list[ChatColumn]):
+    def get_all_chat_columns_by_id(self, chat_id: str, columns: list[ChatColumn],auth_token):
         try:
+            self.supabase: Client = create_supabase_client_by_auth_token(auth_token)
             columns = ", ".join(columns)
             data, count = (
                 self.supabase.from_(self.table)
