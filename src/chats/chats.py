@@ -54,14 +54,16 @@ class Chat:
         self.math_agent = math_agent
 
     @timer(log_level=TimerLogLevel.BASIC)
-    def chat(self, request: ChatRequest, auth_token):
-        payload = self.supabase.get_chat_column_by_id(
-            request.chat_id, ChatColumn.PAYLOAD, auth_token
+    def chat(self, request: ChatRequest, auth_token, credit_service: CreditsSupabase):
+        chat_record = self.supabase.get_all_chat_columns_by_id(
+            request.chat_id, [ChatColumn.PAYLOAD, ChatColumn.LEARNER_MODE, ChatColumn.USER_ID], auth_token
         )
+        payload = chat_record[ChatColumn.PAYLOAD]
         payload["messages"].append({"role": "user", "content": request.query})
         response = self.math_agent.query(payload["messages"])
         return StreamingResponse(
-            self.chat_event_generator(response, payload, request.chat_id),
+            self.chat_event_generator(response, payload, request.chat_id, chat_record[ChatColumn.LEARNER_MODE], 
+                                      callback=credit_service.decrement_credit(chat_record[ChatColumn.USER_ID])),
             media_type="text/event-stream",
         )
 
@@ -103,7 +105,7 @@ class Chat:
     def delete_chat(self, chat_id: str, auth_token):
         self.supabase.delete_chat_by_id(chat_id, auth_token)
 
-    def chat_event_generator(self, response, payload, chat_id, callback=None):
+    def chat_event_generator(self, response, payload, chat_id, mode, callback=None):
         full_response = ""
         try:
             chat_again = check_message_size(payload["messages"])
@@ -130,7 +132,7 @@ class Chat:
                     {"role": "assistant", "content": full_response}
                 )
                 self.supabase.update_payload(chat_id, payload)
-                if callback:
+                if callback and not mode:
                     callback()
             except Exception as db_error:
                 logging.error("Error updating payload to database: %s", db_error)
