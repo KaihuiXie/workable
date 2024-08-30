@@ -52,3 +52,39 @@ class Stripe:
     async def update_premium(self, email, status):
         supabase = await AsyncSupabase.create(self.supabase_url, self.supabase_key)
         await supabase.update_premium(email, status)
+
+    def get_customer_info(self, email):
+        try:
+            customers = stripe.Customer.list(email=email).data
+            if not customers:
+                raise HTTPException(status_code=404, detail="Customer not found")
+            
+            customer = customers[0]  
+            payment_methods = stripe.PaymentMethod.list(customer=customer.id, type="card")
+            if not payment_methods.data:
+                raise HTTPException(status_code=404, detail="No payment methods found")
+
+            card_last4 = payment_methods.data[0].card.last4
+            card_exp_month = payment_methods.data[0].card.exp_month
+            card_exp_year = payment_methods.data[0].card.exp_year
+
+            subscriptions = stripe.Subscription.list(customer=customer.id, status="active").data
+
+            if not subscriptions:
+                raise HTTPException(status_code=404, detail="No active subscriptions found")
+            
+            plan_name = subscriptions[0].plan.nickname
+            product_id = subscriptions[0].plan.product
+
+            product = stripe.Product.retrieve(product_id)
+            product_name = product.name
+
+            return {
+                "email": email,
+                "card_last4": card_last4,
+                "card_expiry": f"{card_exp_month}/{card_exp_year}",
+                "subscription_plan": product_name
+            }
+
+        except stripe.error.StripeError as e:
+            raise HTTPException(status_code=400, detail=str(e))

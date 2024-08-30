@@ -177,3 +177,8 @@ def get_user_subscription(request: Request):
     user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
     return {"result":users.get_subscription(user_id)}
     
+@router.get("/user_subscription/info")
+def get_user_subscription_info(request: Request):
+    authorization = request.headers.get('Authorization')
+    user_email = users.verify_jwt(authorization.replace("Bearer ", "")).user.email
+    return payment_service.get_customer_info(user_email)
