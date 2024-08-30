@@ -2,6 +2,8 @@ import stripe
 from fastapi import HTTPException
 from src.supabase.async_supabase import AsyncSupabase
 from src.email.sendgrid import EmailService
+import datetime
+
 class Stripe:
     def __init__(self, apikeys, endpoint_key, supabase_url, supabase_key, ems:EmailService):
         stripe.api_key = apikeys
@@ -78,12 +80,14 @@ class Stripe:
 
             product = stripe.Product.retrieve(product_id)
             product_name = product.name
+            next_payment_date = datetime.datetime.fromtimestamp(subscriptions[0].current_period_end)
 
             return {
                 "email": email,
                 "card_last4": card_last4,
                 "card_expiry": f"{card_exp_month}/{card_exp_year}",
-                "subscription_plan": product_name
+                "subscription_plan": product_name,
+                "next_payment_date": next_payment_date.strftime("%Y-%m-%d %H:%M:%S")
             }
 
         except stripe.error.StripeError as e:
