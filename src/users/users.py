@@ -24,7 +24,7 @@ class User(UsersSupabase):
         package = "free"
         user_info = UserInfo(
             user_id = auth_response.user.id,
-            email = auth_response.user.user_metadata.get("email"),
+            email = auth_response.user.email,
             name = auth_response.user.user_metadata.get("full_name"),
             package = package,
             avatar_url = auth_response.user.user_metadata.get("avatar_url")
@@ -32,8 +32,8 @@ class User(UsersSupabase):
         return LoginResponse(
             access_token = auth_response.session.access_token,
             user_info = user_info,
-            expire_in = auth_response.session.expires_in,
-            expire_at = auth_response.session.expires_at,
+            expires_in = auth_response.session.expires_in,
+            expires_at = auth_response.session.expires_at,
             refresh_token = auth_response.session.refresh_token,
             token_type = auth_response.session.token_type
         )
