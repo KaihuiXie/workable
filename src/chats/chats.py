@@ -54,10 +54,7 @@ class Chat:
         self.math_agent = math_agent
 
     @timer(log_level=TimerLogLevel.BASIC)
-    def chat(self, request: ChatRequest, auth_token, credit_service: CreditsSupabase):
-        chat_record = self.supabase.get_all_chat_columns_by_id(
-            request.chat_id, [ChatColumn.PAYLOAD, ChatColumn.LEARNER_MODE, ChatColumn.USER_ID], auth_token
-        )
+    def chat(self, request: ChatRequest, chat_record, auth_token, credit_service: CreditsSupabase):
         payload = chat_record[ChatColumn.PAYLOAD]
         payload["messages"].append({"role": "user", "content": request.query})
         response = self.math_agent.query(payload["messages"])
