@@ -98,10 +98,10 @@ class User(UsersSupabase):
         package = "free"
         user_info = UserInfo(
             user_id = response.user.id,
-            email = response.user.user_metadata["email"],
-            name = response.user.user_metadata["full_name"],
+            email = response.user.email,
+            name = response.user.user_metadata.get("full_name", ""),
             package = package,
-            avatar_url = response.user.user_metadata["avatar_url"]
+            avatar_url = response.user.user_metadata.get("avatar_url", "")
         )
         return user_info
 
