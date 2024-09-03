@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from src.supabase.async_supabase import AsyncSupabase
 from src.email.sendgrid import EmailService
 import datetime
+import logging
 
 class Stripe:
     def __init__(self, apikeys, endpoint_key, supabase_url, supabase_key, ems:EmailService):
@@ -44,11 +45,11 @@ class Stripe:
 
         except ValueError as e:
             # Invalid payload
-            print(e)
+            logging.error(e)
             raise HTTPException(status_code=400, detail="Invalid payload")
         except stripe.error.SignatureVerificationError as e:
             # Invalid signature
-            print(e)
+            logging.error(e)
             raise HTTPException(status_code=400, detail="Invalid signature")
         
     async def update_premium(self, email, status):
@@ -91,4 +92,5 @@ class Stripe:
             }
 
         except stripe.error.StripeError as e:
+            logging.error(e)
             raise HTTPException(status_code=400, detail=str(e))

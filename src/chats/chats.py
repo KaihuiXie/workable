@@ -54,13 +54,13 @@ class Chat:
         self.math_agent = math_agent
 
     @timer(log_level=TimerLogLevel.BASIC)
-    def chat(self, request: ChatRequest, chat_record, auth_token, credit_service: CreditsSupabase):
+    def chat(self, request: ChatRequest, chat_record, callback):
         payload = chat_record[ChatColumn.PAYLOAD]
         payload["messages"].append({"role": "user", "content": request.query})
         response = self.math_agent.query(payload["messages"])
         return StreamingResponse(
             self.chat_event_generator(response, payload, request.chat_id, chat_record[ChatColumn.LEARNER_MODE], 
-                                      callback=credit_service.decrement_credit(chat_record[ChatColumn.USER_ID])),
+                                      callback=callback),
             media_type="text/event-stream",
         )
 
@@ -177,11 +177,11 @@ class Chat:
                 self.delete_chat(chat_id)
                 logging.error("Error updating payload to database: %s", db_error)
 
-    def new_chat(self, request: NewChatRequest, creditService:CreditsSupabase, auth_token):
+    def new_chat(self, user_id:str, request: NewChatRequest, callback, auth_token):
 
         try:
             chat_id = self.supabase.create_empty_chat(
-                user_id=request.user_id,
+                user_id=user_id,
                 auth_token=auth_token,
             )
 
@@ -230,7 +230,7 @@ class Chat:
             response = self.math_agent.solve(chat, payload["messages"], language)
             return StreamingResponse(
                 self.sync_event_generator(
-                    response, payload, chat_id, callback=creditService.decrement_credit(request.user_id)
+                    response, payload, chat_id, callback
                 ),
                 media_type="text/event-stream",
             )
