@@ -122,6 +122,7 @@ def reset_password(request: UpdatePasswordRequest, authorization:str = Header(No
         response = users.update_password(request.model_dump(),authorization.replace("Bearer ", ""))
         return response
     except AuthorizationError as e:
+        logging.error(e)
         raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:
         logging.error(e)
@@ -140,6 +141,7 @@ def invite_user_by_email(request: InviteByEmailRequest):
         ems.send_invitation_email(request.email, redirect_url)
         return {"status": "success", "message": "Invitation email sent successfully"}
     except HTTPException as e:
+        logging.error(e)
         raise HTTPException(status_code=e.status_code, detail=str(e.detail))
 
 @router.post("/sign_up_by_email", response_model=LoginResponse)
@@ -148,6 +150,7 @@ def sign_up_by_email(request: SignUpRequest) -> LoginResponse:
         response = users.sign_up_with_email(request.email, request.password)
         return response
     except HTTPException as e:
+        logging.error(e)
         raise HTTPException(status_code=e.status_code, detail=str(e.detail))
 
 @router.get("/daily_bonus/{user_id}")

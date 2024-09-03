@@ -1,16 +1,16 @@
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 
-from common.objects import credits
+from common.objects import credits, users
 from src.credits.interfaces import (
     CreditResponse,
-    DecrementCreditRequest,
-    DeleteCreditResponse,
-    NewCreditResponse,
     PermCreditResponse,
     TempCreditResponse,
-    UpdateCreditRequest,
+)
+
+from src.chats.interfaces import (
+    AuthorizationError,
 )
 
 router = APIRouter(
@@ -21,8 +21,8 @@ router = APIRouter(
 
 logging.basicConfig(level=logging.INFO)
 
-@router.get("/{user_id}", response_model=CreditResponse)
-def get_credit(user_id: str) -> CreditResponse:
+@router.get("", response_model=CreditResponse)
+def get_credit(request: Request) -> CreditResponse:
     """
     Get the temp and perm credits from a specific user.
 
@@ -30,43 +30,48 @@ def get_credit(user_id: str) -> CreditResponse:
     - return: `temp_credit` and `perm_credit` in an array with index 0 is temp_credit, 1 is perm_credit.\n
     """
     try:
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            raise AuthorizationError("Authorization header missing")
+        auth_token = authorization.replace("Bearer ", "")
+        user_id = users.verify_jwt(auth_token).user.id
         temp_credit, perm_credit = credits.get_credit(user_id)
         return CreditResponse(temp_credit=temp_credit, perm_credit=perm_credit)
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
+# TODO deprecate
+# @router.get("/temp/{user_id}", response_model=TempCreditResponse)
+# def get_temp_credit(user_id: str) -> TempCreditResponse:
+#     """
+#     Get the temp credit from a specific user.
 
-@router.get("/temp/{user_id}", response_model=TempCreditResponse)
-def get_temp_credit(user_id: str) -> TempCreditResponse:
-    """
-    Get the temp credit from a specific user.
-
-     - param request: `user_id` type of string. The unique uuid of the user,\n
-     - return: `credit`, the temp credit of the user.\n
-    """
-    try:
-        temp_credit = credits.get_temp_credit(user_id)
-        return TempCreditResponse(credit=temp_credit)
-    except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
+#      - param request: `user_id` type of string. The unique uuid of the user,\n
+#      - return: `credit`, the temp credit of the user.\n
+#     """
+#     try:
+#         temp_credit = credits.get_temp_credit(user_id)
+#         return TempCreditResponse(credit=temp_credit)
+#     except Exception as e:
+#         logging.error(e)
+#         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/perm/{user_id}", response_model=PermCreditResponse)
-def get_perm_credit(user_id: str) -> PermCreditResponse:
-    """
-    Get the perm credit from a specific user.
+# @router.get("/perm/{user_id}", response_model=PermCreditResponse)
+# def get_perm_credit(user_id: str) -> PermCreditResponse:
+#     """
+#     Get the perm credit from a specific user.
 
-     - param request: `user_id` type of string. The unique uuid of the user,\n
-     - return: `credit`, the perm credit of the user.\n
-    """
-    try:
-        perm_credit = credits.get_perm_credit(user_id)
-        return PermCreditResponse(credit=perm_credit)
-    except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
+#      - param request: `user_id` type of string. The unique uuid of the user,\n
+#      - return: `credit`, the perm credit of the user.\n
+#     """
+#     try:
+#         perm_credit = credits.get_perm_credit(user_id)
+#         return PermCreditResponse(credit=perm_credit)
+#     except Exception as e:
+#         logging.error(e)
+#         raise HTTPException(status_code=500, detail=str(e))
 
 # TODO deprecate
 # @router.post("/{user_id}", response_model=NewCreditResponse)

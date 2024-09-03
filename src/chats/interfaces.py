@@ -167,7 +167,6 @@ class NewChatIDRequest(BaseModel):
 
 
 class NewChatRequest(BaseModel):
-    user_id: str
     mode: Mode
     language: Optional[Language] = None
     prompt: Optional[str] = None
@@ -183,7 +182,6 @@ class NewChatRequest(BaseModel):
     @staticmethod
     # Dependency to parse QuestionRequest model from form data
     def parse_new_chat_request(
-        user_id: str = Form(...),
         mode: Mode = Form(...),
         language: Optional[Language] = Form(None),
         prompt: Optional[str] = Form(None),
@@ -191,7 +189,6 @@ class NewChatRequest(BaseModel):
     ) -> "NewChatRequest":
         # Construct the NewChatRequest object
         return NewChatRequest(
-            user_id=user_id,
             mode=mode,
             language=language,
             prompt=prompt,

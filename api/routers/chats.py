@@ -2,8 +2,9 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from common.objects import chats, credits
+from common.objects import chats, credits, users
 from src.chats.interfaces import (
+    ChatColumn,
     AllChatsResponse,
     AuthorizationError,
     ChatOwnershipError,
@@ -34,19 +35,29 @@ def new_chat(
         authorization = request.headers.get("Authorization")
         if not authorization:
             raise AuthorizationError("Authorization header missing")
-        temp_credit, perm_credit = credits.get_credit(chat_request.user_id)
-        if temp_credit + perm_credit <= 0:
+        auth_token = authorization.replace("Bearer ", "")
+        user_id = users.verify_jwt(auth_token).user.id
+        temp_credit, perm_credit = credits.get_credit(user_id)
+        is_premium = users.get_subscription(user_id)
+        if temp_credit + perm_credit <= 0 and not is_premium:
             raise ValueError("Not enough credits")
+        callback = lambda: credits.decrement_credit(user_id)
+        if is_premium:
+            callback = None
         return chats.new_chat(
-            chat_request, credits, authorization.replace("Bearer ", "")
+            user_id, chat_request, callback, auth_token
         )
     except NewChatError as e:
+        logging.error(e)
         return chats.sync_sse_error(f"{e}", 441)
-    except ValueError:
+    except ValueError as e:
+        logging.error(e)
         return chats.sync_sse_error("Balance is out of credits", 405)
     except AuthorizationError as e:
+        logging.error(e)
         return chats.sync_sse_error(e, 401)
     except Exception as e:
+        logging.error(e)
         return chats.sync_sse_error(f"Internet error + {e}", 500)
 
 @router.post("/chat", response_model=SSEResponse)
@@ -56,22 +67,44 @@ def chat(chat_request: ChatRequest, request: Request):
         authorization = request.headers.get("Authorization")
         if not authorization:
             raise AuthorizationError("Authorization header missing")
-
-        return chats.chat(chat_request, authorization.replace("Bearer ", ""), credits)
+        auth_token = authorization.replace("Bearer ", "")
+        chat_record = chats.supabase.get_all_chat_columns_by_id(
+            chat_request.chat_id, [ChatColumn.PAYLOAD, ChatColumn.LEARNER_MODE, ChatColumn.USER_ID], auth_token
+        )
+        user_id = users.verify_jwt(auth_token).user.id
+        is_premium = users.get_subscription(user_id)
+        temp_credit, perm_credit = credits.get_credit(user_id)
+        callback = lambda: credits.decrement_credit(chat_record[ChatColumn.USER_ID])
+        if not chat_record[ChatColumn.LEARNER_MODE]:
+            if temp_credit + perm_credit <= 0 and not is_premium:
+                raise ValueError("Not enough credits")
+            if is_premium:
+                callback = None
+        else:
+            callback = None
+        return chats.chat(chat_request, chat_record, callback)
+    except NewChatError as e:
+        logging.error(e)
+        return chats.sync_sse_error(f"{e}", 441)
+    except ValueError as e:
+        logging.error(e)
+        return chats.sync_sse_error("Balance is out of credits", 405)
     except AuthorizationError as e:
-        raise HTTPException(status_code=401, detail=str(e))
+        logging.error(e)
+        return chats.sync_sse_error(e, 401)
     except Exception as e:
         logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
+        return chats.sync_sse_error(f"Internet error + {e}", 500)
 
 
-@router.get("/all_chats/{user_id}", response_model=AllChatsResponse)
-def all_chats(user_id: str, request: Request):
+@router.get("/all_chats", response_model=AllChatsResponse)
+def all_chats(request: Request):
     try:
         # get the authorization header
         authorization = request.headers.get("Authorization")
         if not authorization:
             raise AuthorizationError("Authorization header missing")
+        user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
         response = chats.get_all_chats(user_id, authorization.replace("Bearer ", ""))
         return AllChatsResponse(data=response.data, count=response.count)
     except AuthorizationError as e:
@@ -82,19 +115,20 @@ def all_chats(user_id: str, request: Request):
 
 
 @router.get("/chat/{chat_id}", response_model=GetChatResponse)
-def get_chat(chat_id: str, user_id: str, request: Request):
+def get_chat(chat_id: str, request: Request):
     try:
         # get the authorization header
         authorization = request.headers.get("Authorization")
         if not authorization:
             raise AuthorizationError("Authorization header missing")
-
+        user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
         return chats.get_chat(
             chat_id=chat_id,
             user_id=user_id,
             auth_token=authorization.replace("Bearer ", ""),
         )
     except AuthorizationError as e:
+        logging.error(e)
         raise HTTPException(status_code=401, detail=str(e))
     except ChatOwnershipError as e:
         logging.error(e)
@@ -115,6 +149,7 @@ def delete_chat(chat_id: str, request: Request):
         chats.delete_chat(chat_id, authorization.replace("Bearer ", ""))
         return DeleteChatResponse(chat_id=chat_id)
     except AuthorizationError as e:
+        logging.error(e)
         raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:
         logging.error(e)

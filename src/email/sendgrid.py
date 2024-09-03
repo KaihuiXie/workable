@@ -4,6 +4,7 @@ from fastapi import HTTPException, status
 import httpx
 import dns.resolver
 import re
+import logging
 
 class EmailService:
     def __init__(self, api,email_header):
@@ -28,6 +29,7 @@ class EmailService:
             response = self.client.send(message)
             return response
         except Exception as e:
+            logging.error(e)
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
         
     def is_valid_email_format(self, email):
