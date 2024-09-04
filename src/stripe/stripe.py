@@ -84,6 +84,17 @@ class Stripe:
             next_payment_date = datetime.datetime.fromtimestamp(subscriptions[0].current_period_end)
             subscription_status = subscriptions[0].status
             subscription_price = subscriptions[0].plan.amount
+   
+            interval = subscriptions[0].plan.interval  # 'day', 'week', 'month', 'year'
+            interval_count = subscriptions[0].plan.interval_count  # 1 for monthly, 3 for quarterly, etc.
+            
+            # 判断是月度、季度还是其他周期
+            if interval == "month" and interval_count == 1:
+                billing_cycle = "monthly"
+            elif interval == "month" and interval_count == 3:
+                billing_cycle = "quarterly"
+            else:
+                billing_cycle = f"every {interval_count} {interval}s"
 
             return {
                 "email": email,
@@ -92,7 +103,8 @@ class Stripe:
                 "subscription_plan": product_name,
                 "next_payment_date": next_payment_date.strftime("%Y-%m-%d %H:%M:%S"),
                 "subscription_status": subscription_status,
-                "subscription_price": subscription_price
+                "subscription_price": subscription_price,
+                "billing_cycle":billing_cycle
             }
 
         except stripe.error.StripeError as e:
