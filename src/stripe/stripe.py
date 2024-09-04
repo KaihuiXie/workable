@@ -90,9 +90,9 @@ class Stripe:
             
             # 判断是月度、季度还是其他周期
             if interval == "month" and interval_count == 1:
-                billing_cycle = "monthly"
+                billing_cycle = "Monthly"
             elif interval == "month" and interval_count == 3:
-                billing_cycle = "quarterly"
+                billing_cycle = "Quarterly"
             else:
                 billing_cycle = f"every {interval_count} {interval}s"
 
