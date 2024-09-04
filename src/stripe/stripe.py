@@ -71,7 +71,7 @@ class Stripe:
             card_exp_month = payment_methods.data[0].card.exp_month
             card_exp_year = payment_methods.data[0].card.exp_year
 
-            subscriptions = stripe.Subscription.list(customer=customer.id, status="active").data
+            subscriptions = stripe.Subscription.list(customer=customer.id).data
 
             if not subscriptions:
                 raise HTTPException(status_code=404, detail="No active subscriptions found")
@@ -82,13 +82,17 @@ class Stripe:
             product = stripe.Product.retrieve(product_id)
             product_name = product.name
             next_payment_date = datetime.datetime.fromtimestamp(subscriptions[0].current_period_end)
+            subscription_status = subscriptions[0].status
+            subscription_price = subscriptions[0].plan.amount
 
             return {
                 "email": email,
                 "card_last4": card_last4,
                 "card_expiry": f"{card_exp_month}/{card_exp_year}",
                 "subscription_plan": product_name,
-                "next_payment_date": next_payment_date.strftime("%Y-%m-%d %H:%M:%S")
+                "next_payment_date": next_payment_date.strftime("%Y-%m-%d %H:%M:%S"),
+                "subscription_status": subscription_status,
+                "subscription_price": subscription_price
             }
 
         except stripe.error.StripeError as e:
