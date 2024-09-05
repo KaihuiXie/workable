@@ -19,16 +19,26 @@ class Stripe:
                 payload, sig_header, self.endpoint_key
             )
                 # Process the event
-            if event["type"] == "customer.subscription.created":
-                subscription = event["data"]["object"]
-                customer_id = subscription['customer']
-                # Retrieve the customer object
-                customer = stripe.Customer.retrieve(customer_id)
-                # Get the customer's email
-                customer_email = customer.get('email')
-                await self.update_premium(customer_email, True)
-                # Handle successful payment here
-                await self.ems.send_subscription_email(customer_email)
+            if event['type'] == 'checkout.session.completed':
+                session = event['data']['object']
+
+                customer_email = session.get('customer_details', {}).get('email')
+                if session['payment_status'] == 'paid':
+                    await self.update_premium(customer_email, True)
+                    # Handle successful payment here
+                    await self.ems.send_subscription_email(customer_email)
+                else:
+                    print("Payment failed for session:", session.id)
+            # if event["type"] == "customer.subscription.created":
+            #     subscription = event["data"]["object"]
+            #     customer_id = subscription['customer']
+            #     # Retrieve the customer object
+            #     customer = stripe.Customer.retrieve(customer_id)
+            #     # Get the customer's email
+            #     customer_email = customer.get('email')
+            #     await self.update_premium(customer_email, True)
+            #     # Handle successful payment here
+            #     await self.ems.send_subscription_email(customer_email)
 
             elif event["type"] == "customer.subscription.deleted":
                 subscription = event["data"]["object"]
