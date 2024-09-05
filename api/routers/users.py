@@ -14,6 +14,7 @@ from src.users.interfaces import (
     InviteByEmailRequest,
     SignUpRequest,
 )
+from src.stripe.interfaces import CheckoutSessionRequest
 import json
 import urllib
 
@@ -185,3 +186,10 @@ def get_user_subscription_info(request: Request):
     authorization = request.headers.get('Authorization')
     user_email = users.verify_jwt(authorization.replace("Bearer ", "")).user.email
     return payment_service.get_customer_info(user_email)
+
+@router.post("/create_checkout_session")
+async def create_checkout_session(request: CheckoutSessionRequest):
+    try:
+        return payment_service.create_subscription_session(request.email, request.successUrl, request.cancelUrl, request.priceId)
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)

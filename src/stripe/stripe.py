@@ -86,7 +86,6 @@ class Stripe:
             if not subscriptions:
                 raise HTTPException(status_code=404, detail="No active subscriptions found")
             
-            plan_name = subscriptions[0].plan.nickname
             product_id = subscriptions[0].plan.product
 
             product = stripe.Product.retrieve(product_id)
@@ -122,3 +121,49 @@ class Stripe:
         except stripe.error.StripeError as e:
             logging.error(e)
             raise HTTPException(status_code=400, detail=str(e))
+        
+
+    def create_subscription_session(self, email, successUrl, cancelUrl, priceId):
+        try:
+            # Step 1: Check if a customer with this email already exists
+            customers = stripe.Customer.list(email=email).data
+
+            if customers:
+                customer_id = customers[0].id  # Reuse existing customer
+            else:
+                customer = stripe.Customer.create(email=email)  # Create new customer
+                customer_id = customer.id
+
+            # Step 2: Check if customer already has an active subscription for the same priceId
+            subscriptions = stripe.Subscription.list(customer=customer_id, status="active").data
+
+            if subscriptions:
+                # Customer already has an active subscription to this priceId
+                raise HTTPException(
+                    status_code=409, detail="You already have an active subscription to this plan."
+                )
+            # Step 3: Create the checkout session with the customer ID
+            session = stripe.checkout.Session.create(
+                payment_method_types=["card"],
+                customer=customer_id,  # Use the existing or new customer ID
+                line_items=[
+                    {
+                        'price': priceId,
+                        'quantity': 1,
+                    },
+                ],
+                mode='subscription',
+                success_url=successUrl,
+                cancel_url=cancelUrl,
+            )
+
+            # Step 4: Return sessionId to the frontend
+            return {"sessionId": session.id}
+
+        except stripe.error.StripeError as e:
+            logging.error(e)
+            raise HTTPException(status_code=400, detail=str(e))
+        except HTTPException as e:
+            # Invalid payload
+            logging.error(e)
+            raise HTTPException(status_code=e.status_code, detail=e.detail)
