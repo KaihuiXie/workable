@@ -84,7 +84,8 @@ class Stripe:
             next_payment_date = datetime.datetime.fromtimestamp(subscriptions[0].current_period_end)
             subscription_status = subscriptions[0].status
             subscription_price = subscriptions[0].plan.amount
-   
+            is_canceled = subscriptions[0].cancel_at_period_end
+
             interval = subscriptions[0].plan.interval  # 'day', 'week', 'month', 'year'
             interval_count = subscriptions[0].plan.interval_count  # 1 for monthly, 3 for quarterly, etc.
             
@@ -104,7 +105,8 @@ class Stripe:
                 "next_payment_date": next_payment_date.strftime("%Y-%m-%d %H:%M:%S"),
                 "subscription_status": subscription_status,
                 "subscription_price": subscription_price,
-                "billing_cycle":billing_cycle
+                "billing_cycle":billing_cycle,
+                "is_canceled" : is_canceled
             }
 
         except stripe.error.StripeError as e:
