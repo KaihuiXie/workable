@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import RedirectResponse
 
 from common.objects import credits, users
 from src.credits.interfaces import (
@@ -33,14 +34,29 @@ def get_credit(request: Request) -> CreditResponse:
         authorization = request.headers.get("Authorization")
         if not authorization:
             raise AuthorizationError("Authorization header missing")
+
         auth_token = authorization.replace("Bearer ", "")
-        user_id = users.verify_jwt(auth_token).user.id
+
+        try:
+            # Try to verify the JWT token
+            user_id = users.verify_jwt(auth_token).user.id
+        except Exception as jwt_error:  # General Exception to catch any errors during JWT verification
+            logging.error(f"JWT verification failed: {jwt_error}")
+            # Redirect to login if JWT verification fails
+            return RedirectResponse(url="/login", status_code=307)
+
+        # If JWT is verified, get the credits
         temp_credit, perm_credit = credits.get_credit(user_id)
         return CreditResponse(temp_credit=temp_credit, perm_credit=perm_credit)
-    except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
 
+    except AuthorizationError as auth_error:
+        logging.error(f"Authorization error: {auth_error}")
+        # Redirect the user to the login page if the Authorization header is missing
+        return RedirectResponse(url="/login", status_code=307)
+
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 # TODO deprecate
 # @router.get("/temp/{user_id}", response_model=TempCreditResponse)
 # def get_temp_credit(user_id: str) -> TempCreditResponse:
