@@ -14,8 +14,7 @@ from api.routers import (
     users,
 )
 from common.objects import supabase
-from src.middlewares import ExtendTimeoutMiddleware, TimerMiddleware
-
+from src.middlewares import ExtendTimeoutMiddleware, TimerMiddleware, AuthMiddleware
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
@@ -72,6 +71,7 @@ app.add_middleware(
 
 app.add_middleware(ExtendTimeoutMiddleware)
 app.add_middleware(TimerMiddleware)
+app.add_middleware(AuthMiddleware)
 app.include_router(shared_chats.router)
 app.include_router(users.router)
 app.include_router(chats.router)
