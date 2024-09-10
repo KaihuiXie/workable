@@ -106,16 +106,16 @@ class InvitationsSupabase(Supabase):
 
     def get_referee_list(self, user_id):
         try:
-            response = (
+            data, count = (
                 self.supabase.table("referee_list")
                 .select("*")
                 .eq("referrer_id", user_id)
                 .execute()
             )
-            return response
+            return data[1]
         except Exception as e:
             raise Exception(
-                f"An error occurred during deleting invitation for user {user_id}: {e}"
+                f"An error occurred during query invitation list for user {user_id}: {e}"
             )
 
     def update_referee_list(self, user_id, guest_email):

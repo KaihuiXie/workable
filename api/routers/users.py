@@ -3,7 +3,7 @@ import urllib.parse
 
 from fastapi import APIRouter, HTTPException, Request, Form, Header, status
 from fastapi.responses import RedirectResponse
-from common.objects import users, ems, payment_service
+from common.objects import users, ems, payment_service, invitations, url_platforms
 from src.users.interfaces import (
     SignInRequest, 
     LoginResponse,
@@ -13,6 +13,10 @@ from src.users.interfaces import (
     UpdatePasswordRequest,
     InviteByEmailRequest,
     SignUpRequest,
+)
+from src.url_platforms.interfaces import (
+    IncrementClicksRequest,
+    UpdateUserProfilePlatformIdRequest,
 )
 from src.stripe.interfaces import CheckoutSessionRequest
 import json
@@ -50,11 +54,15 @@ def oauth_callback(code: str, state: str):
         decoded_state = json.loads(state)
         provider = decoded_state.get('provider')
         redirect_url = decoded_state.get('redirect_url')
+        invitation_token = decoded_state.get('invitation_token')
+        platform_token = decoded_state.get('platform_token')
 
         #retreive user tokens from provider
         tokens = users.exchange_code_for_token(code,provider)
         #save info into supabase
         sessions = users.save_oauth_session(tokens["id_token"],provider)
+        users.set_invitation_token_from_user_profile(sessions["user"].get("id"),invitation_token)
+        users.set_platform_id_from_user_profile(sessions["user"].get("id"),platform_token)
 
         response_param = {}
         response_param["access_token"] = sessions["access_token"]
@@ -75,11 +83,17 @@ def oauth_callback(code: str = Form(...), state: str = Form(...)):
         decoded_state = json.loads(state)
         provider = decoded_state.get('provider')
         redirect_url = decoded_state.get('redirect_url') #frontend location
+        invitation_token = decoded_state.get('invitation_token')
+        platform_token = decoded_state.get('platform_token')
 
         #retreive user tokens from provider
         tokens = users.exchange_code_for_token(code,provider)
         #save info into supabase
         sessions = users.save_oauth_session(tokens["id_token"],provider)
+
+        #update platform_id and invitation_token
+        users.set_invitation_token_from_user_profile(sessions["user"].get("id"),invitation_token)
+        users.set_platform_id_from_user_profile(sessions["user"].get("id"),platform_token)
 
         response_param = {}
         response_param["access_token"] = sessions["access_token"]
@@ -100,6 +114,7 @@ def get_user_info(request: Request):
     try:
         authorization = request.headers.get('Authorization')
         response = users.get_user(authorization.replace("Bearer ", ""))
+        response.is_valid_for_new = invitations.get_invitation_by_token(request.invitation_token, response.user_id)
         return response
     except Exception as e:
         logging.error(e)
@@ -149,6 +164,10 @@ def invite_user_by_email(request: InviteByEmailRequest):
 def sign_up_by_email(request: SignUpRequest) -> LoginResponse:
     try:
         response = users.sign_up_with_email(request.email, request.password)
+        response.user_info.is_valid_for_new = invitations.get_invitation_by_token(request.invitation_token, response.user_info.user_id)
+        if request.platform_token:
+            url_platforms.increment_clicks(IncrementClicksRequest(platform_id=request.platform_token))
+            url_platforms.update_platform_id(UpdateUserProfilePlatformIdRequest(platform_id=request.platform_token,user_id=response.user_info.user_id))
         return response
     except HTTPException as e:
         logging.error(e)

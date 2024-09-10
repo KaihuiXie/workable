@@ -5,7 +5,6 @@ from fastapi import APIRouter, HTTPException
 from common.objects import invitations
 from src.invitations.interfaces import (
     InvitationTokenResponse,
-    RefereeListResponse,
     UpdateInvitationNotificationRequest,
     VerifyUserIsEligibleForBonus,
 )
@@ -53,7 +52,7 @@ def verify_user(request: VerifyUserIsEligibleForBonus) -> bool:
 
 
 @router.get("/list/{user_id}")
-def get_referee_list(user_id: str) -> RefereeListResponse:
+def get_referee_list(user_id: str):
     """
     get referee list of the user
     - input: \n

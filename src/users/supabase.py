@@ -173,3 +173,43 @@ class UsersSupabase:
             .execute()
         )
         return data[1][0]["is_premium"]
+
+    def set_invitation_token_from_user_profile(self, user_id, invitation_token):
+        try:
+            data, count = (
+                self.supabase.table("user_profile")
+                .update({"invitation_token":invitation_token})
+                .eq("user_id", user_id)
+                .execute()
+            )
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during updating invitation token for user {user_id}: {e}"
+            )
+
+    def set_platform_id_from_user_profile(self, user_id, platform_id):
+        try:
+            data, count = (
+                self.supabase.table("user_profile")
+                .update({"platform_id":platform_id})
+                .eq("user_id", user_id)
+                .execute()
+            )
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during updating platform_id for user {user_id}: {e}"
+            )
+
+    def get_invitation_token_from_user_profile(self, user_id):
+        try:
+            data, count = (
+                self.supabase.table("user_profile")
+                .select("invitation_token")
+                .eq("user_id", user_id)
+                .execute()
+            )
+            return data[1][0]["invitation_token"]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting invitation token for user {user_id}: {e}"
+            )

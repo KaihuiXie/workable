@@ -2,6 +2,7 @@ import time
 from fastapi import Request, HTTPException
 from fastapi.responses import RedirectResponse
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import JSONResponse
 from common.objects import users
 
 class AuthMiddleware(BaseHTTPMiddleware):
@@ -22,18 +23,17 @@ class AuthMiddleware(BaseHTTPMiddleware):
             "/credit",
             "/url_platforms/update_user_profile"
         ]
-
+        auth_header = request.headers.get("Authorization")
         if any(request.url.path.startswith(path) for path in closed_paths):
-            auth_header = request.headers.get("Authorization")
             if not auth_header:
-                return RedirectResponse(url="/login", status_code=307)
+                return JSONResponse({"error": "Unauthorized"}, status_code=401)
 
             try:
                 token = auth_header.replace("Bearer ", "")
                 users.verify_jwt(token)
-            except Exception:
-                return RedirectResponse(url="/login", status_code=307)
-
+            except HTTPException:
+                return JSONResponse({"error": "Unauthorized"}, status_code=401)
+            
         response = await call_next(request)
         return response
 class ExtendTimeoutMiddleware(BaseHTTPMiddleware):

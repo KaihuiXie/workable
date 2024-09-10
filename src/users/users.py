@@ -21,12 +21,12 @@ class User(UsersSupabase):
 
     def login(self, email, password):
         auth_response = self.supabase.sign_in_with_password(email, password)
-        package = "free"
+        package = self.supabase.get_subscription(auth_response.user.id)
         user_info = UserInfo(
             user_id = auth_response.user.id,
             email = auth_response.user.email,
             name = auth_response.user.user_metadata.get("full_name"),
-            package = package,
+            package = "free" if not package else "premium",
             avatar_url = auth_response.user.user_metadata.get("avatar_url")
         )
         return LoginResponse(
@@ -95,12 +95,12 @@ class User(UsersSupabase):
            
     def get_user(self,jwt):
         response = self.supabase.get_user(jwt)
-        package = "free"
+        package = self.supabase.get_subscription(response.user.id)
         user_info = UserInfo(
             user_id = response.user.id,
             email = response.user.email,
             name = response.user.user_metadata.get("full_name", ""),
-            package = package,
+            package = "free" if not package else "premium",
             avatar_url = response.user.user_metadata.get("avatar_url", "")
         )
         return user_info
@@ -116,12 +116,12 @@ class User(UsersSupabase):
     
     def sign_up_with_email(self, email, password):
         auth_response = self.supabase.sign_up_with_email(email, password)
-        package = "free"
+        package = self.supabase.get_subscription(auth_response.user.id)
         user_info = UserInfo(
             user_id = auth_response.user.id,
             email = auth_response.user.user_metadata.get("email"),
             name = auth_response.user.user_metadata.get("full_name"),
-            package = package,
+            package = "free" if not package else "premium",
             avatar_url = auth_response.user.user_metadata.get("avatar_url")
         )
         return LoginResponse(

@@ -16,6 +16,8 @@ class SignInRequest(BaseModel):
 class SignUpRequest(BaseModel):
     email: str
     password: str
+    invitation_token: Optional[str] = None
+    platform_token: Optional[str] = None
 
 class UserInfo(BaseModel):
     user_id: str
@@ -23,6 +25,7 @@ class UserInfo(BaseModel):
     name: Optional[str] = None
     package: str
     avatar_url: Optional[str] = None
+    is_valid_for_new: Optional[bool] = False
 
 class LoginResponse(BaseModel):
     access_token: str

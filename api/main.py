@@ -13,7 +13,6 @@ from api.routers import (
     url_platforms,
     users,
 )
-from common.objects import supabase
 from src.middlewares import ExtendTimeoutMiddleware, TimerMiddleware, AuthMiddleware
 # Configure logging
 logging.basicConfig(level=logging.INFO)
