@@ -8,6 +8,9 @@ from common.objects import users
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # List of paths that require authentication
+        if request.method == "OPTIONS":
+            response = await call_next(request)
+            return response
         closed_paths = [
             "/logout",
             "/user_info",
