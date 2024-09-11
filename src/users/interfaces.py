@@ -57,8 +57,8 @@ class AuthorizationError(Exception):
 class InviteByEmailRequest(BaseModel):
     email: str = Field(..., description="User email")
     redirect_to_url: str = Field(..., description="Redirect url")
-    invitation_token: Optional[str] = Field(..., description="invitation_token")
-    platform_token: Optional[str] = Field(..., description="platform_token")
+    invitation_token: Optional[str] = Field(None, description="invitation_token")
+    platform_token: Optional[str] = Field(None, description="platform_token")
 
 
 class DeleteByEmailRequest(BaseModel):
