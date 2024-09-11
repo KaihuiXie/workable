@@ -13,7 +13,7 @@ from api.routers import (
     url_platforms,
     users,
 )
-from src.middlewares import ExtendTimeoutMiddleware, TimerMiddleware, AuthMiddleware
+from src.middlewares import ExtendTimeoutMiddleware, TimerMiddleware
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
@@ -70,7 +70,7 @@ app.add_middleware(
 
 app.add_middleware(ExtendTimeoutMiddleware)
 app.add_middleware(TimerMiddleware)
-app.add_middleware(AuthMiddleware)
+# app.add_middleware(AuthMiddleware)
 app.include_router(shared_chats.router)
 app.include_router(users.router)
 app.include_router(chats.router)
