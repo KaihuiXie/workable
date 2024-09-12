@@ -8,14 +8,14 @@ from src.invitations.interfaces import (
     UpdateInvitationNotificationRequest,
     VerifyUserIsEligibleForBonus,
 )
-
+import uuid
 router = APIRouter(
     prefix="/invitation",
     tags=["invitations"],
     responses={404: {"description": "Not found"}},
 )
 logging.basicConfig(level=logging.INFO)
-import uuid
+
 
 def is_valid_uuid(user_id):
     try:
@@ -33,8 +33,13 @@ def get_invitation_by_user_id(user_id: str) -> InvitationTokenResponse:
       - `token`: the invitation token\n
     """
     try:
+        if not is_valid_uuid(user_id):
+            raise HTTPException(status_code=401, detail="Authorization header missing")
         response = invitations.get_invitation_by_user_id(user_id)
         return InvitationTokenResponse(token=response)
+    except HTTPException as e:
+        logging.error(f"HTTP Exception: {e.detail}")
+        raise e
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail=str(e))
