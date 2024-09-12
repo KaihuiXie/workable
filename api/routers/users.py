@@ -61,8 +61,6 @@ def oauth_callback(code: str, state: str):
         tokens = users.exchange_code_for_token(code,provider)
         #save info into supabase
         sessions = users.save_oauth_session(tokens["id_token"],provider)
-        print(invitation_token)
-        print(platform_token)
         if invitation_token and not users.supabase.get_invitation_token_from_user_profile(sessions["user"].get("id")):
             users.supabase.set_invitation_token_from_user_profile(sessions["user"].get("id"),invitation_token)
         if platform_token and not users.supabase.get_platform_token_from_user_profile(sessions["user"].get("id")):
