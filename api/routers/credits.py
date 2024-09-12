@@ -41,11 +41,11 @@ def get_credit(request: Request) -> CreditResponse:
         try:
             user_id = users.verify_jwt(auth_token).user.id
         except Exception as e:
-            raise HTTPException(status_code=401, detail=e)
+            raise HTTPException(status_code=401, detail=str(e))
         temp_credit, perm_credit = credits.get_credit(user_id)
         return CreditResponse(temp_credit=temp_credit, perm_credit=perm_credit)
     except HTTPException as e:
-        logging.error(f"HTTP Exception: {e.detail}")
+        logging.error(f"HTTP Exception: {e}")
         raise e
     except Exception as e:
         logging.error(f"Unexpected error: {e}")

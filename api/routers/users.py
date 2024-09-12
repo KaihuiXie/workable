@@ -224,7 +224,7 @@ def get_user_subscription(request: Request):
         try:
             user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
         except Exception as e:
-            raise HTTPException(status_code=401, detail=e)
+            raise HTTPException(status_code=401, detail=str(e))
         return {"result":users.get_subscription(user_id)}
     except HTTPException as e:
         logging.error(f"HTTP Exception: {e.detail}")
@@ -244,7 +244,7 @@ def get_user_subscription_info(request: Request):
         try:
             user_email = users.verify_jwt(authorization.replace("Bearer ", "")).user.email
         except Exception as e:
-            raise HTTPException(status_code=401, detail=e)
+            raise HTTPException(status_code=401, detail=str(e))
         return payment_service.get_customer_info(user_email)
     except HTTPException as e:
         logging.error(f"HTTP Exception: {e.detail}")
