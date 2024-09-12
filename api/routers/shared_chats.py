@@ -10,6 +10,7 @@ from src.shared_chats.interfaces import (
     NewSharedChatRequest,
     NewSharedChatResponse,
 )
+from src.utils import is_valid_jwt_format
 
 router = APIRouter(
     prefix="/shared_chat",
@@ -37,6 +38,8 @@ def create_shared_chat(
         authorization = request.headers.get("Authorization")
         if not authorization:
             raise AuthorizationError("Authorization header missing")
+        if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
+            raise HTTPException(status_code=401, detail="Authorization not valid")
         shared_chat_id = shared_chats.create_shared_chat(
             shared_chat_request, authorization.replace("Bearer ", "")
         )

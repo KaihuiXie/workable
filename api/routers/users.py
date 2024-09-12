@@ -21,6 +21,7 @@ from src.url_platforms.interfaces import (
 from src.stripe.interfaces import CheckoutSessionRequest
 import json
 import urllib
+from src.utils import is_valid_jwt_format
 
 router = APIRouter(
     # prefix="/users",
@@ -43,6 +44,10 @@ def login(request: SignInRequest):
 def logout(request:Request):
     try:
         authorization = request.headers.get("Authorization")
+        if not authorization:
+            raise HTTPException(status_code=401, detail="Authorization header missing")
+        if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
+            raise HTTPException(status_code=401, detail="Authorization not valid")
         users.logout(authorization.replace("Bearer ", ""))
     except Exception as e:
         logging.error(e)
@@ -117,6 +122,10 @@ def oauth_callback(code: str = Form(...), state: str = Form(...)):
 def get_user_info(request: Request):
     try:
         authorization = request.headers.get('Authorization')
+        if not authorization:
+            raise HTTPException(status_code=401, detail="Authorization header missing")
+        if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
+            raise HTTPException(status_code=401, detail="Authorization not valid")
         response = users.get_user(authorization.replace("Bearer ", ""))
         invitation_token = users.supabase.get_invitation_token_from_user_profile(response.user_id)
         response.is_valid_for_new = invitations.get_invitation_by_token(invitation_token, response.user_id)
@@ -137,6 +146,10 @@ def reset_password(request: ResetPasswordRequest):
 @router.post("/update_password")
 def reset_password(request: UpdatePasswordRequest, authorization:str = Header(None)):
     try:
+        if not authorization:
+            raise HTTPException(status_code=401, detail="Authorization header missing")
+        if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
+            raise HTTPException(status_code=401, detail="Authorization not valid")
         user = users.verify_jwt(authorization.replace("Bearer ", ""))
         if not user:
             raise AuthorizationError("Authorization header missing or expired")
@@ -206,6 +219,8 @@ def get_user_subscription(request: Request):
         authorization = request.headers.get("Authorization")
         if not authorization:
             raise HTTPException(status_code=401, detail="Authorization header missing")
+        if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
+            raise HTTPException(status_code=401, detail="Authorization not valid")
         try:
             user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
         except Exception as e:
@@ -224,6 +239,8 @@ def get_user_subscription_info(request: Request):
         authorization = request.headers.get("Authorization")
         if not authorization:
             raise HTTPException(status_code=401, detail="Authorization header missing")
+        if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
+            raise HTTPException(status_code=401, detail="Authorization not valid")
         try:
             user_email = users.verify_jwt(authorization.replace("Bearer ", "")).user.email
         except Exception as e:

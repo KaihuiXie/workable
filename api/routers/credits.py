@@ -12,8 +12,7 @@ from src.credits.interfaces import (
 from src.chats.interfaces import (
     AuthorizationError,
 )
-import base64
-import json
+from src.utils import is_valid_jwt_format
 
 router = APIRouter(
     prefix="/credit",
@@ -23,25 +22,6 @@ router = APIRouter(
 
 logging.basicConfig(level=logging.INFO)
 
-def is_valid_jwt_format(token: str) -> bool:
-    try:
-        # 分割 JWT 为三个部分
-        parts = token.split('.')
-        if len(parts) != 3:
-            return False
-        
-        # 验证 Header 和 Payload 是否是有效的 Base64 编码的 JSON
-        header = base64.urlsafe_b64decode(parts[0] + "==").decode('utf-8')
-        payload = base64.urlsafe_b64decode(parts[1] + "==").decode('utf-8')
-        
-        # 尝试将 Header 和 Payload 解析为 JSON
-        json.loads(header)
-        json.loads(payload)
-        
-        # 如果能成功解析，说明格式是有效的
-        return True
-    except Exception:
-        return False
     
 @router.get("", response_model=CreditResponse)
 def get_credit(request: Request) -> CreditResponse:

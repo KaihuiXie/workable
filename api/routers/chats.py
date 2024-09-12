@@ -15,6 +15,7 @@ from src.chats.interfaces import (
     NewChatRequest,
     SSEResponse,
 )
+from src.utils import is_valid_jwt_format
 
 router = APIRouter(
     # prefix="/chats",
@@ -35,6 +36,8 @@ def new_chat(
         authorization = request.headers.get("Authorization")
         if not authorization:
             raise AuthorizationError("Authorization header missing")
+        if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
+            raise HTTPException(status_code=401, detail="Authorization not valid")
         auth_token = authorization.replace("Bearer ", "")
         user_id = users.verify_jwt(auth_token).user.id
         temp_credit, perm_credit = credits.get_credit(user_id)
@@ -67,6 +70,8 @@ def chat(chat_request: ChatRequest, request: Request):
         authorization = request.headers.get("Authorization")
         if not authorization:
             raise AuthorizationError("Authorization header missing")
+        if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
+            raise HTTPException(status_code=401, detail="Authorization not valid")
         auth_token = authorization.replace("Bearer ", "")
         chat_record = chats.supabase.get_all_chat_columns_by_id(
             chat_request.chat_id, [ChatColumn.PAYLOAD, ChatColumn.LEARNER_MODE, ChatColumn.USER_ID], auth_token
@@ -104,6 +109,8 @@ def all_chats(request: Request):
         authorization = request.headers.get("Authorization")
         if not authorization:
             raise AuthorizationError("Authorization header missing")
+        if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
+            raise HTTPException(status_code=401, detail="Authorization not valid")
         user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
         response = chats.get_all_chats(user_id, authorization.replace("Bearer ", ""))
         return AllChatsResponse(data=response.data, count=response.count)
@@ -121,6 +128,8 @@ def get_chat(chat_id: str, request: Request):
         authorization = request.headers.get("Authorization")
         if not authorization:
             raise AuthorizationError("Authorization header missing")
+        if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
+            raise HTTPException(status_code=401, detail="Authorization not valid")
         user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
         return chats.get_chat(
             chat_id=chat_id,
@@ -145,7 +154,8 @@ def delete_chat(chat_id: str, request: Request):
         authorization = request.headers.get("Authorization")
         if not authorization:
             raise AuthorizationError("Authorization header missing")
-
+        if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
+            raise HTTPException(status_code=401, detail="Authorization not valid")
         chats.delete_chat(chat_id, authorization.replace("Bearer ", ""))
         return DeleteChatResponse(chat_id=chat_id)
     except AuthorizationError as e:
