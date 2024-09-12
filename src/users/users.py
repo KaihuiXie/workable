@@ -137,13 +137,22 @@ class User(UsersSupabase):
             raise HTTPException(status_code=e.status_code, detail=str(e.detail))
 
     def verify_jwt(self,jwt):
-        return self.supabase.get_user(jwt)
+        try:
+            return self.supabase.get_user(jwt)
+        except Exception as e:
+            raise Exception(f"An error occurred during verify_jwt: {e}")
     
     def verify_email(self,email):
-        return self.supabase.verify_if_user_exist(email)
+        try:
+            return self.supabase.verify_if_user_exist(email)
+        except Exception as e:
+            raise Exception(f"An error occurred during verify_email: {e}")
     
     def get_subscription(self, user_id):
-        return self.supabase.get_subscription(user_id)
+        try:
+            return self.supabase.get_subscription(user_id)
+        except Exception as e:
+            raise Exception(f"An error occurred during get subscription: {e}")
     # def invite_user_by_email(self, email: str, redirect_to_url: str, invitation_token: str, platform_token: str):
     #     return super().invite_user_by_email(email, redirect_to_url, invitation_token, platform_token)
     
