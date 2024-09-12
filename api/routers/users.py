@@ -61,8 +61,12 @@ def oauth_callback(code: str, state: str):
         tokens = users.exchange_code_for_token(code,provider)
         #save info into supabase
         sessions = users.save_oauth_session(tokens["id_token"],provider)
-        users.set_invitation_token_from_user_profile(sessions["user"].get("id"),invitation_token)
-        users.set_platform_id_from_user_profile(sessions["user"].get("id"),platform_token)
+        print(invitation_token)
+        print(platform_token)
+        if invitation_token and not users.supabase.get_invitation_token_from_user_profile(sessions["user"].get("id")):
+            users.supabase.set_invitation_token_from_user_profile(sessions["user"].get("id"),invitation_token)
+        if platform_token and not users.supabase.get_platform_token_from_user_profile(sessions["user"].get("id")):
+            users.supabase.set_platform_id_from_user_profile(sessions["user"].get("id"),platform_token)
 
         response_param = {}
         response_param["access_token"] = sessions["access_token"]
@@ -92,8 +96,10 @@ def oauth_callback(code: str = Form(...), state: str = Form(...)):
         sessions = users.save_oauth_session(tokens["id_token"],provider)
 
         #update platform_id and invitation_token
-        users.set_invitation_token_from_user_profile(sessions["user"].get("id"),invitation_token)
-        users.set_platform_id_from_user_profile(sessions["user"].get("id"),platform_token)
+        if invitation_token:
+            users.supabase.set_invitation_token_from_user_profile(sessions["user"].get("id"),invitation_token)
+        if platform_token:
+            users.supabase.set_platform_id_from_user_profile(sessions["user"].get("id"),platform_token)
 
         response_param = {}
         response_param["access_token"] = sessions["access_token"]
@@ -114,7 +120,8 @@ def get_user_info(request: Request):
     try:
         authorization = request.headers.get('Authorization')
         response = users.get_user(authorization.replace("Bearer ", ""))
-        response.is_valid_for_new = invitations.get_invitation_by_token(request.invitation_token, response.user_id)
+        invitation_token = users.supabase.get_invitation_token_from_user_profile(response.user_id)
+        response.is_valid_for_new = invitations.get_invitation_by_token(invitation_token, response.user_id)
         return response
     except Exception as e:
         logging.error(e)
@@ -164,7 +171,8 @@ def invite_user_by_email(request: InviteByEmailRequest):
 def sign_up_by_email(request: SignUpRequest) -> LoginResponse:
     try:
         response = users.sign_up_with_email(request.email, request.password)
-        response.user_info.is_valid_for_new = invitations.get_invitation_by_token(request.invitation_token, response.user_info.user_id)
+        if request.invitation_token:
+            response.user_info.is_valid_for_new = invitations.get_invitation_by_token(request.invitation_token, response.user_info.user_id)
         if request.platform_token:
             url_platforms.increment_clicks(IncrementClicksRequest(platform_id=request.platform_token))
             url_platforms.update_platform_id(UpdateUserProfilePlatformIdRequest(platform_id=request.platform_token,user_id=response.user_info.user_id))

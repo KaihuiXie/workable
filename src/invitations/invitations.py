@@ -18,8 +18,6 @@ class Invitations(InvitationsSupabase):
 
     def get_invitation_by_token(self, invitation_token: str, user_id: str):
         original_invitation_token = self.supabase.get_invitation_token_from_user_profile(user_id)
-        if invitation_token and invitation_token!=original_invitation_token: #Already claim the bonus
-            return False
         if not invitation_token: #no invitation token found if it is oauth or sign up
             invitation_token = original_invitation_token 
         if not invitation_token: #no invitation at all

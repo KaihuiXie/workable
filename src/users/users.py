@@ -115,23 +115,26 @@ class User(UsersSupabase):
         return self.supabase.grant_login_award(user_id)
     
     def sign_up_with_email(self, email, password):
-        auth_response = self.supabase.sign_up_with_email(email, password)
-        package = self.supabase.get_subscription(auth_response.user.id)
-        user_info = UserInfo(
-            user_id = auth_response.user.id,
-            email = auth_response.user.user_metadata.get("email"),
-            name = auth_response.user.user_metadata.get("full_name"),
-            package = "free" if not package else "premium",
-            avatar_url = auth_response.user.user_metadata.get("avatar_url")
-        )
-        return LoginResponse(
-            access_token = auth_response.session.access_token,
-            user_info = user_info,
-            expires_in = auth_response.session.expires_in,
-            expires_at = auth_response.session.expires_at,
-            refresh_token = auth_response.session.refresh_token,
-            token_type = auth_response.session.token_type
-        )
+        try:
+            auth_response = self.supabase.sign_up_with_email(email, password)
+            package = self.supabase.get_subscription(auth_response.user.id)
+            user_info = UserInfo(
+                user_id = auth_response.user.id,
+                email = auth_response.user.user_metadata.get("email"),
+                name = auth_response.user.user_metadata.get("full_name"),
+                package = "free" if not package else "premium",
+                avatar_url = auth_response.user.user_metadata.get("avatar_url")
+            )
+            return LoginResponse(
+                access_token = auth_response.session.access_token,
+                user_info = user_info,
+                expires_in = auth_response.session.expires_in,
+                expires_at = auth_response.session.expires_at,
+                refresh_token = auth_response.session.refresh_token,
+                token_type = auth_response.session.token_type
+            )
+        except HTTPException as e:
+            raise HTTPException(status_code=e.status_code, detail=str(e.detail))
 
     def verify_jwt(self,jwt):
         return self.supabase.get_user(jwt)

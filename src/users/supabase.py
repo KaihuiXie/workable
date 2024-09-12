@@ -30,9 +30,7 @@ class UsersSupabase:
             })
             return res
         except Exception as e:
-            raise Exception(
-                f"An error occurred during signing up user with email {email}: {e}"
-            )
+            raise HTTPException(status_code=409, detail=e)
 
     def sign_in_with_password(self, email: str, password: str):
         try:
@@ -177,7 +175,7 @@ class UsersSupabase:
     def set_invitation_token_from_user_profile(self, user_id, invitation_token):
         try:
             data, count = (
-                self.supabase.table("user_profile")
+                self.supabase.from_("user_profile")
                 .update({"invitation_token":invitation_token})
                 .eq("user_id", user_id)
                 .execute()
@@ -190,7 +188,7 @@ class UsersSupabase:
     def set_platform_id_from_user_profile(self, user_id, platform_id):
         try:
             data, count = (
-                self.supabase.table("user_profile")
+                self.supabase.from_("user_profile")
                 .update({"platform_id":platform_id})
                 .eq("user_id", user_id)
                 .execute()
@@ -203,7 +201,7 @@ class UsersSupabase:
     def get_invitation_token_from_user_profile(self, user_id):
         try:
             data, count = (
-                self.supabase.table("user_profile")
+                self.supabase.from_("user_profile")
                 .select("invitation_token")
                 .eq("user_id", user_id)
                 .execute()
@@ -212,4 +210,18 @@ class UsersSupabase:
         except Exception as e:
             raise Exception(
                 f"An error occurred during getting invitation token for user {user_id}: {e}"
+            )
+        
+    def get_platform_token_from_user_profile(self, user_id):
+        try:
+            data, count = (
+                self.supabase.from_("user_profile")
+                .select("platform_id")
+                .eq("user_id", user_id)
+                .execute()
+            )
+            return data[1][0]["platform_id"]
+        except Exception as e:
+            raise Exception(
+                f"An error occurred during getting platform_id for user {user_id}: {e}"
             )
