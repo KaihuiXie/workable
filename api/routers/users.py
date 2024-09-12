@@ -202,15 +202,40 @@ async def stripe_webhook(request: Request):
 
 @router.get("/user_subscription")
 def get_user_subscription(request: Request):
-    authorization = request.headers.get('Authorization')
-    user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
-    return {"result":users.get_subscription(user_id)}
+    try:
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            raise HTTPException(status_code=401, detail="Authorization header missing")
+        try:
+            user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
+        except Exception as e:
+            raise HTTPException(status_code=401, detail=e)
+        return {"result":users.get_subscription(user_id)}
+    except HTTPException as e:
+        logging.error(f"HTTP Exception: {e.detail}")
+        raise e
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
     
 @router.get("/user_subscription/info")
 def get_user_subscription_info(request: Request):
-    authorization = request.headers.get('Authorization')
-    user_email = users.verify_jwt(authorization.replace("Bearer ", "")).user.email
-    return payment_service.get_customer_info(user_email)
+    try:
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            raise HTTPException(status_code=401, detail="Authorization header missing")
+        try:
+            user_email = users.verify_jwt(authorization.replace("Bearer ", "")).user.email
+        except Exception as e:
+            raise HTTPException(status_code=401, detail=e)
+        return payment_service.get_customer_info(user_email)
+    except HTTPException as e:
+        logging.error(f"HTTP Exception: {e.detail}")
+        raise e
+    except Exception as e:
+        logging.error(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+    
 
 @router.post("/create_checkout_session")
 async def create_checkout_session(request: CheckoutSessionRequest):

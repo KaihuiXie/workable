@@ -32,14 +32,20 @@ def get_credit(request: Request) -> CreditResponse:
     try:
         authorization = request.headers.get("Authorization")
         if not authorization:
-            raise AuthorizationError("Authorization header missing")
+            raise HTTPException(status_code=401, detail="Authorization header missing")
         auth_token = authorization.replace("Bearer ", "")
-        user_id = users.verify_jwt(auth_token).user.id
+        try:
+            user_id = users.verify_jwt(auth_token).user.id
+        except Exception as e:
+            raise HTTPException(status_code=401, detail=e)
         temp_credit, perm_credit = credits.get_credit(user_id)
         return CreditResponse(temp_credit=temp_credit, perm_credit=perm_credit)
+    except HTTPException as e:
+        logging.error(f"HTTP Exception: {e.detail}")
+        raise e
     except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.error(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 # TODO deprecate
 # @router.get("/temp/{user_id}", response_model=TempCreditResponse)

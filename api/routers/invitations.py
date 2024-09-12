@@ -15,7 +15,14 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 logging.basicConfig(level=logging.INFO)
+import uuid
 
+def is_valid_uuid(user_id):
+    try:
+        uuid_obj = uuid.UUID(user_id, version=4)
+        return str(uuid_obj) == user_id
+    except ValueError:
+        return False
 
 @router.get("/{user_id}")
 def get_invitation_by_user_id(user_id: str) -> InvitationTokenResponse:
@@ -60,7 +67,7 @@ def get_referee_list(user_id: str):
     - return: `list`, the list of referee information\n
     """
     try:
-        if not user_id:
+        if not is_valid_uuid(user_id):
             return []
         return invitations.get_referee_list(user_id)
     except Exception as e:
