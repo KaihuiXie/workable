@@ -108,18 +108,18 @@ def all_chats(request: Request):
         # get the authorization header
         authorization = request.headers.get("Authorization")
         if not authorization:
-            raise AuthorizationError("Authorization header missing")
+            raise HTTPException(status_code=401, detail="Authorization header missing")
         if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
             raise HTTPException(status_code=401, detail="Authorization not valid")
         user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
         response = chats.get_all_chats(user_id, authorization.replace("Bearer ", ""))
         return AllChatsResponse(data=response.data, count=response.count)
-    except AuthorizationError as e:
-        raise HTTPException(status_code=401, detail=str(e))
+    except HTTPException as e:
+        logging.error(f"HTTP Exception: {e.detail}")
+        raise e
     except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
-
+        logging.error(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @router.get("/chat/{chat_id}", response_model=GetChatResponse)
 def get_chat(chat_id: str, request: Request):
@@ -127,7 +127,7 @@ def get_chat(chat_id: str, request: Request):
         # get the authorization header
         authorization = request.headers.get("Authorization")
         if not authorization:
-            raise AuthorizationError("Authorization header missing")
+            raise HTTPException(status_code=401, detail="Authorization header missing")
         if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
             raise HTTPException(status_code=401, detail="Authorization not valid")
         user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
@@ -136,15 +136,12 @@ def get_chat(chat_id: str, request: Request):
             user_id=user_id,
             auth_token=authorization.replace("Bearer ", ""),
         )
-    except AuthorizationError as e:
-        logging.error(e)
-        raise HTTPException(status_code=401, detail=str(e))
-    except ChatOwnershipError as e:
-        logging.error(e)
-        raise HTTPException(status_code=405, detail=str(e))
+    except HTTPException as e:
+        logging.error(f"HTTP Exception: {e.detail}")
+        raise e
     except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.error(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.delete("/chat/{chat_id}", response_model=DeleteChatResponse)
@@ -153,17 +150,17 @@ def delete_chat(chat_id: str, request: Request):
         # get the authorization header
         authorization = request.headers.get("Authorization")
         if not authorization:
-            raise AuthorizationError("Authorization header missing")
+            raise HTTPException(status_code=401, detail="Authorization header missing")
         if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
             raise HTTPException(status_code=401, detail="Authorization not valid")
         chats.delete_chat(chat_id, authorization.replace("Bearer ", ""))
         return DeleteChatResponse(chat_id=chat_id)
-    except AuthorizationError as e:
-        logging.error(e)
-        raise HTTPException(status_code=401, detail=str(e))
+    except HTTPException as e:
+        logging.error(f"HTTP Exception: {e.detail}")
+        raise e
     except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.error(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 # TODO deprecated

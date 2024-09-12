@@ -71,7 +71,6 @@ class Chat:
             all_chats.data = [chat for chat in all_chats.data if chat["question"] != ""]
             return all_chats
         except Exception as e:
-            print(e)
             logging.error(e)
 
     def get_chat(self, chat_id: str, user_id: str, auth_token) -> GetChatResponse:
