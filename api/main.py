@@ -87,6 +87,13 @@ def health_check():
         logging.error(f"Health Check Failed: {e}")
         raise HTTPException(status_code=500, detail="Service unavailable")
 
+@app.get("/")
+def health_check():
+    try:
+        return {"status": "up"}
+    except Exception as e:
+        logging.error(f"Root Check Failed: {e}")
+        raise HTTPException(status_code=500, detail="Service unavailable")
 
 # TODO deprecate
 # @app.get("/examples")
