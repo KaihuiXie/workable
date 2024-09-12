@@ -111,7 +111,10 @@ def all_chats(request: Request):
             raise HTTPException(status_code=401, detail="Authorization header missing")
         if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
             raise HTTPException(status_code=401, detail="Authorization not valid")
-        user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
+        try:
+            user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
+        except Exception as e:
+            raise HTTPException(status_code=401, detail=str(e))
         response = chats.get_all_chats(user_id, authorization.replace("Bearer ", ""))
         return AllChatsResponse(data=response.data, count=response.count)
     except HTTPException as e:
@@ -130,7 +133,10 @@ def get_chat(chat_id: str, request: Request):
             raise HTTPException(status_code=401, detail="Authorization header missing")
         if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
             raise HTTPException(status_code=401, detail="Authorization not valid")
-        user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
+        try:
+            user_id = users.verify_jwt(authorization.replace("Bearer ", "")).user.id
+        except Exception as e:
+            raise HTTPException(status_code=401, detail=str(e))
         return chats.get_chat(
             chat_id=chat_id,
             user_id=user_id,
@@ -153,6 +159,10 @@ def delete_chat(chat_id: str, request: Request):
             raise HTTPException(status_code=401, detail="Authorization header missing")
         if not is_valid_jwt_format(authorization.replace("Bearer ", "")):
             raise HTTPException(status_code=401, detail="Authorization not valid")
+        try:
+            users.verify_jwt(authorization.replace("Bearer ", ""))
+        except Exception as e:
+            raise HTTPException(status_code=401, detail=str(e))
         chats.delete_chat(chat_id, authorization.replace("Bearer ", ""))
         return DeleteChatResponse(chat_id=chat_id)
     except HTTPException as e:
