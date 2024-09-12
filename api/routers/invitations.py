@@ -60,6 +60,8 @@ def get_referee_list(user_id: str):
     - return: `list`, the list of referee information\n
     """
     try:
+        if not user_id:
+            return []
         return invitations.get_referee_list(user_id)
     except Exception as e:
         logging.error(e)
