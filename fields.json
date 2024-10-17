@@ -1,1 +1,128 @@
-[  {    "label": "First Name",    "id": "first_name",    "required": true,    "type": "text",    "field_key": "first_name"  },  {    "label": "Last Name",    "id": "last_name",    "required": true,    "type": "text",    "field_key": "last_name"  },  {    "label": "Email",    "id": "email",    "required": true,    "type": "email",    "field_key": "email"  },  {    "label": "Phone",    "id": "phone",    "required": true,    "type": "tel",    "field_key": "phone_number"  },  {    "label": "Resume/CV",    "id": "resume",    "required": true,    "type": "file",    "field_key": "resume"  },  {    "label": "Cover Letter",    "id": "cover_letter",    "required": false,    "type": "file",    "field_key": "cover_letter"  },  {    "label": "LinkedIn Profile",    "id": "job_application_answers_attributes_0_text_value",    "required": false,    "type": "text",    "field_key": "linkedin"  },  {    "label": "Website",    "id": "job_application_answers_attributes_1_text_value",    "required": false,    "type": "text",    "field_key": "personal_website"  },  {    "label": "How did you hear about this job?",    "id": "job_application_answers_attributes_2_text_value",    "required": true,    "type": "text",    "field_key": "referral_source"  },  {    "label": "Are you willing and able to reside in the Austin, TX metro area?",    "id": "job_application_answers_attributes_3_boolean_value",    "required": true,    "type": "select",    "field_key": "austin_residence"  },  {    "label": "Have you received or will you be receiving a Bachelor Degree in Computer Science?",    "id": "job_application_answers_attributes_4_boolean_value",    "required": true,    "type": "select",    "field_key": "bachelor_degree_cs"  },  {    "label": "Have you applied or interviewed for this role at Talroo in the last 6 months?",    "id": "job_application_answers_attributes_5_boolean_value",    "required": true,    "type": "select",    "field_key": "previous_application"  },  {    "label": "Gender",    "id": "job_application_gender",    "required": false,    "type": "select",    "field_key": "gender"  },  {    "label": "Are you Hispanic/Latino?",    "id": "job_application_hispanic_ethnicity",    "required": false,    "type": "select",    "field_key": "hispanic_ethnicity"  },  {    "label": "Please identify your race",    "id": "job_application_race",    "required": false,    "type": "select",    "field_key": "race"  },  {    "label": "Veteran Status",    "id": "job_application_veteran_status",    "required": false,    "type": "select",    "field_key": "veteran_status"  },  {    "label": "Disability Status",    "id": "job_application_disability_status",    "required": false,    "type": "select",    "field_key": "disability_status"  },  {    "label": "Security Code",    "id": "security_code",    "required": true,    "type": "text",    "field_key": "security_code"  }]
+[
+  {
+    "label": "First Name",
+    "id": "first_name",
+    "required": true,
+    "type": "text",
+    "field_key": "first_name"
+  },
+  {
+    "label": "Last Name",
+    "id": "last_name",
+    "required": true,
+    "type": "text",
+    "field_key": "last_name"
+  },
+  {
+    "label": "Email",
+    "id": "email",
+    "required": true,
+    "type": "email",
+    "field_key": "email"
+  },
+  {
+    "label": "Phone",
+    "id": "phone",
+    "required": true,
+    "type": "tel",
+    "field_key": "phone_number"
+  },
+  {
+    "label": "Resume/CV",
+    "id": "resume",
+    "required": true,
+    "type": "file",
+    "field_key": "resume"
+  },
+  {
+    "label": "Cover Letter",
+    "id": "cover_letter",
+    "required": false,
+    "type": "file",
+    "field_key": "cover_letter"
+  },
+  {
+    "label": "LinkedIn Profile",
+    "id": "job_application_answers_attributes_0_text_value",
+    "required": false,
+    "type": "text",
+    "field_key": "linkedin"
+  },
+  {
+    "label": "Website",
+    "id": "job_application_answers_attributes_1_text_value",
+    "required": false,
+    "type": "text",
+    "field_key": "personal_website"
+  },
+  {
+    "label": "How did you hear about this job?",
+    "id": "job_application_answers_attributes_2_text_value",
+    "required": true,
+    "type": "text",
+    "field_key": "referral_source"
+  },
+  {
+    "label": "Are you willing and able to reside in the Austin, TX metro area?",
+    "id": "job_application_answers_attributes_3_boolean_value",
+    "required": true,
+    "type": "select",
+    "field_key": "austin_residence"
+  },
+  {
+    "label": "Have you received or will you be receiving a Bachelor Degree in Computer Science?",
+    "id": "job_application_answers_attributes_4_boolean_value",
+    "required": true,
+    "type": "select",
+    "field_key": "bachelor_degree_cs"
+  },
+  {
+    "label": "Have you applied or interviewed for this role at Talroo in the last 6 months?",
+    "id": "job_application_answers_attributes_5_boolean_value",
+    "required": true,
+    "type": "select",
+    "field_key": "previous_application"
+  },
+  {
+    "label": "Gender",
+    "id": "job_application_gender",
+    "required": false,
+    "type": "select",
+    "field_key": "gender"
+  },
+  {
+    "label": "Are you Hispanic/Latino?",
+    "id": "job_application_hispanic_ethnicity",
+    "required": false,
+    "type": "select",
+    "field_key": "hispanic_ethnicity"
+  },
+  {
+    "label": "Please identify your race",
+    "id": "job_application_race",
+    "required": false,
+    "type": "select",
+    "field_key": "race"
+  },
+  {
+    "label": "Veteran Status",
+    "id": "job_application_veteran_status",
+    "required": false,
+    "type": "select",
+    "field_key": "veteran_status"
+  },
+  {
+    "label": "Disability Status",
+    "id": "job_application_disability_status",
+    "required": false,
+    "type": "select",
+    "field_key": "disability_status"
+  },
+  {
+    "label": "Security Code",
+    "id": "security_code",
+    "required": true,
+    "type": "text",
+    "field_key": "security_code"
+  }
+]

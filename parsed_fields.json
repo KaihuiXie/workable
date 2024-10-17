@@ -1,0 +1,118 @@
+{
+  "fields": [
+    {
+      "label": "First Name",
+      "selector": "input#first_name",
+      "required": true,
+      "key": "first_name"
+    },
+    {
+      "label": "Last Name",
+      "selector": "input#last_name",
+      "required": true,
+      "key": "last_name"
+    },
+    {
+      "label": "Email",
+      "selector": "input#email",
+      "required": true,
+      "key": "email"
+    },
+    {
+      "label": "Phone",
+      "selector": "input#phone",
+      "required": true,
+      "key": "phone"
+    },
+    {
+      "label": "Resume/CV",
+      "selector": "textarea#resume_text",
+      "required": true,
+      "key": "resume"
+    },
+    {
+      "label": "School",
+      "selector": "input#education_school_name_0",
+      "required": true,
+      "key": "education_school"
+    },
+    {
+      "label": "Degree",
+      "selector": "select#education_degree_0",
+      "required": true,
+      "key": "education_degree"
+    },
+    {
+      "label": "Discipline",
+      "selector": "select#education_discipline_0",
+      "required": true,
+      "key": "education_discipline"
+    },
+    {
+      "label": "LinkedIn Profile",
+      "selector": "input#job_application_answers_attributes_0_text_value",
+      "required": true,
+      "key": "linkedin_profile"
+    },
+    {
+      "label": "Are you currently located and planning to work in the US?",
+      "selector": "select#job_application_answers_attributes_1_boolean_value",
+      "required": true,
+      "key": "located_in_us"
+    },
+    {
+      "label": "Are you legally authorized to work in the U.S. without any restrictions?",
+      "selector": "select#job_application_answers_attributes_2_boolean_value",
+      "required": true,
+      "key": "authorized_to_work_us"
+    },
+    {
+      "label": "Will you now or in the future require sponsorship for employment visa status?",
+      "selector": "select#job_application_answers_attributes_3_boolean_value",
+      "required": true,
+      "key": "require_visa_sponsorship"
+    },
+    {
+      "label": "Which of the following states do you plan to work in?",
+      "selector": "select#job_application_answers_attributes_4_answer_selected_options_attributes_4_question_option_id",
+      "required": true,
+      "key": "work_state"
+    },
+    {
+      "label": "Do you have experience with Kotlin, Android studio, and Git?",
+      "selector": "select#job_application_answers_attributes_5_boolean_value",
+      "required": true,
+      "key": "experience_kotlin_android_git"
+    },
+    {
+      "label": "Have you developed or worked on apps using Kotlin, Android studio, and Git?",
+      "selector": "select#job_application_answers_attributes_6_boolean_value",
+      "required": true,
+      "key": "developed_apps_kotlin_android_git"
+    },
+    {
+      "label": "If yes, please include a link to your website or the app you worked on using Kotlin, Android studio, and Git",
+      "selector": "input#job_application_answers_attributes_7_text_value",
+      "required": true,
+      "key": "app_link"
+    },
+    {
+      "label": "Are you a referral?",
+      "selector": "select#job_application_answers_attributes_8_boolean_value",
+      "required": true,
+      "key": "is_referral"
+    },
+    {
+      "label": "Referrer Full Name (If Applicable)",
+      "selector": "input#job_application_answers_attributes_9_text_value",
+      "required": false,
+      "key": "referrer_full_name"
+    },
+    {
+      "label": "Referrer's Fieldwire/Hilti work Email Address (If Applicable)",
+      "selector": "input#job_application_answers_attributes_10_text_value",
+      "required": true,
+      "key": "referrer_email"
+    }
+  ]
+}

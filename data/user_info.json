@@ -1,8 +1,8 @@
 {
   "first_name": "Kaihui",
-  "second_name": "Xie",
+  "last_name": "Xie",
   "contact": {
-    "phone_number": "(510) 710-3028",
+    "phone": "(510) 710-3028",
     "email": "kaihui_xie@berkeley.edu",
     "location": "San Francisco Bay Area, CA",
     "linkedin": "linkedin.com/in/kaihui-xie"
@@ -146,5 +146,10 @@
         "Clustered 14 categories of aspect words and analyzed their impact using linear regression"
       ]
     }
-  ]
+  ],
+  "resume": "E:\\projects\\workable\\data\\CV-Kaihui Xie.pdf",
+  "cover_letter": "E:\\projects\\workable\\data\\Cover Letter.pdf",
+  "visa_sponsorship": "True",
+  "work_authorization_us": "True",
+  "referral": "False"
 }
