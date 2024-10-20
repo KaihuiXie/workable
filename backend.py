@@ -66,7 +66,7 @@ def parse_html_with_gpt(simplified_html, user_info):
         
         also here is the user's information. 
         ```{user_info}```
-        try to align "key" with the user information json file's keys when you are figuring out the fields.
+        try to align "key" with the user information json file's keys when you are figuring out the fields. Also make sure you don't force match irrelevant keys.
         
         Ensure the CSS selector is accurate and can be used in document.querySelector().
         
@@ -139,6 +139,8 @@ def find_key(data, target_key):
     return None
 
 def get_value_from_user_info(key, user_info):
+    if not key:
+        return None
     keys = key.split('.')
     #print("key: ", key)
     #print("keys: ", keys)
