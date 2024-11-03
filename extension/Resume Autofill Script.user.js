@@ -12,8 +12,8 @@
     'use strict';
 
     // Configuration
-    const BACKEND_URL = 'http://localhost:5000/process_html';
-    const RESUME_URL = 'http://localhost:5000/get_resume';
+    const BACKEND_URL = 'http://localhost:8080/process_html';
+    const RESUME_URL = 'http://localhost:8080/get_resume';
 
     // Function to check if we're on a recruiting-related page
     function isRecruitingSite() {
@@ -22,7 +22,9 @@
             /lever\.co/,
             /myworkdayjobs\.com/,
             /workday\.com/,
-            /smartrecruiters\.com/
+            /smartrecruiters\.com/,
+            /icims\.com/,
+            /breezy\.hr/
         ];
         return recruitingPatterns.some(pattern => pattern.test(window.location.hostname)) ||
                document.querySelector("iframe[src*='greenhouse.io'], iframe[src*='lever.co'], iframe[src*='myworkdayjobs.com'], iframe[src*='workday.com'], iframe[src*='smartrecruiters.com']");
