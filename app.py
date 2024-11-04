@@ -9,12 +9,26 @@ from src.autofill import extract_form_elements, parse_html_with_gpt, map_fields_
 app = Flask(__name__)
 CORS(app)
 
+resume_path = "data/CV_Kaihui_Xie.pdf"
+
 # Load user information
-with open('data/user_info.json', 'r') as f:
-    user_info = json.load(f)
+def get_user_info():
+    from src.autofill.parse_resume import parse_resume
+    if os.path.exists("data/user_info.json"):
+        print("existing user_info.json=======")
+        with open('data/user_info.json', 'r') as f:
+            return json.load(f)
+    else:
+        print("new user_info.json*******")
+        with open('data/user_info.json', 'w') as f:
+            info = parse_resume(resume_path)
+            f.write(json.dumps(info, indent=4))
+            return info
+
 
 @app.route('/process_html', methods=['POST'])
 def process_html():
+    user_info = get_user_info()
     data = request.get_json()
     print('1111')
     html_content = data.get('html', '')
@@ -27,6 +41,7 @@ def process_html():
     if not parsed_fields:
         return jsonify({'error': 'Failed to parse fields from HTML.'}), 500
     mapped_fields = map_fields_to_user_info(parsed_fields, user_info)
+    print(mapped_fields)
     return jsonify({'fields': mapped_fields})
 
 @app.route('/get_resume', methods=['GET'])
@@ -35,7 +50,7 @@ def get_resume():
         #resume_path = os.path.abspath('CV_Kaihui_Xie.pdf')
         #print(resume_path)
         #print(find_key(user_info, 'resume'))
-        return send_file(find_key(user_info, 'resume'), as_attachment=True)
+        return send_file(resume_path, as_attachment=True)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

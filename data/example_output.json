@@ -1,0 +1,159 @@
+{
+  "title": "Title",
+  "first_name": "First Name",
+  "middle_name": "Middle Name",
+  "last_name": "Last Name",
+  "phone": {
+    "country_code": "Country Code",
+    "number": "Numeric Phone Number"
+  },
+  "email": "Email Address",
+  "location": {
+    "address_1": "Primary Address Line",
+    "address_2": "Secondary Address Line",
+    "city": "City",
+    "state": "State or Region",
+    "postal_code": "Postal Code",
+    "country": "Country"
+  },
+  "linkedin": "LinkedIn URL",
+  "github": "GitHub URL",
+  "website": "Personal Website URL",
+  "summary": "Brief summary or objective if available",
+  "education": [
+    {
+      "school": "School Name",
+      "location": {
+        "address_1": "Primary Address Line",
+        "address_2": "Secondary Address Line",
+        "city": "City",
+        "state": "State or Region",
+        "postal_code": "Postal Code",
+        "country": "Country"
+      },
+      "degree": "Degree",
+      "gpa": {
+        "gpa_score": "GPA Score",
+        "gpa_scale": "GPA Scale"
+      },
+      "start_date": {
+        "day": "Start Day",
+        "month": "Start Month",
+        "year": "Start Year"
+      },
+      "end_date": {
+        "day": "End Day",
+        "month": "End Month",
+        "year": "End Year"
+      },
+      "details": {
+        "relevant_courses": [
+          "Course1",
+          "Course2",
+          ...
+        ],
+        "other_details": "Additional details if available"
+      }
+    },
+    ...
+  ],
+  "skills": {
+    "programming_languages": [
+      "Language1",
+      "Language2",
+      ...
+    ],
+    "web_development": [
+      "Framework1",
+      "Framework2",
+      ...
+    ],
+    "machine_learning_frameworks": [
+      "Framework1",
+      "Framework2",
+      ...
+    ],
+    "databases": [
+      "Database1",
+      "Database2",
+      ...
+    ],
+    "data_analysis_tools": [
+      "Tool1",
+      "Tool2",
+      ...
+    ],
+    "version_control": [
+      "Tool1",
+      "Tool2",
+      ...
+    ],
+    "languages": [
+      "Language1",
+      "Language2",
+      ...
+    ]
+  },
+  "experience": [
+    {
+      "title": "Job Title",
+      "company": "Company Name",
+      "department": "Department Name",
+      "location": {
+        "address_1": "Primary Address Line",
+        "address_2": "Secondary Address Line",
+        "city": "City",
+        "state": "State or Region",
+        "postal_code": "Postal Code",
+        "country": "Country"
+      },
+      "start_date": {
+        "day": "Start Day",
+        "month": "Start Month",
+        "year": "Start Year"
+      },
+      "end_date": {
+        "day": "End Day",
+        "month": "End Month",
+        "year": "End Year"
+      },
+      "responsibilities": [
+        "Responsibility1",
+        "Responsibility2",
+        ...
+      ]
+    },
+    ...
+  ],
+  "projects": [
+    {
+      "title": "Project Title",
+      "course": "Course Name or Type",
+      "school": "School or Organization",
+      "location": {
+        "address_1": "Primary Address Line",
+        "address_2": "Secondary Address Line",
+        "city": "City",
+        "state": "State or Region",
+        "postal_code": "Postal Code",
+        "country": "Country"
+      },
+      "start_date": {
+        "day": "Start Day",
+        "month": "Start Month",
+        "year": "Start Year"
+      },
+      "end_date": {
+        "day": "End Day",
+        "month": "End Month",
+        "year": "End Year"
+      },
+      "details": [
+        "Detail1",
+        "Detail2",
+        ...
+      ]
+    },
+    ...
+  ]
+}

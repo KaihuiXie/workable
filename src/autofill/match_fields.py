@@ -2,7 +2,7 @@ import json
 import openai
 from bs4 import BeautifulSoup
 
-from .prompt import get_prompt
+from .prompt import get_match_prompt
 
 
 # Set your OpenAI API key
@@ -20,16 +20,17 @@ def extract_form_elements(html_content):
 
 
 def parse_html_with_gpt(simplified_html, user_info):
-    prompt = get_prompt(simplified_html, user_info)
+    print(simplified_html)
+    prompt = get_match_prompt(simplified_html, user_info)
 
     try:
-        print('parsing...')
+        print('parsing html...')
         response = openai.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini-2024-07-18",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.2
         )
-        print('parsed')
+        print('===html parsed')
         # print(response)
         # print(type(response))
 
@@ -39,7 +40,7 @@ def parse_html_with_gpt(simplified_html, user_info):
         # print(parsed_fields)
         return parsed_fields
     except Exception as e:
-        print(f"Error in GPT API call: {e}")
+        print(f"Error in GPT API call during field matching: {e}")
         return None
 
 

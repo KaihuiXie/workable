@@ -1,156 +1,291 @@
 {
-  "full_name": "Kaihui Xie",
-  "first_name": "Kaihui",
-  "last_name": "Xie",
-  "contact": {
-    "phone": "(510) 710-3028",
+    "title": null,
+    "first_name": "Kaihui",
+    "middle_name": null,
+    "last_name": "Xie",
+    "phone": {
+        "country_code": "+1",
+        "number": "5107103028"
+    },
     "email": "kaihui_xie@berkeley.edu",
-    "location": "San Francisco Bay Area, CA",
-    "linkedin": "linkedin.com/in/kaihui-xie"
-  },
-  "education": [
-    {
-      "institution": "University of California, Berkeley",
-      "location": "Berkeley, CA",
-      "degree": "Master of Analytics",
-      "gpa": "3.88/4.0",
-      "start_date": "08/2023",
-      "end_date": "08/2024",
-      "relevant_courses": [
-        "Database",
-        "Machine Learning",
-        "Deep Learning",
-        "Supply Chain",
-        "Financial Engineering",
-        "Optimization"
-      ]
+    "location": {
+        "address_1": null,
+        "address_2": null,
+        "city": "San Francisco Bay Area",
+        "state": "CA",
+        "postal_code": null,
+        "country": "USA"
     },
-    {
-      "institution": "Southeast University",
-      "location": "Nanjing, China",
-      "degree": "Bachelor of Management, Electronic Business",
-      "gpa": "3.72/4.0",
-      "start_date": "2019",
-      "end_date": "2023",
-      "relevant_courses": [
-        "Data Structures",
-        "Operations Research",
-        "Data Mining",
-        "Big Data Analysis",
-        "Statistical Inference",
-        "UI",
-        "MIS"
-      ]
-    }
-  ],
-  "skills": {
-    "programming_languages": [
-      "Python",
-      "JavaScript",
-      "C",
-      "SQL",
-      "Java",
-      "R"
+    "linkedin": "linkedin.com/in/kaihui-xie",
+    "github": null,
+    "website": null,
+    "summary": null,
+    "education": [
+        {
+            "school": "University of California, Berkeley",
+            "location": {
+                "address_1": null,
+                "address_2": null,
+                "city": "Berkeley",
+                "state": "CA",
+                "postal_code": null,
+                "country": "USA"
+            },
+            "degree": "Master of Analytics",
+            "gpa": {
+                "gpa_score": "3.88",
+                "gpa_scale": "4.0"
+            },
+            "start_date": {
+                "day": null,
+                "month": "08",
+                "year": "2023"
+            },
+            "end_date": {
+                "day": null,
+                "month": "08",
+                "year": "2024"
+            },
+            "details": {
+                "relevant_courses": [
+                    "Database",
+                    "Machine Learning",
+                    "Deep Learning",
+                    "Supply Chain",
+                    "Financial Engineering",
+                    "Optimization"
+                ],
+                "other_details": null
+            }
+        },
+        {
+            "school": "Southeast University",
+            "location": {
+                "address_1": null,
+                "address_2": null,
+                "city": "Nanjing",
+                "state": null,
+                "postal_code": null,
+                "country": "China"
+            },
+            "degree": "Bachelor of Management",
+            "gpa": {
+                "gpa_score": "3.72",
+                "gpa_scale": "4.0"
+            },
+            "start_date": {
+                "day": null,
+                "month": null,
+                "year": "2019"
+            },
+            "end_date": {
+                "day": null,
+                "month": null,
+                "year": "2023"
+            },
+            "details": {
+                "relevant_courses": [
+                    "Data Structures",
+                    "Operations Research",
+                    "Data Mining",
+                    "Big Data Analysis",
+                    "Statistical Inference",
+                    "UI",
+                    "MIS"
+                ],
+                "other_details": null
+            }
+        }
     ],
-    "web_development": [
-      "Flask",
-      "Node.js",
-      "HTML",
-      "CSS"
-    ],
-    "machine_learning_frameworks": [
-      "PyTorch",
-      "TensorFlow",
-      "Scikit-Learn",
-      "Keras"
-    ],
-    "databases": [
-      "MySQL",
-      "Microsoft SQL Server",
-      "MongoDB",
-      "Google Cloud"
-    ],
-    "data_analysis_tools": [
-      "Pandas",
-      "Matplotlib",
-      "Seaborn",
-      "Excel",
-      "Tableau"
-    ],
-    "version_control": ["GitHub", "Docker"],
-    "languages": ["Chinese", "English", "French"]
-  },
-  "experience": [
-    {
-      "title": "Machine Learning Engineer Intern",
-      "company": "Silicon Valley Commerce",
-      "location": "Berkeley, CA",
-      "start_date": "05/2024",
-      "end_date": "present",
-      "responsibilities": [
-        "Developed a web scraping tool using Tampermonkey, Python, and MySQL to automate data collection from e-commerce platforms",
-        "Built an automated platform using LLMs (GPT-4, Stable Diffusion) to generate A+ content for Amazon listings, increasing conversion rates by 10%-25%",
-        "Leveraged Flask and Node.js to design the back-end infrastructure",
-        "Utilized GitHub for version control and collaboration",
-        "Performed prompt engineering and fine-tuning techniques for the automatic A+ content generator",
-        "Conducted A/B testing to ensure model robustness and accuracy"
-      ]
+    "skills": {
+        "programming_languages": [
+            "Python",
+            "JavaScript",
+            "C",
+            "SQL",
+            "Java",
+            "R"
+        ],
+        "web_development": [
+            "Flask",
+            "Node.js",
+            "HTML",
+            "CSS"
+        ],
+        "machine_learning_frameworks": [
+            "PyTorch",
+            "TensorFlow",
+            "Scikit-Learn",
+            "Keras"
+        ],
+        "databases": [
+            "MySQL",
+            "Microsoft SQL Server",
+            "MongoDB",
+            "Google Cloud"
+        ],
+        "data_analysis_tools": [
+            "Pandas",
+            "Matplotlib",
+            "Seaborn",
+            "Excel",
+            "Tableau"
+        ],
+        "version_control": [
+            "GitHub",
+            "Docker"
+        ],
+        "languages": [
+            "Chinese",
+            "English",
+            "French"
+        ]
     },
-    {
-      "title": "Consulting Intern, HR Consulting (Automobile Team)",
-      "company": "Mercer",
-      "location": "Shanghai, China",
-      "start_date": "06/2022",
-      "end_date": "08/2022",
-      "responsibilities": [
-        "Developed and implemented a data pipeline using Python to screen compensation data and perform quantile regression calculations",
-        "Conducted data cleansing and corrected over 200 errors, enhancing data accuracy by 15%",
-        "Matched over 20,000 position titles for talent research projects",
-        "Drafted a 22-page industry report on talent trends influenced by electric vehicle and autonomous driving technologies"
-      ]
-    },
-    {
-      "title": "Intern, Financial Services Department",
-      "company": "China Galaxy Securities Co.Ltd.",
-      "location": "Nanning, China",
-      "start_date": "07/2021",
-      "end_date": "07/2021",
-      "responsibilities": [
-        "Automated short-term stock selection using a Python-based application with Tencent Finance API",
-        "Created a user-friendly interface with TkInter for the stock selection tool",
-        "Produced investment strategy visualizations for stakeholder communication"
-      ]
-    }
-  ],
-  "projects": [
-    {
-      "title": "Predictive Analytics for Soccer Performance",
-      "course": "Analytics Lab",
-      "institution": "University of California, Berkeley",
-      "start_date": "01/2024",
-      "end_date": "05/2024",
-      "details": [
-        "Developed a data pipeline and utilized OOP principles in Python to process soccer event data",
-        "Used PyTorch framework and ensemble learning with Random Forest, XGBoost, and CNN to predict expected goals and passing success",
-        "Created an interactive website using Streamlit for performance analysis"
-      ]
-    },
-    {
-      "title": "Aspect-Based Analysis of User Reviews' Impact on Online Healthcare Consultations",
-      "type": "Graduation Dissertation",
-      "institution": "Southeast University",
-      "start_date": "12/2022",
-      "end_date": "05/2023",
-      "details": [
-        "Scraped 5M+ consultation records and 1M+ reviews from an online healthcare app",
-        "Utilized LCF-ATEPC method with BERT model for sentiment analysis",
-        "Clustered 14 categories of aspect words and analyzed their impact using linear regression"
-      ]
-    }
-  ],
-  "resume": "/Users/theodorexie/Documents/Projects/GitHub/workable/data/CV_Kaihui_Xie.pdf",
-  "cover_letter": "E:\\projects\\workable\\data\\Cover Letter.pdf",
-  "visa_sponsorship": "True",
-  "work_authorization_us": "True",
-  "referral": "False"
+    "experience": [
+        {
+            "title": "Machine Learning Engineer Intern",
+            "company": "Silicon Valley Commerce",
+            "department": null,
+            "location": {
+                "address_1": null,
+                "address_2": null,
+                "city": "Berkeley",
+                "state": "CA",
+                "postal_code": null,
+                "country": "USA"
+            },
+            "start_date": {
+                "day": "05",
+                "month": "05",
+                "year": "2024"
+            },
+            "end_date": {
+                "day": null,
+                "month": null,
+                "year": "present"
+            },
+            "responsibilities": [
+                "Developed a web scraping tool using Tampermonkey, Python, and MySQL to automate data collection from e-commerce platforms, significantly reducing the manual research efforts",
+                "Built an automated platform using LLMs (GPT-4o, Stable Diffusion) to generate A+ content for Amazon listings and leveraged Flask and Node.js to design the back-end infrastructure, increasing conversion rates by 10%-25%",
+                "Utilized GitHub for version control and collaboration, ensuring smooth project management and teamwork",
+                "Performed prompt engineering and fine-tuning techniques to the automatic A+ content generator, resulting in a 45% increase in graphic designer and quality control approval rate",
+                "Conducted A/B testing to ensure the robustness and accuracy of deployed models"
+            ]
+        },
+        {
+            "title": "Consulting Intern, HR Consulting (Automobile team)",
+            "company": "Mercer",
+            "department": null,
+            "location": {
+                "address_1": null,
+                "address_2": null,
+                "city": "Shanghai",
+                "state": null,
+                "postal_code": null,
+                "country": "China"
+            },
+            "start_date": {
+                "day": "06",
+                "month": "06",
+                "year": "2022"
+            },
+            "end_date": {
+                "day": "08",
+                "month": "08",
+                "year": "2022"
+            },
+            "responsibilities": [
+                "Developed and implemented a data pipeline using Python to screen compensation data and perform quantile regression calculations, significantly improving the precision of compensation strategies",
+                "Conducted a meticulous data cleansing process, identified and corrected over 200 errors in compensation surveys, enhancing data accuracy by 15%",
+                "Participated in data preparation and matched over 20,000 position titles for automobile industry talent research projects",
+                "Drafted a 22-page industry report on talent trends influenced by electric vehicle and autonomous driving technologies"
+            ]
+        },
+        {
+            "title": "Intern, Financial Services Department",
+            "company": "China Galaxy Securities Co.Ltd.",
+            "department": null,
+            "location": {
+                "address_1": null,
+                "address_2": null,
+                "city": "Nanning",
+                "state": null,
+                "postal_code": null,
+                "country": "China"
+            },
+            "start_date": {
+                "day": "07",
+                "month": "07",
+                "year": "2021"
+            },
+            "end_date": {
+                "day": null,
+                "month": null,
+                "year": null
+            },
+            "responsibilities": [
+                "Automated short-term stock selection by innovatively proposing and creating a Python-based application using Tencent Finance API, greatly improving stock selection efficiency and accuracy, available on GitHub",
+                "Created a user-friendly interface with TkInter for the stock selection tool, facilitating non-technical user interaction",
+                "Assisted in creating investment strategy visualizations by producing 5 detailed charts and reports, used to communicate key findings to stakeholders, reinforcing customer relations and data-driven decision-making"
+            ]
+        }
+    ],
+    "projects": [
+        {
+            "title": "Predictive Analytics for Soccer Performance",
+            "course": "Analytics Lab Course Project",
+            "school": "University of California, Berkeley",
+            "location": {
+                "address_1": null,
+                "address_2": null,
+                "city": "Berkeley",
+                "state": "CA",
+                "postal_code": null,
+                "country": "USA"
+            },
+            "start_date": {
+                "day": "01",
+                "month": "01",
+                "year": "2024"
+            },
+            "end_date": {
+                "day": "05",
+                "month": "05",
+                "year": "2024"
+            },
+            "details": [
+                "Developed a robust data pipeline and utilized OOP principles in Python to acquire and process soccer event data sourced through the Statsbomb API for machine learning model training",
+                "Performed feature engineering and used PyTorch framework to implement ensemble learning with algorithms including Random Forest, XGBoost, and CNN to predict expected goals and passing success, improving recall by 15%",
+                "Created an interactive website using Streamlit that enables users to upload event data and explore detailed performance analyses for teams and individual players, with customizable metrics for performance tuning"
+            ]
+        },
+        {
+            "title": "Aspect-Based Analysis of User Reviews' Impact on Online Healthcare Consultations",
+            "course": "Graduation Dissertation",
+            "school": "Southeast University",
+            "location": {
+                "address_1": null,
+                "address_2": null,
+                "city": "Nanjing",
+                "state": null,
+                "postal_code": null,
+                "country": "China"
+            },
+            "start_date": {
+                "day": "12",
+                "month": "12",
+                "year": "2022"
+            },
+            "end_date": {
+                "day": "05",
+                "month": "05",
+                "year": "2023"
+            },
+            "details": [
+                "Scraped 5M+ consultation records and 1M+ reviews from an online healthcare APP and removed irrelevant symbols",
+                "Utilized LCF-ATEPC, an aspect-based sentiment analysis method integrated with a domain-adapted BERT model, to extract aspect words and predict their sentiments",
+                "Clustered 14 categories of synonymous aspect words as impact factors using K-Means and analyzed the impact of each category on doctor consultation using linear regression"
+            ]
+        }
+    ]
 }
