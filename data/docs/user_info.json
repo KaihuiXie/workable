@@ -1,0 +1,167 @@
+{
+  "full_name": "Kaihui Xie",
+  "first_name": "Kaihui",
+  "last_name": "Xie",
+  "contact": {
+    "phone": "(510) 710-3028",
+    "email": "kaihui_xie@berkeley.edu",
+    "location": "San Francisco Bay Area, CA",
+    "linkedin": "linkedin.com/in/kaihui-xie"
+  },
+  "summary": "",
+  "education": [
+    {
+      "school": "University of California, Berkeley",
+      "location": "Berkeley, CA",
+      "degree": "Master of Analytics",
+      "gpa": "3.88",
+      "scale": "4.0",
+      "start_date_day": "",
+      "start_date_month": "08",
+      "start_date_year": "2023",
+      "end_date_day": "",
+      "end_date_month": "08",
+      "end_date": "2024",
+      "relevant_courses": [
+        "Database",
+        "Machine Learning",
+        "Deep Learning",
+        "Supply Chain",
+        "Financial Engineering",
+        "Optimization"
+      ]
+    },
+    {
+      "school": "Southeast University",
+      "location": "Nanjing, China",
+      "degree": "Bachelor of Management, Electronic Business",
+      "gpa": "3.72",
+      "scale": "4.0",
+      "start_date_day": "",
+      "start_date_month": "",
+      "start_date_year": "2019",
+      "end_date_day": "",
+      "end_date_month": "",
+      "end_date_year": "2023",
+      "relevant_courses": [
+        "Data Structures",
+        "Operations Research",
+        "Data Mining",
+        "Big Data Analysis",
+        "Statistical Inference",
+        "UI",
+        "MIS"
+      ]
+    }
+  ],
+  "skills": {
+    "programming_languages": [
+      "Python",
+      "JavaScript",
+      "C",
+      "SQL",
+      "Java",
+      "R"
+    ],
+    "web_development": [
+      "Flask",
+      "Node.js",
+      "HTML",
+      "CSS"
+    ],
+    "machine_learning_frameworks": [
+      "PyTorch",
+      "TensorFlow",
+      "Scikit-Learn",
+      "Keras"
+    ],
+    "databases": [
+      "MySQL",
+      "Microsoft SQL Server",
+      "MongoDB",
+      "Google Cloud"
+    ],
+    "data_analysis_tools": [
+      "Pandas",
+      "Matplotlib",
+      "Seaborn",
+      "Excel",
+      "Tableau"
+    ],
+    "version_control": ["GitHub", "Docker"],
+    "languages": ["Chinese", "English", "French"]
+  },
+  "experience": [
+    {
+      "title": "Machine Learning Engineer Intern",
+      "company": "Silicon Valley Commerce",
+      "location": "Berkeley, CA",
+      "start_date": "05/2024",
+      "end_date": "present",
+      "responsibilities": [
+        "Developed a web scraping tool using Tampermonkey, Python, and MySQL to automate data collection from e-commerce platforms",
+        "Built an automated platform using LLMs (GPT-4, Stable Diffusion) to generate A+ content for Amazon listings, increasing conversion rates by 10%-25%",
+        "Leveraged Flask and Node.js to design the back-end infrastructure",
+        "Utilized GitHub for version control and collaboration",
+        "Performed prompt engineering and fine-tuning techniques for the automatic A+ content generator",
+        "Conducted A/B testing to ensure model robustness and accuracy"
+      ]
+    },
+    {
+      "title": "Consulting Intern, HR Consulting (Automobile Team)",
+      "company": "Mercer",
+      "location": "Shanghai, China",
+      "start_date": "06/2022",
+      "end_date": "08/2022",
+      "responsibilities": [
+        "Developed and implemented a data pipeline using Python to screen compensation data and perform quantile regression calculations",
+        "Conducted data cleansing and corrected over 200 errors, enhancing data accuracy by 15%",
+        "Matched over 20,000 position titles for talent research projects",
+        "Drafted a 22-page industry report on talent trends influenced by electric vehicle and autonomous driving technologies"
+      ]
+    },
+    {
+      "title": "Intern, Financial Services Department",
+      "company": "China Galaxy Securities Co.Ltd.",
+      "location": "Nanning, China",
+      "start_date": "07/2021",
+      "end_date": "07/2021",
+      "responsibilities": [
+        "Automated short-term stock selection using a Python-based application with Tencent Finance API",
+        "Created a user-friendly interface with TkInter for the stock selection tool",
+        "Produced investment strategy visualizations for stakeholder communication"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "title": "Predictive Analytics for Soccer Performance",
+      "course": "Analytics Lab",
+      "institution": "University of California, Berkeley",
+      "start_date": "01/2024",
+      "end_date": "05/2024",
+      "details": [
+        "Developed a data pipeline and utilized OOP principles in Python to process soccer event data",
+        "Used PyTorch framework and ensemble learning with Random Forest, XGBoost, and CNN to predict expected goals and passing success",
+        "Created an interactive website using Streamlit for performance analysis"
+      ]
+    },
+    {
+      "title": "Aspect-Based Analysis of User Reviews' Impact on Online Healthcare Consultations",
+      "type": "Graduation Dissertation",
+      "institution": "Southeast University",
+      "start_date": "12/2022",
+      "end_date": "05/2023",
+      "details": [
+        "Scraped 5M+ consultation records and 1M+ reviews from an online healthcare app",
+        "Utilized LCF-ATEPC method with BERT model for sentiment analysis",
+        "Clustered 14 categories of aspect words and analyzed their impact using linear regression"
+      ]
+    }
+  ],
+  "resume": "/Users/theodorexie/Documents/Projects/GitHub/workable/data/CV_Kaihui_Xie.pdf",
+  "cover_letter": "E:\\projects\\workable\\data\\Cover Letter.pdf",
+  "visa_sponsorship": "True",
+  "work_authorization_us": "True",
+  "referral": "False"
+}

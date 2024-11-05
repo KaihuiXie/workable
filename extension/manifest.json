@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Resume Autofill Extension",
+  "version": "1.0",
+  "description": "Automatically fills out resume information on job application pages.",
+  "permissions": ["scripting", "activeTab", "unlimitedStorage", "storage", "tabs", "clipboardWrite"],
+  "host_permissions": ["http://localhost:8080/*"],
+  "background": {
+    "service_worker": "background/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "all_frames": true,
+      "matches": ["*://*/*"],
+      "js": ["content/content-wrapper.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self';"
+   },
+  "web_accessible_resources": [
+    {
+      "matches": ["https://*/*"],
+      "resources": ["scripts/api.js", "scripts/autofill.js", "content/content.js"],
+      "use_dynamic_url": false
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html"
+  }
+}

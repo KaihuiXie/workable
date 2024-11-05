@@ -3,10 +3,8 @@
     "first_name": "Kaihui",
     "middle_name": null,
     "last_name": "Xie",
-    "phone": {
-        "country_code": "+1",
-        "number": "5107103028"
-    },
+    "phone": "5107103028",
+    "country_code": "+1",
     "email": "kaihui_xie@berkeley.edu",
     "location": {
         "address_1": null,

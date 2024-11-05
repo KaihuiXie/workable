@@ -22,10 +22,8 @@ Use the following schema:
   "first_name": "First Name",
   "middle_name": "Middle Name",
   "last_name": "Last Name",
-  "phone": {
-    "country_code": "Country Code",
-    "number": "Numeric Phone Number"
-  },
+  "phone": "Numeric Phone Number",
+  "country_code": "Phone number Country Code", 
   "email": "Email Address",
   "location": {
     "address_1": "Primary Address Line",

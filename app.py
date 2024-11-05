@@ -33,7 +33,7 @@ def process_html():
     print('1111')
     html_content = data.get('html', '')
     print('2222')
-    simplified_html = extract_form_elements(html_content)
+    simplified_html = html_content#extract_form_elements(html_content)
     print('3333')
     parsed_fields = parse_html_with_gpt(simplified_html, user_info)
     #json.dump(parsed_fields, open('parsed_fields.json', 'w'))

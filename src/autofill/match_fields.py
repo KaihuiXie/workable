@@ -19,9 +19,9 @@ def extract_form_elements(html_content):
     return str(form)
 
 
-def parse_html_with_gpt(simplified_html, user_info):
-    print(simplified_html)
-    prompt = get_match_prompt(simplified_html, user_info)
+def parse_html_with_gpt(html, user_info):
+    print(html)
+    prompt = get_match_prompt(html, user_info)
 
     try:
         print('parsing html...')

@@ -4,7 +4,7 @@ match_prompt = f"""
         Given the following HTML form:
 
         ```
-        {{simplified_html}}
+        {{html}}
         ```
 
         Identify all input fields that a user needs to fill in. For each field, provide:
