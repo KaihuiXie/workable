@@ -19,6 +19,7 @@ Use the following schema:
 
 {
   "title": "Title",
+  "full_name": "<NAME>",
   "first_name": "First Name",
   "middle_name": "Middle Name",
   "last_name": "Last Name",

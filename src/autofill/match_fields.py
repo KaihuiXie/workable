@@ -20,7 +20,7 @@ def extract_form_elements(html_content):
 
 
 def parse_html_with_gpt(html, user_info):
-    print(html)
+    #print(html)
     prompt = get_match_prompt(html, user_info)
 
     try:

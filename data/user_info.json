@@ -1,5 +1,6 @@
 {
     "title": null,
+    "full_name": "Kaihui Xie",
     "first_name": "Kaihui",
     "middle_name": null,
     "last_name": "Xie",
@@ -15,7 +16,7 @@
         "country": "USA"
     },
     "linkedin": "linkedin.com/in/kaihui-xie",
-    "github": null,
+    "github": "https://github.com/KaihuiXie",
     "website": null,
     "summary": null,
     "education": [
@@ -285,5 +286,15 @@
                 "Clustered 14 categories of synonymous aspect words as impact factors using K-Means and analyzed the impact of each category on doctor consultation using linear regression"
             ]
         }
-    ]
+    ],
+    "current_company": "Silicon Valley Commerce",
+    "sponsorship": "Yes",
+    "legally_work": "Yes",
+    "where_hear_from": "Linkedin",
+    "in_office": "Yes",
+    "gender": "Male",
+    "is_hispanic_latino": "No",
+    "race": "Asian",
+    "veteran_status": "I am not a protected veteran",
+    "disability": "No, I do not have a disability and have not had one in the past"
 }

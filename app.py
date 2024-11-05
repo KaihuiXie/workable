@@ -42,6 +42,7 @@ def process_html():
         return jsonify({'error': 'Failed to parse fields from HTML.'}), 500
     mapped_fields = map_fields_to_user_info(parsed_fields, user_info)
     print(mapped_fields)
+    #print(parsed_fields)
     return jsonify({'fields': mapped_fields})
 
 @app.route('/get_resume', methods=['GET'])
