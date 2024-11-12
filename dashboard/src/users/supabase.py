@@ -4,12 +4,12 @@ class UsersSupabase:
     def __init__(self, url, key):
         self.supabase: Client = create_client(url, key)
     
-    def sign_in_with_password(self, email, password):
+    def sign_in_with_password(self, email):
         response = (
             self.supabase
                 .table("users")
                 .select("*")
-                .match({"email": email, "password": password})
+                .match({"email": email})
                 .execute()
         )
         if response.data:
@@ -21,7 +21,6 @@ class UsersSupabase:
     def sign_up_with_email(self, email, password, name):
         if self.has_user(email):
             return None
-        
         response = (
             self.supabase
             .table("users")
@@ -32,7 +31,7 @@ class UsersSupabase:
             return response
         else:
             print("Error occurred during insertion.")
-            return None  # Handle as needed
+            return None
 
 
     def has_user(self, email):

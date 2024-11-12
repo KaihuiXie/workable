@@ -1,22 +1,16 @@
 from typing import Optional
-from pydantic import BaseModel
+from marshmallow import Schema, fields
 
-class UserInfo(BaseModel):
-    user_id: int
-    email: str
-    token: str
-    name: Optional[str] = None
+# Define Marshmallow schema
+class SignInRequestSchema(Schema):
+    email = fields.Email(required=True)
+    password = fields.String(required=True)
+    name = fields.Str(required=False, allow_none=True)
 
-class LoginResponse(BaseModel):
-    user_info: UserInfo
+class UserInfoSchema(Schema):
+    user_id = fields.Int(required=True)
+    email = fields.Str(required=True)
+    name = fields.Str(required=False, allow_none=True)
+    token = fields.Str(required=True)
 
-class SignUpRequest(BaseModel):
-    name: str
-    email: str
-    password: str
-
-class SignInRequest(BaseModel):
-    name: str
-    email: str
-    password: str
     
