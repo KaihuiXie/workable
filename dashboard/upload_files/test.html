@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hidden Input with Select2</title>
+  <!-- Include jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Include Select2 CSS and JS -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+</head>
+<body>
+  <!-- Visible Select2 Dropdown -->
+  <select id="school-dropdown" class="school-name" style="width: 60%;">
+    <option value="">Select a School</option>
+    <option value="1">Harvard University</option>
+    <option value="2">Stanford University</option>
+    <option value="3">MIT</option>
+  </select>
+
+  <!-- Hidden Input -->
+  <input type="hidden" name="job_application[educations][][school_name_id]" 
+         id="education_school_name_0" 
+         class="school-name background-field" 
+         placeholder="Select a School" 
+         aria-required="true" 
+         data-url="https://boards-api.greenhouse.io/v1/boards/appliedintuition/education/schools" 
+         data-validators='[{ "type": "notBlank", "key": "SchoolNameRequired" }]' 
+         tabindex="-1" 
+         value="">
+
+  <script>
+    $(document).ready(function() {
+      // Initialize Select2
+      $('#school-dropdown').select2();
+
+      // Sync the hidden input value with the selected value in the dropdown
+      $('#school-dropdown').on('change', function() {
+        var selectedValue = $(this).val(); // Get the selected value
+        $('#education_school_name_0').val(selectedValue); // Update the hidden input
+      });
+    });
+  </script>
+</body>
+</html>

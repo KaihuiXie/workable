@@ -6,23 +6,23 @@
       </div>
       <div class="card-body text-center">
         <h4>Welcome back, {{ userName }}!</h4>
-        <p>You have successfully logged in.</p>
-
-        <!-- Show logout button -->
-        <button @click="logout" class="btn btn-danger w-100 mt-3">
-          Logout
-        </button>
+        <FileUpload @fileUploaded="fetchFiles" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import FileUpload from "../components/FileUpload.vue";
+
 export default {
   data() {
     return {
       userName: "",
     };
+  },
+  components: {
+    FileUpload,
   },
 };
 </script>
