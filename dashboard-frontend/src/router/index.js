@@ -1,23 +1,23 @@
 import { createRouter, createWebHistory } from "vue-router";
-import LoginCmpt from "../views/LoginCmpt.vue";
-import RegisterCmpt from "../views/RegisterCmpt.vue";
-import HomePageCmpt from "../views/HomePageCmpt.vue";
+import LoginPage from "../views/LoginPage.vue";
+import RegisterPage from "../views/RegisterPage.vue";
+import HomePage from "../views/HomePage.vue";
 
 const routes = [
   {
     path: "/login",
-    name: "login",
-    component: LoginCmpt,
+    name: "loginPage",
+    component: LoginPage,
   },
   {
     path: "/register",
-    name: "register",
-    component: RegisterCmpt,
+    name: "registerPage",
+    component: RegisterPage,
   },
   {
     path: "/homePage",
     name: "homePage",
-    component: HomePageCmpt,
+    component: HomePage,
   },
 ];
 
