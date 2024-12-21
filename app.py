@@ -9,7 +9,7 @@ from src.autofill import extract_form_elements, parse_html_with_gpt, map_fields_
 app = Flask(__name__)
 CORS(app)
 
-resume_path = "data/CV_Kaihui_Xie.pdf"
+resume_path = "data/CV_Theo_Xie.pdf"
 
 # Load user information
 def get_user_info():

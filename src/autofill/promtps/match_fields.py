@@ -20,6 +20,7 @@ try to align "key" with the user information json file's keys when you are figur
 3. Sometimes, in blanks with options, the values from user_info that you need to assign to the fields are not exactly the same as the options in the field. you might get the value first and then think of the most close meaning option to the value. return that option as value.
 4. remember don't make up any answers.
 5. If there is a blank for current company, find the company name when the date as present or use value 'None' if there aren't any. 
+6. try to find the education like school and degree if there are any
 
 Ensure the CSS selector is accurate and can be used in document.querySelector().
 

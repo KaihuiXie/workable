@@ -4,13 +4,14 @@
     "first_name": "Kaihui",
     "middle_name": null,
     "last_name": "Xie",
+    "preferred_name": "Theo",
     "phone": "5107103028",
     "country_code": "+1",
     "email": "kaihui_xie@berkeley.edu",
     "location": {
         "address_1": null,
         "address_2": null,
-        "city": "San Francisco Bay Area",
+        "city": "Emeryville",
         "state": "CA",
         "postal_code": null,
         "country": "USA"
@@ -21,7 +22,7 @@
     "summary": null,
     "education": [
         {
-            "school": "University of California, Berkeley",
+            "school": "University of California - Berkeley",
             "location": {
                 "address_1": null,
                 "address_2": null,
@@ -30,7 +31,8 @@
                 "postal_code": null,
                 "country": "USA"
             },
-            "degree": "Master of Analytics",
+            "degree": "Master's Degree",
+            "discipline": "Operations Research & Strategy",
             "gpa": {
                 "gpa_score": "3.88",
                 "gpa_scale": "4.0"
@@ -67,7 +69,8 @@
                 "postal_code": null,
                 "country": "China"
             },
-            "degree": "Bachelor of Management",
+            "degree": "Bachelor's Degree",
+            "discipline": "Business",
             "gpa": {
                 "gpa_score": "3.72",
                 "gpa_scale": "4.0"

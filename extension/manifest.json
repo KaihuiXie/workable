@@ -13,7 +13,10 @@
     {
       "all_frames": true,
       "matches": ["*://*/*"],
-      "js": ["content/content-wrapper.js"],
+      "js": [
+        "scripts/jquery.min.js",
+        "content/content-wrapper.js"
+      ],
       "run_at": "document_end"
     }
   ],

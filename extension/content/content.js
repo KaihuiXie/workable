@@ -3,13 +3,15 @@ import { autofillForm } from '../scripts/autofill.js';
 
 function isRecruitingSite() {
   const recruitingPatterns = [
-    /greenhouse\.io/,
-    /lever\.co/,
-    /myworkdayjobs\.com/,
-    /workday\.com/,
-    /smartrecruiters\.com/,
-    /icims\.com/,
-    /breezy\.hr/
+      /greenhouse\.io/,
+      /lever\.co/,
+      /myworkdayjobs\.com/,
+      /workday\.com/,
+      /smartrecruiters\.com/,
+      /icims\.com/,
+      /breezy\.hr/,
+      /jobvite\.com/,
+      /rippling\.com/
   ];
   return recruitingPatterns.some(pattern => pattern.test(window.location.hostname)) ||
          document.querySelector("iframe[src*='greenhouse.io'], iframe[src*='lever.co'], iframe[src*='myworkdayjobs.com'], iframe[src*='workday.com'], iframe[src*='smartrecruiters.com']");
